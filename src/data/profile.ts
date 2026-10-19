@@ -19,7 +19,7 @@ export const profile: Profile = {
   linkedin: "https://www.linkedin.com/in/josesanchezaldana",
 };
 
-// Datos breves para "Sobre mí" (formación e idiomas: perfil de LinkedIn).
+// Datos breves para "Sobre mí" (formación, idiomas y habilidades: CV y perfil de LinkedIn).
 // Añade aquí tu enfoque, intereses, forma de trabajar y objetivos.
 export const aboutFacts: AboutFact[] = [
   {
@@ -40,8 +40,15 @@ export const aboutFacts: AboutFact[] = [
   {
     label: { es: "Idiomas", en: "Languages" },
     value: {
-      es: "Inglés, competencia profesional plena",
-      en: "English, full professional proficiency",
+      es: "Español (nativo) · Inglés (B2 Cambridge)",
+      en: "Spanish (native) · English (Cambridge B2)",
+    },
+  },
+  {
+    label: { es: "Habilidades", en: "Skills" },
+    value: {
+      es: "Trabajo en equipo y resolución de problemas",
+      en: "Teamwork and problem solving",
     },
   },
 ];

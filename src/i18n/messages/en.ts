@@ -31,7 +31,7 @@ export const en: Messages = {
     profileLinksLabel: "Profile links",
     downloadCv: "Download CV",
     stackLabel: "stack",
-    portraitAlt: (name) => `Illustration of ${name}`,
+    portraitAlt: (name) => `Photo of ${name}`,
   },
   projects: {
     techLabel: "Technologies",

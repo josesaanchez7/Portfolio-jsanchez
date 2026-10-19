@@ -1,7 +1,10 @@
 import type { ExperienceItem } from "../types/content";
 
-// Fuente: perfil de LinkedIn. Del más reciente al más antiguo dentro de cada tipo.
-const TORCAL = { es: "Torcal Autoescuelas y Formación", en: "Torcal Autoescuelas y Formación" };
+// Fuente: CV (descripciones y centros) y perfil de LinkedIn (fechas de estudios).
+const TORCAL = {
+  es: "Torcal Innovación y Seguridad SL",
+  en: "Torcal Innovación y Seguridad SL",
+};
 
 export const experience: ExperienceItem[] = [
   {
@@ -10,18 +13,18 @@ export const experience: ExperienceItem[] = [
     organization: TORCAL,
     period: { es: "oct. 2025 – Actualidad", en: "Oct 2025 – Present" },
     description: {
-      es: "Aseguro la calidad y el buen funcionamiento de las aplicaciones.",
-      en: "I ensure the quality and proper functioning of applications.",
+      es: "Diseño y ejecución de pruebas manuales y exploratorias sobre aplicaciones internas, validación de APIs y detección de incidencias funcionales, así como planificación y gestión de pruebas mediante JIRA, colaborando estrechamente con los equipos de desarrollo en entornos de metodologías ágiles y automatización de pruebas QA.",
+      en: "Design and execution of manual and exploratory tests on internal applications, API validation and detection of functional issues, plus test planning and management with JIRA, working closely with development teams in agile-methodology environments and QA test automation.",
     },
   },
   {
     kind: "work",
-    title: { es: "Soporte técnico", en: "Technical support" },
+    title: { es: "Soporte técnico / Programador", en: "Technical support / Developer" },
     organization: TORCAL,
     period: { es: "may. 2023 – sep. 2025", en: "May 2023 – Sep 2025" },
     description: {
-      es: "Asistencia técnica a usuarios internos y externos, gestionando y resolviendo incidencias informáticas. Durante los últimos doce meses, también desempeñé labores de programación en PHP.",
-      en: "Technical assistance for internal and external users, managing and resolving IT incidents. During the last twelve months, I also worked on PHP programming.",
+      es: "Asistencia técnica a usuarios internos y externos, gestionando y resolviendo incidencias informáticas, así como desarrollo y mantenimiento de funcionalidades en PHP durante el último año del puesto.",
+      en: "Technical assistance for internal and external users, managing and resolving IT incidents, plus developing and maintaining PHP features during the last year in the role.",
     },
   },
   {
@@ -30,7 +33,7 @@ export const experience: ExperienceItem[] = [
       es: "Desarrollo de Aplicaciones Multiplataforma",
       en: "Multiplatform Application Development",
     },
-    organization: { es: "Colegio San Jose Málaga", en: "Colegio San Jose Málaga" },
+    organization: { es: "Colegio Concertado San José", en: "Colegio Concertado San José" },
     period: { es: "2021 – 2024", en: "2021 – 2024" },
     description: {
       es: "Ciclo formativo de grado superior",
@@ -40,7 +43,7 @@ export const experience: ExperienceItem[] = [
   {
     kind: "education",
     title: { es: "Bachillerato Tecnológico", en: "Baccalaureate, Technology track" },
-    organization: { es: "Colegio Santa Rosa de Lima", en: "Colegio Santa Rosa de Lima" },
+    organization: { es: "C.D.P Santa Rosa de Lima", en: "C.D.P Santa Rosa de Lima" },
     period: { es: "2018 – 2020", en: "2018 – 2020" },
   },
   {

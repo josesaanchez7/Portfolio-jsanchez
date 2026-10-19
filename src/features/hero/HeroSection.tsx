@@ -1,6 +1,6 @@
 import { FaArrowRight, FaDownload, FaGithub, FaLinkedin } from "react-icons/fa";
 import cvFile from "../../assets/doc/cv.pdf";
-import perfil from "../../assets/img/hero.png";
+import perfil from "../../assets/img/hero.webp";
 import Button from "../../components/ui/Button/Button";
 import { profile } from "../../data/profile";
 import { HERO_ID } from "../../data/sections";
@@ -104,9 +104,9 @@ const HeroSection = () => {
           <img
             src={perfil}
             alt={t.hero.portraitAlt(profile.name)}
-            width={865}
-            height={865}
-            className="h-full w-full rounded-md object-contain"
+            width={640}
+            height={640}
+            className="h-full w-full rounded-md object-cover"
           />
         </div>
       </div>

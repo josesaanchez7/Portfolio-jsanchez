@@ -4,7 +4,7 @@ import type { StackCategory } from "../types/content";
 /** Nombre propio de tecnología: se escribe igual en todos los idiomas. */
 const tech = (name: string): LocalizedText => ({ es: name, en: name });
 
-// Frontend y herramientas: lo que usa este portfolio. Backend y testing: tu perfil de LinkedIn.
+// Frontend y herramientas: lo que usa este portfolio. Backend y testing: CV y perfil de LinkedIn.
 // Añade aquí más tecnologías: las categorías sin elementos no se muestran.
 const allCategories: StackCategory[] = [
   {
@@ -16,9 +16,12 @@ const allCategories: StackCategory[] = [
   {
     label: { es: "Testing y calidad", en: "Testing and quality" },
     items: [
-      { es: "Pruebas API", en: "API testing" },
       { es: "Pruebas manuales", en: "Manual testing" },
+      { es: "Pruebas exploratorias", en: "Exploratory testing" },
+      { es: "Pruebas API", en: "API testing" },
       { es: "Planificación de pruebas", en: "Test planning" },
+      tech("Jira"),
+      { es: "Metodologías ágiles", en: "Agile methodologies" },
     ],
   },
   {

@@ -31,7 +31,7 @@ export const es: Messages = {
     profileLinksLabel: "Enlaces de perfil",
     downloadCv: "Descargar CV",
     stackLabel: "stack",
-    portraitAlt: (name) => `Ilustración de ${name}`,
+    portraitAlt: (name) => `Foto de ${name}`,
   },
   projects: {
     techLabel: "Tecnologías",
