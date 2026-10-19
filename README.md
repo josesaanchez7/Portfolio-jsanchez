@@ -1,6 +1,7 @@
 # Portfolio de Jose Sánchez
 
-Portfolio personal construido con React 19, TypeScript, Vite, Tailwind CSS v4 y Sass (CSS Modules).
+Portfolio personal construido con React 19, TypeScript, Vite y Tailwind CSS v4. Todos los estilos son
+utilidades de Tailwind (no hay hojas CSS por componente).
 
 Requisitos: Node ≥ 22.13 y [pnpm](https://pnpm.io) (la versión está fijada en `packageManager`;
 con Corepack basta `corepack enable`).
@@ -26,14 +27,24 @@ entorno ni rutas de servidor.
 
 ## Estilos
 
-- **Tokens de diseño:** variables CSS en [`src/styles/global.css`](src/styles/global.css), con tema claro/oscuro.
-- **Tailwind v4** está cargado **sin preflight** (solo tema y utilidades) para no alterar el reset
-  propio. Los tokens se exponen como utilidades: `bg-surface`, `text-fg-muted`, `border-border`,
-  `text-accent`, `font-heading`, etc., y siguen el tema activo.
-- Convive con los CSS Modules existentes; el Footer (barra de estado) usa utilidades.
-- **Capas CSS:** el reset de elementos de `global.css` está en `@layer base`, por debajo de las utilidades
-  de Tailwind (así `ml-auto` o un anillo de foco propio funcionan sobre cualquier elemento). Los CSS
-  Modules no están en ninguna capa y siguen ganando a ambos.
+Todo el estilo es Tailwind v4 (preflight incluido); la configuración vive en
+[`src/styles/global.css`](src/styles/global.css):
+
+- **Tokens de color:** variables CSS (`--bg`, `--surface`, `--accent`…) con tema claro/oscuro en `:root`.
+  `@theme inline` las expone como utilidades que siguen el tema activo: `bg-page`, `bg-surface`,
+  `text-fg`, `text-fg-muted`, `text-accent`, `border-border`, `border-border-strong`, `shadow-card`…
+- **Tipografías:** `font-sans` (Inter), `font-heading` (Space Grotesk), `font-code` (JetBrains Mono) y
+  `font-boot` (Geist Mono, pantalla de carga).
+- **Radios y ancho:** `rounded-sm|md|lg` (8/12/16 px) y `max-w-site` (1040 px).
+- **Puntos de corte con nombre:** `max-nav:` (≤ 820 px), `max-tablet:` (≤ 768), `max-tight:` (≤ 640),
+  `max-phone:` (≤ 600) y `max-mini:` (≤ 420). Tailwind aplica `max-*` con «ancho < valor», por eso en
+  `@theme` cada uno vale N + 1.
+- **Base:** los estilos de elementos (tipografía de los títulos, foco visible, `scroll-behavior`) están en
+  `@layer base`, de modo que cualquier utilidad puede sustituirlos.
+- **Modo debug** (`<html data-debug="true">`): variantes `in-data-[debug=true]:` en
+  [`src/lib/debugSection.ts`](src/lib/debugSection.ts).
+- Los estados se expresan con atributos de datos y ARIA (`data-exiting`, `data-pending`,
+  `aria-[current=true]`, `aria-pressed`), que también usan los tests.
 
 ## Estructura
 
@@ -48,8 +59,8 @@ src/
 ├── i18n/         idioma activo (es/en): proveedor, hook, <RichText> y diccionarios de interfaz
 ├── data/         contenido estático tipado (perfil, proyectos, experiencia, stack, secciones)
 ├── types/        modelos de dominio del contenido
-├── lib/          funciones puras (persistencia del tema)
-├── styles/       tokens de diseño y estilos globales
+├── lib/          funciones puras (tema, idioma, formato) y utilidades de estilo
+├── styles/       global.css: Tailwind, tokens de diseño y base
 └── test/         configuración de tests
 ```
 
@@ -93,7 +104,7 @@ Los datos (rama, errores, veces probada, ubicación, disponibilidad) están en
 [`src/data/statusBar.ts`](src/data/statusBar.ts); `testRuns` es un dato de ejemplo marcado con `TODO`.
 
 - **Debug:** activa el modo debug (`<html data-debug="true">`, estilos en
-  [`src/styles/debug.css`](src/styles/debug.css)): cada sección muestra un borde discontinuo y su ancla.
+  [`src/lib/debugSection.ts`](src/lib/debugSection.ts)): cada sección muestra un borde discontinuo y su ancla.
 - **404 y Ctrl+K:** botones preparados. Quedan inactivos (`aria-disabled`) hasta que se pasen
   `onShow404` / `onOpenConsole` a `<Footer />` en `App.tsx`; esas funciones aún no existen.
 - En móvil se ocultan los elementos secundarios y respeta las zonas seguras (`env(safe-area-inset-*)`).

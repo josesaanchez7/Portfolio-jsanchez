@@ -19,9 +19,9 @@ const Section = ({ id, children }: SectionProps) => {
       id={id}
       data-section={id}
       aria-labelledby={headingId}
-      className={`w-full scroll-mt-(--header-height) border-t border-border px-6 py-24 max-[768px]:px-5 max-[768px]:py-16 ${DEBUG_SECTION}`}
+      className={`w-full scroll-mt-(--header-height) border-t border-border px-6 py-24 max-tablet:px-5 max-tablet:py-16 ${DEBUG_SECTION}`}
     >
-      <div className="mx-auto flex w-full max-w-site flex-col gap-10 max-[768px]:gap-8">
+      <div className="mx-auto flex w-full max-w-site flex-col gap-10 max-tablet:gap-8">
         <header className="flex items-baseline gap-4">
           <span className="font-code text-[0.9rem] text-accent" aria-hidden="true">
             {number}

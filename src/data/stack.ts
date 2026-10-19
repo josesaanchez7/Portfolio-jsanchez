@@ -3,7 +3,7 @@ import type { StackCategory } from "../types/content";
 // Solo tecnologías que aparecen en este proyecto. Añade aquí tu stack de backend,
 // bases de datos o testing: las categorías sin elementos no se muestran.
 const allCategories: StackCategory[] = [
-  { label: { es: "Frontend", en: "Frontend" }, items: ["React", "TypeScript", "HTML", "CSS / Sass"] },
+  { label: { es: "Frontend", en: "Frontend" }, items: ["React", "TypeScript", "HTML", "CSS", "Tailwind CSS"] },
   { label: { es: "Backend", en: "Backend" }, items: [] },
   { label: { es: "Bases de datos", en: "Databases" }, items: [] },
   { label: { es: "Testing y calidad", en: "Testing and quality" }, items: [] },

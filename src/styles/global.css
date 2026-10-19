@@ -29,6 +29,16 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --container-site: 1040px;
+
+  /*
+   * Puntos de corte. Tailwind aplica `max-*` con "width < valor", así que cada uno vale N+1:
+   * `max-nav:` equivale a "ancho ≤ 820px".
+   */
+  --breakpoint-nav: 821px; /* menú móvil y diseños a una columna */
+  --breakpoint-tablet: 769px; /* secciones con menos margen */
+  --breakpoint-tight: 641px; /* línea de tiempo */
+  --breakpoint-phone: 601px; /* pantalla de carga */
+  --breakpoint-mini: 421px; /* oculta el nombre junto al logo */
   --animate-blink: blink 1s steps(1) infinite;
 
   @keyframes blink {

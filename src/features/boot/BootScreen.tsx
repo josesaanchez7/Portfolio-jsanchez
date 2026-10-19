@@ -35,7 +35,7 @@ const INLINE_TAGS = {
 
 // Duración del fundido: debe coincidir con EXIT_DURATION_MS (bootTimeline.ts).
 const ROOT =
-  "fixed inset-0 z-[9999] flex cursor-pointer items-center justify-center overflow-hidden bg-boot-bg p-6 font-boot text-[15px] leading-[1.7] text-boot-text transition-[opacity,scale] duration-500 ease-[ease] [-webkit-tap-highlight-color:transparent] max-[600px]:text-[13px] data-exiting:pointer-events-none data-exiting:scale-[1.02] data-exiting:opacity-0";
+  "fixed inset-0 z-[9999] flex cursor-pointer items-center justify-center overflow-hidden bg-boot-bg p-6 font-boot text-[15px] leading-[1.7] text-boot-text transition-[opacity,scale] duration-500 ease-[ease] [-webkit-tap-highlight-color:transparent] max-phone:text-[13px] data-exiting:pointer-events-none data-exiting:scale-[1.02] data-exiting:opacity-0";
 
 // Las líneas con `data-pending` aún no se han escrito: se mantienen ocultas para reservar su espacio.
 const LINE = "min-h-[1.7em] [overflow-wrap:anywhere] whitespace-pre-wrap data-pending:invisible";

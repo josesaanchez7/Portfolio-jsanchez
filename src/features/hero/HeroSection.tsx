@@ -25,7 +25,7 @@ const HeroSection = () => {
       aria-labelledby="hero-title"
       className={`relative isolate scroll-mt-(--header-height) px-6 pt-[clamp(3.5rem,9vw,7rem)] pb-[clamp(4rem,9vw,7rem)] before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:bg-[radial-gradient(color-mix(in_srgb,var(--text-muted)_25%,transparent)_1px,transparent_1px)] before:bg-size-[28px_28px] before:mask-[linear-gradient(to_bottom,#000_0%,transparent_85%)] before:content-[''] ${DEBUG_SECTION}`}
     >
-      <div className="mx-auto grid max-w-site grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-[clamp(2rem,6vw,5rem)] max-[820px]:grid-cols-1">
+      <div className="mx-auto grid max-w-site grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-[clamp(2rem,6vw,5rem)] max-nav:grid-cols-1">
         <div className="flex flex-col items-start gap-6">
           <p className="font-code text-[0.85rem] text-accent">
             {profile.name} <span className="px-[0.15rem] text-fg-muted" aria-hidden="true">
@@ -100,7 +100,7 @@ const HeroSection = () => {
           )}
         </div>
 
-        <div className="aspect-square w-[min(100%,340px)] justify-self-center rounded-lg border border-border bg-surface p-4 shadow-card max-[820px]:order-first max-[820px]:w-[120px] max-[820px]:justify-self-start max-[820px]:p-2">
+        <div className="aspect-square w-[min(100%,340px)] justify-self-center rounded-lg border border-border bg-surface p-4 shadow-card max-nav:order-first max-nav:w-[120px] max-nav:justify-self-start max-nav:p-2">
           <img
             src={perfil}
             alt={t.hero.portraitAlt(profile.name)}

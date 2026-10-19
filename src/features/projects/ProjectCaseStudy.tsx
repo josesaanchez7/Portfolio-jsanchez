@@ -29,7 +29,7 @@ const ProjectCaseStudy = ({ project, caseStudy }: ProjectCaseStudyProps) => {
 
       <dialog
         ref={dialogRef}
-        className="max-h-[calc(100dvh-4rem)] w-[min(680px,calc(100%-2rem))] rounded-lg border border-border bg-surface p-0 text-fg backdrop:bg-[rgba(8,10,16,0.7)]"
+        className="m-auto max-h-[calc(100dvh-4rem)] w-[min(680px,calc(100%-2rem))] rounded-lg border border-border bg-surface p-0 text-fg backdrop:bg-[rgba(8,10,16,0.7)]"
         aria-labelledby={titleId}
         onClick={(event) => {
           // Atajo para ratón: clic en el fondo cierra el diálogo. Con teclado se cierra con Escape o el botón.

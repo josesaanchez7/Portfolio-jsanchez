@@ -7,7 +7,7 @@ const AboutSection = () => {
 
   return (
     <Section id="SobreMi">
-      <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start gap-[clamp(2rem,5vw,4rem)] max-[820px]:grid-cols-1">
+      <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start gap-[clamp(2rem,5vw,4rem)] max-nav:grid-cols-1">
         <div className="flex max-w-[60ch] flex-col gap-5 text-[1.1rem]">
           <p>{t.about.intro({ fullName: profile.fullName, nickname: profile.nickname })}</p>
           <p>

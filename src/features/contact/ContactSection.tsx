@@ -17,7 +17,7 @@ const ContactSection = () => {
 
   return (
     <Section id="Contacto">
-      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-start gap-[clamp(2rem,5vw,4rem)] max-[820px]:grid-cols-1">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-start gap-[clamp(2rem,5vw,4rem)] max-nav:grid-cols-1">
         <p className="max-w-[44ch] text-[1.1rem] text-fg-muted">{t.contact.intro}</p>
 
         <div className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6">
@@ -30,7 +30,7 @@ const ContactSection = () => {
             </a>
             <button
               type="button"
-              className="grid w-12 cursor-pointer place-items-center border-l border-border-strong bg-transparent text-base text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface-hover hover:text-accent"
+              className="grid w-12 cursor-pointer place-items-center border-l border-border-strong bg-transparent text-[1rem] text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface-hover hover:text-accent"
               onClick={() => void copy(profile.email)}
               aria-label={t.contact.copyLabel}
             >

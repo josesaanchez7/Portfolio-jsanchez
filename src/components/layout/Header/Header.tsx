@@ -10,7 +10,7 @@ import { useTheme } from "../../../theme/useTheme";
 
 // El menú móvil se activa en ≤ 820px. Sin ancho ni display: cada botón añade los suyos.
 const ICON_BUTTON =
-  "h-[38px] place-items-center rounded-sm bg-transparent text-[1.1rem] text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
+  "h-[38px] place-items-center rounded-sm bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
 
 // Constante de módulo: useActiveSection necesita una referencia estable.
 const OBSERVED_IDS = [HERO_ID, ...SECTIONS.map((section) => section.id)];
@@ -37,7 +37,7 @@ const Header = () => {
       className="sticky top-0 z-[1000] h-(--header-height) border-b border-border bg-[color-mix(in_srgb,var(--bg)_85%,transparent)] backdrop-blur-md"
       ref={headerRef}
     >
-      <div className="mx-auto flex h-full max-w-site items-center gap-6 px-6 max-[820px]:gap-3 max-[820px]:px-5">
+      <div className="mx-auto flex h-full max-w-site items-center gap-6 px-6 max-nav:gap-3 max-nav:px-5">
         <a
           href={`#${HERO_ID}`}
           className="inline-flex items-center gap-[0.65rem] font-heading font-bold tracking-[-0.01em] text-fg"
@@ -49,22 +49,22 @@ const Header = () => {
           >
             JS
           </span>
-          <span className="max-[420px]:hidden">{profile.name}</span>
+          <span className="max-mini:hidden">{profile.name}</span>
         </a>
 
         <nav
           id="main-nav"
           aria-label={t.header.navLabel}
-          className={`ml-auto max-[820px]:absolute max-[820px]:top-(--header-height) max-[820px]:right-0 max-[820px]:left-0 max-[820px]:m-0 max-[820px]:border-b max-[820px]:border-border max-[820px]:bg-page max-[820px]:px-5 max-[820px]:pt-3 max-[820px]:pb-5 max-[820px]:shadow-card ${
-            menuOpen ? "max-[820px]:block" : "max-[820px]:hidden"
+          className={`ml-auto max-nav:absolute max-nav:top-(--header-height) max-nav:right-0 max-nav:left-0 max-nav:m-0 max-nav:border-b max-nav:border-border max-nav:bg-page max-nav:px-5 max-nav:pt-3 max-nav:pb-5 max-nav:shadow-card ${
+            menuOpen ? "max-nav:block" : "max-nav:hidden"
           }`}
         >
-          <ul className="flex gap-1 max-[820px]:flex-col">
+          <ul className="flex gap-1 max-nav:flex-col">
             {SECTIONS.map(({ id, navLabel }) => (
               <li key={id}>
                 <a
                   href={`#${id}`}
-                  className="relative block rounded-sm px-3 py-[0.45rem] text-[0.92rem] font-medium text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-fg aria-[current=true]:text-fg aria-[current=true]:after:absolute aria-[current=true]:after:right-3 aria-[current=true]:after:bottom-[0.1rem] aria-[current=true]:after:left-3 aria-[current=true]:after:h-0.5 aria-[current=true]:after:rounded-[2px] aria-[current=true]:after:bg-accent aria-[current=true]:after:content-[''] max-[820px]:px-2 max-[820px]:py-[0.8rem] max-[820px]:text-base max-[820px]:aria-[current=true]:after:right-auto max-[820px]:aria-[current=true]:after:left-2 max-[820px]:aria-[current=true]:after:w-6"
+                  className="relative block rounded-sm px-3 py-[0.45rem] text-[0.92rem] font-medium text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-fg aria-[current=true]:text-fg aria-[current=true]:after:absolute aria-[current=true]:after:right-3 aria-[current=true]:after:bottom-[0.1rem] aria-[current=true]:after:left-3 aria-[current=true]:after:h-0.5 aria-[current=true]:after:rounded-[2px] aria-[current=true]:after:bg-accent aria-[current=true]:after:content-[''] max-nav:px-2 max-nav:py-[0.8rem] max-nav:text-[1rem] max-nav:aria-[current=true]:after:right-auto max-nav:aria-[current=true]:after:left-2 max-nav:aria-[current=true]:after:w-6"
                   aria-current={activeId === id ? "true" : undefined}
                   onClick={() => setMenuOpen(false)}
                 >
@@ -75,12 +75,12 @@ const Header = () => {
           </ul>
         </nav>
 
-        <div className="flex items-center gap-1 border-l border-border pl-3 max-[820px]:ml-auto max-[820px]:border-l-0 max-[820px]:pl-0">
+        <div className="flex items-center gap-1 border-l border-border pl-3 max-nav:ml-auto max-nav:border-l-0 max-nav:pl-0">
           <a
             href={profile.github}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-grid w-[38px] ${ICON_BUTTON}`}
+            className={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
             aria-label={t.header.github}
           >
             <FaGithub aria-hidden="true" />
@@ -89,7 +89,7 @@ const Header = () => {
             href={profile.linkedin}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-grid w-[38px] ${ICON_BUTTON}`}
+            className={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
             aria-label={t.header.linkedin}
           >
             <FaLinkedin aria-hidden="true" />
@@ -97,7 +97,7 @@ const Header = () => {
           <button
             type="button"
             onClick={toggleTheme}
-            className={`inline-grid w-[38px] ${ICON_BUTTON}`}
+            className={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
             aria-label={isDark ? t.header.themeToLight : t.header.themeToDark}
           >
             {isDark ? <FaMoon aria-hidden="true" /> : <FaSun aria-hidden="true" />}
@@ -114,7 +114,7 @@ const Header = () => {
           <button
             type="button"
             ref={menuButtonRef}
-            className={`hidden w-[38px] max-[820px]:inline-grid ${ICON_BUTTON}`}
+            className={`hidden w-[38px] text-[1.1rem] max-nav:inline-grid ${ICON_BUTTON}`}
             aria-label={menuOpen ? t.header.closeMenu : t.header.openMenu}
             aria-expanded={menuOpen}
             aria-controls="main-nav"
