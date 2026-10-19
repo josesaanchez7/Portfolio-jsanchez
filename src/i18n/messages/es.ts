@@ -2,9 +2,9 @@ import type { Messages } from "./types";
 
 export const es: Messages = {
   meta: {
-    title: "Jose Sánchez · Desarrollador de aplicaciones multiplataforma",
+    title: "José Sánchez · Desarrollador de aplicaciones multiplataforma",
     description:
-      "Portfolio de Jose Sánchez: graduado en Desarrollo de Aplicaciones Multiplataforma y QA Tester. Proyectos, experiencia y contacto.",
+      "Portfolio de José Sánchez: graduado en Desarrollo de Aplicaciones Multiplataforma y QA Tester. Proyectos, experiencia y contacto.",
     ogDescription:
       "Soluciones eficientes y experiencias digitales modernas. Proyectos, experiencia y contacto.",
   },

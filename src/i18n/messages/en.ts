@@ -2,9 +2,9 @@ import type { Messages } from "./types";
 
 export const en: Messages = {
   meta: {
-    title: "Jose Sánchez · Multiplatform application developer",
+    title: "José Sánchez · Multiplatform application developer",
     description:
-      "Portfolio of Jose Sánchez: Multiplatform Application Development graduate and QA Tester. Projects, experience and contact.",
+      "Portfolio of José Sánchez: Multiplatform Application Development graduate and QA Tester. Projects, experience and contact.",
     ogDescription:
       "Efficient solutions and modern digital experiences. Projects, experience and contact.",
   },

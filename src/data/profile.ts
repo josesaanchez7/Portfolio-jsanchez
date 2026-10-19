@@ -3,7 +3,7 @@
 import type { AboutFact, Profile } from "../types/content";
 
 export const profile: Profile = {
-  name: "Jose Sánchez",
+  name: "José Sánchez",
   fullName: "José Francisco Sánchez",
   nickname: "Fran",
   role: {

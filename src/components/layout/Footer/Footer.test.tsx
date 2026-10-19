@@ -28,7 +28,7 @@ describe("Footer (barra de estado)", () => {
 
     renderFooter();
 
-    expect(screen.getByText("© 2031 Jose Sánchez")).toBeInTheDocument();
+    expect(screen.getByText("© 2031 José Sánchez")).toBeInTheDocument();
   });
 
   it("muestra los datos de la barra en español", () => {
