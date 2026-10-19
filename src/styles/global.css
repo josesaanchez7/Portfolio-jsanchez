@@ -1,0 +1,132 @@
+@import "tailwindcss";
+
+/*
+ * Tokens de diseño. Los colores cambian con el tema (claro/oscuro) mediante variables CSS en :root;
+ * `@theme inline` las expone como utilidades de Tailwind (bg-surface, text-fg-muted, border-border…)
+ * apuntando a la variable en vivo, de modo que el cambio de tema funciona también con las utilidades.
+ */
+@theme inline {
+  --color-page: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-fg: var(--text);
+  --color-fg-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-contrast: var(--accent-contrast);
+  --color-accent-soft: var(--accent-soft);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-display);
+  --font-code: var(--font-mono);
+  --shadow-card: var(--shadow);
+}
+
+/* Valores fijos del diseño. */
+@theme {
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --container-site: 1040px;
+  --animate-blink: blink 1s steps(1) infinite;
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+}
+
+/* Pantalla de carga: siempre oscura, independiente del tema de la web. */
+@theme static {
+  --color-boot-bg: #0d1017;
+  --color-boot-text: #d7dce6;
+  --color-boot-dim: #6f7a8e;
+  --color-boot-ok: #5bd49a;
+  --color-boot-prompt: #9aa5ff;
+  --color-boot-warn: #f2c14e;
+  --color-boot-dot: #2a3040;
+  --font-boot: "Geist Mono", ui-monospace, Menlo, "SFMono-Regular", Consolas, monospace;
+}
+
+:root {
+  color-scheme: dark;
+
+  --bg: #151923;
+  --surface: #202635;
+  --surface-hover: #262d40;
+  --text: #f4f5f8;
+  --text-muted: #a7b0c2;
+  --accent: #8ca5ff;
+  --accent-hover: #a5b8ff;
+  --accent-contrast: #10131c;
+  --accent-soft: rgba(140, 165, 255, 0.12);
+  --border: #343c52;
+  --border-strong: #5f6a87;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+
+  --header-height: 64px;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f5f6fa;
+  --surface: #ffffff;
+  --surface-hover: #eef0f7;
+  --text: #151923;
+  --text-muted: #4a5468;
+  --accent: #3550d6;
+  --accent-hover: #2840b8;
+  --accent-contrast: #ffffff;
+  --accent-soft: rgba(53, 80, 214, 0.1);
+  --border: #dce0ea;
+  --border-strong: #7d869c;
+  --shadow: 0 10px 30px rgba(21, 25, 35, 0.08);
+}
+
+/* Estilos base de elementos (los componentes los sustituyen con utilidades). */
+@layer base {
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--accent-contrast);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
