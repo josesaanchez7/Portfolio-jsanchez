@@ -17,6 +17,7 @@ describe("contenido estático", () => {
       profile.github,
       profile.linkedin,
       ...projects.flatMap((project) => [project.code, project.demo]),
+      ...experience.map((item) => item.credential?.url),
     ].filter((link): link is NonNullable<typeof link> => link !== undefined);
 
     for (const link of links) {

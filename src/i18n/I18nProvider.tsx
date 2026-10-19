@@ -5,6 +5,7 @@ import {
   type Language,
   type LocalizedText,
 } from "../lib/language";
+import { pathForLanguage } from "../lib/seo";
 import { I18nContext } from "./i18n-context";
 import { messages } from "./messages";
 
@@ -19,6 +20,18 @@ const applyDocumentLanguage = (language: Language) => {
   setMeta('meta[name="description"]', meta.description);
   setMeta('meta[property="og:title"]', meta.title);
   setMeta('meta[property="og:description"]', meta.ogDescription);
+  setMeta('meta[name="twitter:title"]', meta.title);
+  setMeta('meta[name="twitter:description"]', meta.ogDescription);
+};
+
+/** Mantiene la URL acorde al idioma ("/" o "/en/") conservando la búsqueda y el ancla (#Proyectos). */
+const syncLanguageUrl = (language: Language) => {
+  try {
+    const { search, hash } = window.location;
+    window.history.replaceState(window.history.state, "", pathForLanguage(language) + search + hash);
+  } catch {
+    // Entornos donde history no se puede modificar (p. ej. file://): el idioma funciona igualmente.
+  }
 };
 
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
@@ -32,6 +45,7 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   const setLanguage = useCallback((next: Language) => {
     setLanguageState(next);
     storeLanguage(next);
+    syncLanguageUrl(next);
   }, []);
 
   const value = useMemo(

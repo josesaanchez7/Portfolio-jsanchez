@@ -1,5 +1,5 @@
 import { FaArrowRight, FaDownload, FaGithub, FaLinkedin } from "react-icons/fa";
-import cvFile from "../../assets/doc/cv.pdf";
+import { cvUrl } from "../../data/cv";
 import perfil from "../../assets/img/hero.webp";
 import Button from "../../components/ui/Button/Button";
 import { profile } from "../../data/profile";
@@ -83,7 +83,7 @@ const HeroSection = () => {
             </li>
             <li>
               <Button
-                href={cvFile}
+                href={cvUrl}
                 download="Jose_Sanchez_CV.pdf"
                 variant="ghost"
                 icon={<FaDownload aria-hidden="true" />}

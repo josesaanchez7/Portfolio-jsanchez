@@ -3,6 +3,7 @@ import {
   DEFAULT_LANGUAGE,
   detectLanguage,
   getInitialLanguage,
+  languageFromPath,
   LANGUAGE_STORAGE_KEY,
   parseLanguage,
   readStoredLanguage,
@@ -79,5 +80,38 @@ describe("getInitialLanguage", () => {
 
     expect(getInitialLanguage()).toBe("en");
     vi.restoreAllMocks();
+  });
+});
+
+describe("languageFromPath", () => {
+  it.each([
+    ["/en/", "en"],
+    ["/en", "en"],
+    ["/en/proyectos", "en"],
+    ["/es/", "es"],
+  ])("%s → %s", (pathname, expected) => {
+    expect(languageFromPath(pathname)).toBe(expected);
+  });
+
+  it.each(["/", "", "/index.html", "/english/", "/fr/", "/EN/"])("%j no indica idioma", (pathname) => {
+    expect(languageFromPath(pathname)).toBeNull();
+  });
+});
+
+describe("getInitialLanguage con la URL", () => {
+  it("la URL (/en/) gana al idioma guardado y al del navegador", () => {
+    vi.spyOn(navigator, "languages", "get").mockReturnValue(["es-ES"]);
+    storeLanguage("es");
+    window.history.replaceState(null, "", "/en/");
+
+    expect(getInitialLanguage()).toBe("en");
+    vi.restoreAllMocks();
+  });
+
+  it("en la raíz sigue mandando lo guardado", () => {
+    storeLanguage("en");
+    window.history.replaceState(null, "", "/");
+
+    expect(getInitialLanguage()).toBe("en");
   });
 });

@@ -1,11 +1,14 @@
 import type { ReactNode } from "react";
+import { DebugModeProvider } from "./debug/DebugModeProvider";
 import { I18nProvider } from "./i18n/I18nProvider";
 import { ThemeProvider } from "./theme/ThemeProvider";
 
 /** Proveedores globales de la aplicación. También los usan los tests. */
 const Providers = ({ children }: { children: ReactNode }) => (
   <ThemeProvider>
-    <I18nProvider>{children}</I18nProvider>
+    <I18nProvider>
+      <DebugModeProvider>{children}</DebugModeProvider>
+    </I18nProvider>
   </ThemeProvider>
 );
 

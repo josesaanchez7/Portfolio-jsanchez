@@ -16,7 +16,9 @@ afterEach(() => {
   sessionStorage.clear();
   document.body.style.overflow = "";
   delete document.documentElement.dataset.theme;
+  delete document.documentElement.dataset.debug;
   document.documentElement.lang = "es";
+  window.history.replaceState(null, "", "/");
 });
 
 // jsdom no implementa IntersectionObserver ni los métodos modales de <dialog>.
@@ -32,5 +34,11 @@ class IntersectionObserverStub implements IntersectionObserver {
 }
 vi.stubGlobal("IntersectionObserver", IntersectionObserverStub);
 
-HTMLDialogElement.prototype.showModal = vi.fn();
-HTMLDialogElement.prototype.close = vi.fn();
+HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
+  this.setAttribute("open", "");
+};
+HTMLDialogElement.prototype.close = function close(this: HTMLDialogElement) {
+  if (!this.hasAttribute("open")) return;
+  this.removeAttribute("open");
+  this.dispatchEvent(new Event("close"));
+};

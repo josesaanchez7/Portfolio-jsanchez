@@ -1,4 +1,4 @@
-import type { Messages } from "./types";
+import type { Messages } from "./types.ts";
 
 export const en: Messages = {
   meta: {
@@ -10,6 +10,39 @@ export const en: Messages = {
   },
   skipToContent: "Skip to content",
   boot: { label: "Loading portfolio", skip: "Skip", skipLabel: "Skip the loading animation" },
+  console: {
+    title: "Console",
+    inputLabel: "Type a command",
+    placeholder: "type help",
+    close: "Close console",
+    welcome: "Welcome. Type <ok>help</ok> to see the commands.",
+    help: {
+      help: "show this help",
+      whoami: "who I am",
+      skills: "technologies I work with",
+      projects: "my projects and their status",
+      tests: "run the test suite",
+      contact: "how to reach me",
+      cv: "open my CV",
+      debug: "toggle debug mode",
+      notFound: "visit a page that doesn't exist",
+      clear: "clear the console",
+      exit: "close the console",
+    },
+    whoami: ({ name, job, employer }) =>
+      `${name}. ${job} at ${employer} and multiplatform developer. I test applications and build them with React and TypeScript.`,
+    skillsTesting: "Testing:",
+    skillsDevelopment: "Development:",
+    projectStatus: { done: "Done", "in-progress": "In progress", todo: "To do" },
+    openingCv: "Opening CHANGELOG.md…",
+    debugOn: "Debug mode enabled.",
+    debugOff: "Debug mode disabled.",
+    navigatingToNotFound: "Navigating to /this-page-does-not-exist…",
+    notFoundUnavailable: "The 404 page is not available yet.",
+    sudoGranted: (email) => `Permission granted. Write to me at ${email} 😉`,
+    sudoDenied: "Nice try. Try sudo hire",
+    unknownCommand: (input) => `command not found: ${input}. Type help.`,
+  },
   header: {
     homeLabel: (name) => `${name}, back to top`,
     navLabel: "Main",
@@ -49,7 +82,13 @@ export const en: Messages = {
       "I keep adding new work over time. In the meantime, you can browse my code on GitHub.",
     moreButton: "View GitHub",
   },
-  experience: { work: "Experience", education: "Education", certification: "Certification" },
+  experience: {
+    work: "Experience",
+    education: "Education",
+    certification: "Certification",
+    credentialId: "Credential ID",
+    showCredential: "Show credential",
+  },
   about: {
     intro: ({ fullName, nickname }) =>
       `My name is ${fullName}, though my friends call me ${nickname}. I started programming at 16.`,

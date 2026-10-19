@@ -22,6 +22,10 @@ export const detectLanguage = (preferred: readonly string[]): Language => {
   return DEFAULT_LANGUAGE;
 };
 
+/** Idioma indicado por la URL: "/en/…" → "en". Sin prefijo de idioma devuelve null. */
+export const languageFromPath = (pathname: string): Language | null =>
+  parseLanguage(pathname.split("/")[1]);
+
 export const readStoredLanguage = (): Language | null => {
   try {
     return parseLanguage(localStorage.getItem(LANGUAGE_STORAGE_KEY));
@@ -39,6 +43,8 @@ export const storeLanguage = (language: Language): void => {
   }
 };
 
-/** Idioma guardado por el usuario o, si nunca eligió, el del navegador. */
+/** Idioma de la URL (/en/), si no el guardado por el usuario y, si nunca eligió, el del navegador. */
 export const getInitialLanguage = (): Language =>
-  readStoredLanguage() ?? detectLanguage(navigator.languages);
+  languageFromPath(window.location.pathname) ??
+  readStoredLanguage() ??
+  detectLanguage(navigator.languages);

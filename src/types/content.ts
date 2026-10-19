@@ -22,12 +22,16 @@ export interface CaseStudy {
   results: LocalizedText[];
 }
 
+export type ProjectStatus = "done" | "in-progress" | "todo";
+
 export interface Project {
   id: string;
   title: LocalizedText;
   description: LocalizedText;
   /** Nombres de tecnologías: no se traducen. */
   tags: string[];
+  /** Estado del proyecto (se muestra en la consola). */
+  status: ProjectStatus;
   /** Captura del proyecto. Si falta, se muestra una vista previa provisional. */
   image?: string;
   /** Repositorio. Si falta, el botón no se muestra. */
@@ -40,6 +44,13 @@ export interface Project {
 
 export type ExperienceKind = "work" | "education" | "certification";
 
+/** Credencial verificable (como en LinkedIn): ID y enlace a la página de verificación. */
+export interface Credential {
+  id?: string;
+  /** Enlace de verificación de la entidad emisora. Si falta, no se muestra el botón. */
+  url?: HttpsUrl;
+}
+
 export interface ExperienceItem {
   kind: ExperienceKind;
   title: LocalizedText;
@@ -48,6 +59,8 @@ export interface ExperienceItem {
   /** Opcional (p. ej. "2024 – Actualidad"). */
   period?: LocalizedText;
   description?: LocalizedText;
+  /** Solo para certificaciones. */
+  credential?: Credential;
 }
 
 /** Tecnologías y aptitudes. Los nombres propios llevan el mismo texto en ambos idiomas. */

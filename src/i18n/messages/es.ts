@@ -1,4 +1,4 @@
-import type { Messages } from "./types";
+import type { Messages } from "./types.ts";
 
 export const es: Messages = {
   meta: {
@@ -10,6 +10,39 @@ export const es: Messages = {
   },
   skipToContent: "Saltar al contenido",
   boot: { label: "Cargando portfolio", skip: "Saltar", skipLabel: "Saltar la animación de carga" },
+  console: {
+    title: "Consola",
+    inputLabel: "Escribe un comando",
+    placeholder: "escribe help",
+    close: "Cerrar consola",
+    welcome: "Bienvenido. Escribe <ok>help</ok> para ver los comandos.",
+    help: {
+      help: "muestra esta ayuda",
+      whoami: "quién soy",
+      skills: "tecnologías con las que trabajo",
+      projects: "mis proyectos y su estado",
+      tests: "ejecuta la batería de pruebas",
+      contact: "cómo contactar conmigo",
+      cv: "abre mi currículum",
+      debug: "activa o desactiva el modo debug",
+      notFound: "visita una página que no existe",
+      clear: "limpia la consola",
+      exit: "cierra la consola",
+    },
+    whoami: ({ name, job, employer }) =>
+      `${name}. ${job} en ${employer} y desarrollador multiplataforma. Pruebo aplicaciones y las construyo con React y TypeScript.`,
+    skillsTesting: "Testing:",
+    skillsDevelopment: "Desarrollo:",
+    projectStatus: { done: "Hecho", "in-progress": "En curso", todo: "Por hacer" },
+    openingCv: "Abriendo CHANGELOG.md…",
+    debugOn: "Modo debug activado.",
+    debugOff: "Modo debug desactivado.",
+    navigatingToNotFound: "Navegando a /esta-pagina-no-existe…",
+    notFoundUnavailable: "La página 404 todavía no está disponible.",
+    sudoGranted: (email) => `Permiso concedido. Escríbeme a ${email} 😉`,
+    sudoDenied: "Buen intento. Prueba con sudo contratar",
+    unknownCommand: (input) => `comando no encontrado: ${input}. Escribe help.`,
+  },
   header: {
     homeLabel: (name) => `${name}, ir al inicio`,
     navLabel: "Principal",
@@ -49,7 +82,13 @@ export const es: Messages = {
       "Voy añadiendo trabajo nuevo con el tiempo. Mientras tanto, puedes ver mi código en GitHub.",
     moreButton: "Ver GitHub",
   },
-  experience: { work: "Experiencia", education: "Formación", certification: "Certificación" },
+  experience: {
+    work: "Experiencia",
+    education: "Formación",
+    certification: "Certificación",
+    credentialId: "ID de la credencial",
+    showCredential: "Mostrar credencial",
+  },
   about: {
     intro: ({ fullName, nickname }) =>
       `Me llamo ${fullName}, aunque mis amigos me llaman ${nickname}. Empecé en la programación a los 16 años.`,

@@ -1,6 +1,15 @@
 @import "tailwindcss";
 
 /*
+ * Fuentes alojadas en local (sin peticiones a Google Fonts). Las variables cubren cualquier peso;
+ * JetBrains Mono se carga solo en peso 500, como antes (el resto de pesos usan ese).
+ */
+@import "@fontsource-variable/inter/wght.css";
+@import "@fontsource-variable/space-grotesk/wght.css";
+@import "@fontsource-variable/geist-mono/wght.css";
+@import "@fontsource/jetbrains-mono/latin-500.css";
+
+/*
  * Tokens de diseño. Los colores cambian con el tema (claro/oscuro) mediante variables CSS en :root;
  * `@theme inline` las expone como utilidades de Tailwind (bg-surface, text-fg-muted, border-border…)
  * apuntando a la variable en vivo, de modo que el cambio de tema funciona también con las utilidades.
@@ -57,7 +66,7 @@
   --color-boot-prompt: #9aa5ff;
   --color-boot-warn: #f2c14e;
   --color-boot-dot: #2a3040;
-  --font-boot: "Geist Mono", ui-monospace, Menlo, "SFMono-Regular", Consolas, monospace;
+  --font-boot: "Geist Mono Variable", "Geist Mono", ui-monospace, Menlo, "SFMono-Regular", Consolas, monospace;
 }
 
 :root {
@@ -76,8 +85,8 @@
   --border-strong: #5f6a87;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 
-  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk Variable", "Space Grotesk", "Inter Variable", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
 
   --header-height: 64px;

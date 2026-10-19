@@ -48,6 +48,13 @@ export const experience: ExperienceItem[] = [
   },
   {
     kind: "certification",
-    title: { es: "API Testing Path (v12) Certificate", en: "API Testing Path (v12) Certificate" },
+    // Fuente: página de verificación de la credencial (la fecha es la de finalización que indica Postman Academy).
+    title: {
+      es: "API Testing Learning Path – Completion Certificate (V12)",
+      en: "API Testing Learning Path – Completion Certificate (V12)",
+    },
+    organization: { es: "Postman Academy", en: "Postman Academy" },
+    period: { es: "Completado: 12 ago. 2026", en: "Completed: Aug 12, 2026" },
+    credential: { url: "https://verify.skilljar.com/c/pu9b9suir8w2" },
   },
 ];

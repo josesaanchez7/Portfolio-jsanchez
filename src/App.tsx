@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Footer from "./components/layout/Footer/Footer";
 import Header from "./components/layout/Header/Header";
 import AboutSection from "./features/about/AboutSection";
 import BootScreen from "./features/boot/BootScreen";
+import ConsoleDialog from "./features/console/ConsoleDialog";
+import { useConsoleShortcuts } from "./features/console/useConsoleShortcuts";
 import ContactSection from "./features/contact/ContactSection";
 import ExperienceSection from "./features/experience/ExperienceSection";
 import HeroSection from "./features/hero/HeroSection";
@@ -13,6 +15,14 @@ import { useI18n } from "./i18n/useI18n";
 const App = () => {
   const { t } = useI18n();
   const [booting, setBooting] = useState(true);
+  const [consoleOpen, setConsoleOpen] = useState(false);
+
+  const openConsole = useCallback(() => setConsoleOpen(true), []);
+  const closeConsole = useCallback(() => setConsoleOpen(false), []);
+  const toggleConsole = useCallback(() => setConsoleOpen((open) => !open), []);
+
+  // La consola no se puede abrir mientras se muestra la pantalla de carga.
+  useConsoleShortcuts({ enabled: !booting, onToggle: toggleConsole, onOpen: openConsole });
 
   return (
     <>
@@ -34,8 +44,9 @@ const App = () => {
           <AboutSection />
           <ContactSection />
         </main>
-        <Footer />
+        <Footer onOpenConsole={openConsole} />
       </div>
+      <ConsoleDialog open={consoleOpen && !booting} onClose={closeConsole} />
     </>
   );
 };

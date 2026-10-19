@@ -1,28 +1,22 @@
 <!doctype html>
-<html lang="es" data-theme="dark">
+<html lang="{{lang}}" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>José Sánchez · Desarrollador de aplicaciones multiplataforma</title>
+    <title>{{title}}</title>
     <meta
       name="description"
-      content="Portfolio de José Sánchez: graduado en Desarrollo de Aplicaciones Multiplataforma y QA Tester. Proyectos, experiencia y contacto."
+      content="{{description}}"
     />
     <meta name="author" content="José Sánchez" />
     <meta name="theme-color" content="#151923" />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="José Sánchez · Desarrollador de aplicaciones multiplataforma" />
-    <meta
-      property="og:description"
-      content="Soluciones eficientes y experiencias digitales modernas. Proyectos, experiencia y contacto."
-    />
+    <!-- Open Graph, Twitter, canonical y hreflang: los genera vite-seo-plugin.ts a partir de src/i18n. -->
+    {{seo}}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500&family=JetBrains+Mono:wght@500&family=Space+Grotesk:wght@500;700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Precarga de las fuentes del primer pantallazo (subconjunto latino): evita esperar al CSS para descubrirlas. -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/node_modules/@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="/node_modules/@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2" />
     <script>
       // Aplica el tema guardado antes del primer pintado para evitar parpadeos.
       try {

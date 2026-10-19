@@ -97,3 +97,39 @@ describe("idioma inicial", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("experiencias digitales");
   });
 });
+
+describe("idioma en la URL", () => {
+  it("/en/ arranca en inglés sin guardar la elección", () => {
+    localStorage.clear();
+    window.history.replaceState(null, "", "/en/");
+
+    renderApp();
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("digital experiences");
+    expect(document.documentElement.lang).toBe("en");
+    expect(localStorage.getItem("language")).toBeNull();
+  });
+
+  it("la URL manda sobre el idioma guardado", () => {
+    localStorage.setItem("language", "es");
+    window.history.replaceState(null, "", "/en/");
+
+    renderApp();
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("digital experiences");
+  });
+
+  it("al cambiar de idioma la URL pasa a /en/ y vuelve a /, conservando el ancla", async () => {
+    window.history.replaceState(null, "", "/#Proyectos");
+    const user = userEvent.setup();
+    renderApp();
+
+    await user.click(screen.getByRole("button", { name: "Cambiar idioma a inglés" }));
+    expect(window.location.pathname).toBe("/en/");
+    expect(window.location.hash).toBe("#Proyectos");
+
+    await user.click(screen.getByRole("button", { name: "Switch language to Spanish" }));
+    expect(window.location.pathname).toBe("/");
+    expect(window.location.hash).toBe("#Proyectos");
+  });
+});

@@ -1,6 +1,6 @@
 import { profile } from "../../../data/profile";
 import { statusBar } from "../../../data/statusBar";
-import { useDebugMode } from "../../../hooks/useDebugMode";
+import { useDebugMode } from "../../../debug/useDebugMode";
 import { useI18n } from "../../../i18n/useI18n";
 import { formatInteger } from "../../../lib/format";
 
