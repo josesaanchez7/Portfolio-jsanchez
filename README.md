@@ -1,7 +1,7 @@
 # Portfolio de José Sánchez
 
 Portfolio personal construido con React 19, TypeScript, Vite y Tailwind CSS v4. Todos los estilos son
-utilidades de Tailwind (no hay hojas CSS por componente)
+utilidades de Tailwind (no hay hojas CSS por componente).
 
 Requisitos: Node 24 (LTS; fijado con `engines` en `package.json` para que Vercel no cambie de versión mayor por su cuenta) y [pnpm](https://pnpm.io) (la versión está fijada en `packageManager`;
 con Corepack basta `corepack enable`).
