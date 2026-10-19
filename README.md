@@ -1,4 +1,4 @@
-# Portfolio de José Sánchez
+# Portfolio de José Sánchez.
 
 Portfolio personal construido con React 19, TypeScript, Vite y Tailwind CSS v4. Todos los estilos son
 utilidades de Tailwind (no hay hojas CSS por componente).
