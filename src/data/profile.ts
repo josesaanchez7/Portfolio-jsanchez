@@ -4,8 +4,8 @@ import type { AboutFact, Profile } from "../types/content";
 
 export const profile: Profile = {
   name: "José Sánchez",
-  fullName: "José Francisco Sánchez",
-  nickname: "Fran",
+  fullName: "José Francisco Sánchez Aldana",
+  nickname: "José",
   role: {
     es: "Graduado en Desarrollo de Aplicaciones Multiplataforma",
     en: "Multiplatform Application Development graduate",
@@ -19,7 +19,8 @@ export const profile: Profile = {
   linkedin: "https://www.linkedin.com/in/josesanchezaldana",
 };
 
-// Datos breves para "Sobre mí". Añade aquí tu enfoque, intereses, forma de trabajar y objetivos.
+// Datos breves para "Sobre mí" (formación e idiomas: perfil de LinkedIn).
+// Añade aquí tu enfoque, intereses, forma de trabajar y objetivos.
 export const aboutFacts: AboutFact[] = [
   {
     label: { es: "Empecé a programar", en: "Started programming" },
@@ -28,12 +29,19 @@ export const aboutFacts: AboutFact[] = [
   {
     label: { es: "Formación", en: "Education" },
     value: {
-      es: "Desarrollo de Aplicaciones Multiplataforma",
-      en: "Multiplatform Application Development",
+      es: "Desarrollo de Aplicaciones Multiplataforma (2021 – 2024)",
+      en: "Multiplatform Application Development (2021 – 2024)",
     },
   },
   {
     label: { es: "Ahora", en: "Now" },
     value: { es: "QA Tester en Torcal", en: "QA Tester at Torcal" },
+  },
+  {
+    label: { es: "Idiomas", en: "Languages" },
+    value: {
+      es: "Inglés, competencia profesional plena",
+      en: "English, full professional proficiency",
+    },
   },
 ];

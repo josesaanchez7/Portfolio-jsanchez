@@ -49,7 +49,7 @@ export const en: Messages = {
       "I keep adding new work over time. In the meantime, you can browse my code on GitHub.",
     moreButton: "View GitHub",
   },
-  experience: { work: "Experience", education: "Education" },
+  experience: { work: "Experience", education: "Education", certification: "Certification" },
   about: {
     intro: ({ fullName, nickname }) =>
       `My name is ${fullName}, though my friends call me ${nickname}. I started programming at 16.`,

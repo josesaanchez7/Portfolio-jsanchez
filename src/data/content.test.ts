@@ -30,8 +30,9 @@ describe("contenido estático", () => {
 
   it("el stack no contiene categorías vacías ni tecnologías repetidas", () => {
     for (const category of stack) {
-      expect(category.items.length).toBeGreaterThan(0);
-      expect(new Set(category.items).size).toBe(category.items.length);
+      const names = category.items.map((item) => item.es);
+      expect(names.length).toBeGreaterThan(0);
+      expect(new Set(names).size).toBe(names.length);
     }
   });
 });
@@ -67,12 +68,12 @@ describe("traducciones del contenido", () => {
     ]),
     ...experience.flatMap((item) => [
       item.title,
-      item.organization,
+      ...(item.organization ? [item.organization] : []),
       ...(item.period ? [item.period] : []),
       ...(item.description ? [item.description] : []),
     ]),
     ...SECTIONS.flatMap((section) => [section.navLabel, section.title]),
-    ...stack.map((category) => category.label),
+    ...stack.flatMap((category) => [category.label, ...category.items]),
   ];
 
   it("ningún texto está vacío en ningún idioma", () => {

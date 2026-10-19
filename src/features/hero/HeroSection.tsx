@@ -15,7 +15,7 @@ const TITLE_TAGS = {
 
 const HeroSection = () => {
   const { t, localize } = useI18n();
-  const mainStack = stack[0]?.items ?? [];
+  const mainStack = (stack[0]?.items ?? []).map(localize);
   const job = localize(profile.currentJob);
 
   return (

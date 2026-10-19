@@ -1,15 +1,29 @@
+import type { LocalizedText } from "../lib/language";
 import type { StackCategory } from "../types/content";
 
-// Solo tecnologías que aparecen en este proyecto. Añade aquí tu stack de backend,
-// bases de datos o testing: las categorías sin elementos no se muestran.
+/** Nombre propio de tecnología: se escribe igual en todos los idiomas. */
+const tech = (name: string): LocalizedText => ({ es: name, en: name });
+
+// Frontend y herramientas: lo que usa este portfolio. Backend y testing: tu perfil de LinkedIn.
+// Añade aquí más tecnologías: las categorías sin elementos no se muestran.
 const allCategories: StackCategory[] = [
-  { label: { es: "Frontend", en: "Frontend" }, items: ["React", "TypeScript", "HTML", "CSS", "Tailwind CSS"] },
-  { label: { es: "Backend", en: "Backend" }, items: [] },
+  {
+    label: { es: "Frontend", en: "Frontend" },
+    items: [tech("React"), tech("TypeScript"), tech("HTML"), tech("CSS"), tech("Tailwind CSS")],
+  },
+  { label: { es: "Backend", en: "Backend" }, items: [tech("PHP")] },
   { label: { es: "Bases de datos", en: "Databases" }, items: [] },
-  { label: { es: "Testing y calidad", en: "Testing and quality" }, items: [] },
+  {
+    label: { es: "Testing y calidad", en: "Testing and quality" },
+    items: [
+      { es: "Pruebas API", en: "API testing" },
+      { es: "Pruebas manuales", en: "Manual testing" },
+      { es: "Planificación de pruebas", en: "Test planning" },
+    ],
+  },
   {
     label: { es: "Herramientas y despliegue", en: "Tools and deployment" },
-    items: ["Git", "GitHub", "Vite", "ESLint"],
+    items: [tech("Git"), tech("GitHub"), tech("Vite"), tech("ESLint")],
   },
 ];
 

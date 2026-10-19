@@ -47,7 +47,7 @@ export interface Messages {
     moreDescription: string;
     moreButton: string;
   };
-  experience: { work: string; education: string };
+  experience: { work: string; education: string; certification: string };
   about: {
     intro: (values: { fullName: string; nickname: string }) => string;
     current: (values: { job: string; employer: string }) => string;

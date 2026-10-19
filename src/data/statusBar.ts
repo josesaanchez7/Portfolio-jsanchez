@@ -7,7 +7,7 @@ export const statusBar = {
   errors: 0,
   // TODO: dato de ejemplo. Sustitúyelo por el número real (o quita el elemento) antes de publicar.
   testRuns: 1284,
-  location: { es: "España", en: "Spain" } satisfies LocalizedText,
+  location: { es: "Málaga, España", en: "Málaga, Spain" } satisfies LocalizedText,
   /** Muestra u oculta el indicador "Disponible". */
   available: true,
 };

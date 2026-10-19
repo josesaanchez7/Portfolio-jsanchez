@@ -38,21 +38,22 @@ export interface Project {
   caseStudy?: CaseStudy;
 }
 
-export type ExperienceKind = "work" | "education";
+export type ExperienceKind = "work" | "education" | "certification";
 
 export interface ExperienceItem {
   kind: ExperienceKind;
   title: LocalizedText;
-  organization: LocalizedText;
+  /** Opcional: una certificación puede no indicar la entidad. */
+  organization?: LocalizedText;
   /** Opcional (p. ej. "2024 – Actualidad"). */
   period?: LocalizedText;
   description?: LocalizedText;
 }
 
+/** Tecnologías y aptitudes. Los nombres propios llevan el mismo texto en ambos idiomas. */
 export interface StackCategory {
   label: LocalizedText;
-  /** Nombres de tecnologías: no se traducen. */
-  items: string[];
+  items: LocalizedText[];
 }
 
 export interface AboutFact {

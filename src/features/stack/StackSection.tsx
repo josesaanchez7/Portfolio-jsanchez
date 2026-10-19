@@ -19,10 +19,10 @@ const StackSection = () => {
             <ul className="flex flex-wrap gap-2">
               {category.items.map((item) => (
                 <li
-                  key={item}
+                  key={item.es}
                   className="rounded-sm border border-border-strong px-3 py-[0.3rem] text-[0.92rem]"
                 >
-                  {item}
+                  {localize(item)}
                 </li>
               ))}
             </ul>

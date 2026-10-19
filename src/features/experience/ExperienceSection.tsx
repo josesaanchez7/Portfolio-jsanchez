@@ -19,7 +19,7 @@ const ExperienceSection = () => {
             </div>
             <div className="flex flex-col gap-[0.35rem]">
               <h3 className="text-[1.25rem]">{localize(item.title)}</h3>
-              <p className="font-medium">{localize(item.organization)}</p>
+              {item.organization && <p className="font-medium">{localize(item.organization)}</p>}
               {item.description && (
                 <p className="mt-[0.4rem] max-w-[60ch] text-fg-muted">{localize(item.description)}</p>
               )}
