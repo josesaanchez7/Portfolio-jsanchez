@@ -1,0 +1,87 @@
+---
+import { getI18n } from "../../i18n";
+import type { CaseStudy, Project } from "../../types/content";
+import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
+
+interface Props {
+  project: Project;
+  caseStudy: CaseStudy;
+}
+
+const DETAIL_HEADING =
+  "mb-[0.4rem] font-code text-[0.8rem] font-medium tracking-[0.04em] text-accent uppercase";
+
+const { project, caseStudy } = Astro.props;
+const { t, localize } = getI18n(Astro.currentLocale);
+const dialogId = `project-${project.id}-detail`;
+const titleId = `${dialogId}-title`;
+---
+
+{/*
+  Botón "Ver detalle" + caso de estudio (problema, solución, decisiones y resultados).
+  Usa <dialog> nativo, que gestiona foco, Escape y capa modal sin dependencias.
+*/}
+<Button variant="ghost" data-case-study-open={dialogId} aria-haspopup="dialog">
+  {t.projects.viewDetail}
+</Button>
+
+<dialog
+  id={dialogId}
+  data-case-study
+  class="m-auto max-h-[calc(100dvh-4rem)] w-[min(680px,calc(100%-2rem))] rounded-lg border border-border bg-surface p-0 text-fg backdrop:bg-[rgba(8,10,16,0.7)]"
+  aria-labelledby={titleId}
+>
+  <div class="flex flex-col gap-6 p-7">
+    <header class="flex items-start justify-between gap-4">
+      <h3 id={titleId} class="text-[1.3rem]">{localize(project.title)}</h3>
+      <form method="dialog">
+        <button
+          type="submit"
+          class="grid h-9 w-9 cursor-pointer place-items-center rounded-sm border border-border-strong bg-transparent text-fg hover:border-accent hover:text-accent"
+          aria-label={t.projects.closeDetail}
+        >
+          <Icon name="times" />
+        </button>
+      </form>
+    </header>
+
+    <section>
+      <h4 class={DETAIL_HEADING}>{t.projects.problem}</h4>
+      <p class="text-fg-muted">{localize(caseStudy.problem)}</p>
+    </section>
+    <section>
+      <h4 class={DETAIL_HEADING}>{t.projects.solution}</h4>
+      <p class="text-fg-muted">{localize(caseStudy.solution)}</p>
+    </section>
+    <section>
+      <h4 class={DETAIL_HEADING}>{t.projects.decisions}</h4>
+      <ul class="flex list-disc flex-col gap-[0.4rem] pl-[1.1rem] text-fg-muted">
+        {caseStudy.decisions.map((item) => <li>{localize(item)}</li>)}
+      </ul>
+    </section>
+    <section>
+      <h4 class={DETAIL_HEADING}>{t.projects.results}</h4>
+      <ul class="flex list-disc flex-col gap-[0.4rem] pl-[1.1rem] text-fg-muted">
+        {caseStudy.results.map((item) => <li>{localize(item)}</li>)}
+      </ul>
+    </section>
+  </div>
+</dialog>
+
+<script>
+  // Hay un diálogo por proyecto con caso de estudio: el script se carga una sola vez y los enlaza todos.
+  for (const trigger of document.querySelectorAll<HTMLElement>("[data-case-study-open]")) {
+    const dialog = document.getElementById(trigger.dataset.caseStudyOpen ?? "");
+    if (dialog instanceof HTMLDialogElement) {
+      trigger.addEventListener("click", () => dialog.showModal());
+    }
+  }
+
+  for (const dialog of document.querySelectorAll<HTMLDialogElement>("dialog[data-case-study]")) {
+    // Atajo para ratón: clic en el fondo cierra el diálogo. Con teclado se cierra con Escape o el botón.
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+  }
+</script>

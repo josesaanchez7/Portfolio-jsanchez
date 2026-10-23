@@ -1,0 +1,92 @@
+---
+import { Image } from "astro:assets";
+import perfil from "../../assets/img/hero.webp";
+import { cvUrl } from "../../data/cv";
+import { profile } from "../../data/profile";
+import { HERO_ID } from "../../data/sections";
+import { stack } from "../../data/stack";
+import { getI18n } from "../../i18n";
+import { DEBUG_SECTION } from "../../lib/debugSection";
+import Button from "../ui/Button.astro";
+import RichText, { type TagSpec } from "../ui/RichText.astro";
+
+const { t, localize } = getI18n(Astro.currentLocale);
+const mainStack = (stack[0]?.items ?? []).map(localize);
+const job = localize(profile.currentJob);
+
+const TITLE_TAGS: Record<string, TagSpec> = { h: { as: "span", class: "text-accent" } };
+---
+
+<section
+  id={HERO_ID}
+  data-section={HERO_ID}
+  aria-labelledby="hero-title"
+  class={`relative isolate scroll-mt-(--header-height) px-6 pt-[clamp(3.5rem,9vw,7rem)] pb-[clamp(4rem,9vw,7rem)] before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:bg-[radial-gradient(color-mix(in_srgb,var(--text-muted)_25%,transparent)_1px,transparent_1px)] before:bg-size-[28px_28px] before:mask-[linear-gradient(to_bottom,#000_0%,transparent_85%)] before:content-[''] ${DEBUG_SECTION}`}
+>
+  <div
+    class="mx-auto grid max-w-site grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-[clamp(2rem,6vw,5rem)] max-nav:grid-cols-1"
+  >
+    <div class="flex flex-col items-start gap-6">
+      <p class="font-code text-[0.85rem] text-accent">
+        {profile.name}{" "}<span class="px-[0.15rem] text-fg-muted" aria-hidden="true">/</span>{" "}{t.hero.eyebrowRole(job, profile.employer)}
+      </p>
+
+      <h1
+        id="hero-title"
+        class="text-[clamp(2.4rem,6vw,4.25rem)] leading-[1.05] tracking-[-0.035em] text-balance"
+      >
+        <RichText text={t.hero.title} tags={TITLE_TAGS} />
+      </h1>
+
+      <p
+        class="max-w-[56ch] text-[clamp(1rem,2vw,1.15rem)] text-fg-muted [&_strong]:font-semibold [&_strong]:text-fg"
+      >
+        <RichText
+          text={t.hero.lead({ role: localize(profile.role), job, employer: profile.employer })}
+        />
+      </p>
+
+      <div class="mt-2 flex flex-wrap gap-3">
+        <Button href="#Proyectos" icon="arrowRight">{t.hero.viewProjects}</Button>
+        <Button href="#Contacto" variant="secondary">{t.hero.contact}</Button>
+      </div>
+
+      <ul class="-ml-2 flex flex-wrap gap-x-4 gap-y-1" aria-label={t.hero.profileLinksLabel}>
+        <li>
+          <Button href={profile.github} external variant="ghost" icon="github">GitHub</Button>
+        </li>
+        <li>
+          <Button href={profile.linkedin} external variant="ghost" icon="linkedin">LinkedIn</Button>
+        </li>
+        <li>
+          <Button href={cvUrl} download="Jose_Sanchez_CV.pdf" variant="ghost" icon="download">
+            {t.hero.downloadCv}
+          </Button>
+        </li>
+      </ul>
+
+      {
+        mainStack.length > 0 && (
+          <p class="border-t border-border pt-5 font-code text-[0.82rem] text-fg-muted">
+            <span class="mr-2 text-accent">{t.hero.stackLabel}</span>{" "}{mainStack.join(" · ")}
+          </p>
+        )
+      }
+    </div>
+
+    <div
+      class="aspect-square w-[min(100%,340px)] justify-self-center rounded-lg border border-border bg-surface p-4 shadow-card max-nav:order-first max-nav:w-[120px] max-nav:justify-self-start max-nav:p-2"
+    >
+      <Image
+        src={perfil}
+        alt={t.hero.portraitAlt(profile.name)}
+        width={340}
+        height={340}
+        widths={[340, 680]}
+        sizes="(max-width: 820px) 120px, 340px"
+        loading="eager"
+        class="h-full w-full rounded-md object-cover"
+      />
+    </div>
+  </div>
+</section>

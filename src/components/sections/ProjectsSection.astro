@@ -1,0 +1,26 @@
+---
+import { profile } from "../../data/profile";
+import { projects } from "../../data/projects";
+import { getI18n } from "../../i18n";
+import Section from "../layout/Section.astro";
+import Button from "../ui/Button.astro";
+import ProjectCard from "./ProjectCard.astro";
+
+const { t } = getI18n(Astro.currentLocale);
+---
+
+<Section id="Proyectos">
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] gap-6">
+    {projects.map((project) => <ProjectCard project={project} />)}
+
+    <aside
+      class="flex flex-col items-start justify-center gap-4 rounded-lg border border-dashed border-border-strong p-6"
+    >
+      <h3 class="text-[1.2rem]">{t.projects.moreTitle}</h3>
+      <p class="text-fg-muted">{t.projects.moreDescription}</p>
+      <Button href={profile.github} external variant="secondary" icon="github">
+        {t.projects.moreButton}
+      </Button>
+    </aside>
+  </div>
+</Section>

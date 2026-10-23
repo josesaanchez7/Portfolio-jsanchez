@@ -1,0 +1,115 @@
+---
+import { profile } from "../../data/profile";
+import { statusBar } from "../../data/statusBar";
+import { getI18n } from "../../i18n";
+import { formatInteger } from "../../lib/format";
+
+const { language, t, localize } = getI18n(Astro.currentLocale);
+
+const ITEM = "inline-flex items-center gap-1.5 px-2.5 py-1 whitespace-nowrap";
+
+// Botones que no parecen botones: sin borde ni fondo propio; al pasar el ratón se oscurece el fondo.
+const BUTTON = [
+  ITEM,
+  "cursor-pointer border-0 bg-transparent font-[inherit] text-inherit",
+  "hover:bg-black/20 aria-pressed:bg-black/30",
+  "aria-disabled:cursor-default aria-disabled:opacity-60 aria-disabled:hover:bg-transparent",
+  "focus-visible:rounded-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-contrast",
+].join(" ");
+
+/** Elemento secundario: se oculta en móvil. */
+const SECONDARY = "max-sm:hidden";
+---
+
+{/* Pie de página con aspecto de la barra de estado de VS Code. */}
+<footer
+  aria-label={t.footer.label}
+  class="w-full bg-accent pr-[max(0.25rem,env(safe-area-inset-right))] pb-[env(safe-area-inset-bottom)] pl-[max(0.25rem,env(safe-area-inset-left))] font-code text-[12px] leading-4 text-accent-contrast sm:text-[13px]"
+>
+  <div class="flex flex-wrap items-center">
+    <ul class="flex flex-wrap items-center">
+      <li>
+        <span class={ITEM}>
+          <span aria-hidden="true">⎇</span>
+          {statusBar.branch}
+        </span>
+      </li>
+      <li>
+        <span class={ITEM}>
+          {`© ${new Date().getFullYear()} ${profile.name}`}
+        </span>
+      </li>
+      <li class={SECONDARY}>
+        <span class={ITEM}>
+          <span aria-hidden="true">✓</span>
+          {t.footer.errors(statusBar.errors)}
+        </span>
+      </li>
+    </ul>
+
+    <ul class="ml-auto flex flex-wrap items-center">
+      <li class={SECONDARY}>
+        <span class={ITEM}>
+          <span aria-hidden="true">▶</span>
+          {t.footer.testedTimes(formatInteger(statusBar.testRuns, language))}
+        </span>
+      </li>
+      <li class={SECONDARY}>
+        <span class={ITEM}>
+          <span aria-hidden="true">📍</span>
+          {localize(statusBar.location)}
+        </span>
+      </li>
+      {
+        statusBar.available && (
+          <li class={SECONDARY}>
+            <span class={ITEM}>
+              <span aria-hidden="true">●</span>
+              {t.footer.available}
+            </span>
+          </li>
+        )
+      }
+      <li>
+        <button type="button" class={BUTTON} aria-pressed="false" data-debug-toggle>
+          {t.footer.debug}
+        </button>
+      </li>
+      <li>
+        {/* Preparado: inactivo hasta que exista la página 404. */}
+        <button
+          type="button"
+          class={BUTTON}
+          aria-label={t.footer.notFoundLabel}
+          aria-disabled="true"
+          title={t.footer.comingSoon}
+        >
+          {t.footer.notFound}
+        </button>
+      </li>
+      <li>
+        <button type="button" class={BUTTON} aria-label={t.footer.consoleLabel} data-console-open>
+          <span aria-hidden="true">&gt;_</span>
+          {t.footer.console}
+        </button>
+      </li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+  import { isDebugEnabled, onDebugChange, toggleDebug } from "../../scripts/debug";
+
+  const syncPressed = () => {
+    for (const button of document.querySelectorAll<HTMLButtonElement>("[data-debug-toggle]")) {
+      button.setAttribute("aria-pressed", String(isDebugEnabled()));
+    }
+  };
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-debug-toggle]")) {
+    button.addEventListener("click", toggleDebug);
+  }
+  // El comando `debug` de la consola cambia el mismo estado: el botón se mantiene en sincronía.
+  onDebugChange(syncPressed);
+  syncPressed();
+</script>

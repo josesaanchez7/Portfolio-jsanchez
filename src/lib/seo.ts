@@ -38,70 +38,65 @@ export const resolveSiteUrl = (env: Record<string, string | undefined>): string 
   return null;
 };
 
+/** Una etiqueta de <head> (meta o link) con sus atributos, lista para pintarse desde el layout. */
+export interface SeoTag {
+  tag: "meta" | "link";
+  attributes: Record<string, string>;
+}
+
 /**
  * Etiquetas de <head> para compartir y para buscadores. Sin `siteUrl` se omiten las que exigen
  * URL absoluta (canonical, hreflang, og:url) y la imagen queda con ruta relativa.
+ * Devuelve datos (no HTML): Astro escapa los atributos al pintarlos.
  */
-export const buildSeoHead = (
+export const buildSeoTags = (
   language: Language,
   meta: SeoMeta,
   siteUrl: string | null,
-): string => {
+): SeoTag[] => {
   const absolute = (path: string) => (siteUrl ? joinUrl(siteUrl, path) : path);
-  const tag = (attributes: Record<string, string>) =>
-    `<meta ${Object.entries(attributes)
-      .map(([name, value]) => `${name}="${escapeHtml(value)}"`)
-      .join(" ")} />`;
+  const metaTag = (attributes: Record<string, string>): SeoTag => ({ tag: "meta", attributes });
+  const linkTag = (attributes: Record<string, string>): SeoTag => ({ tag: "link", attributes });
 
   const image = absolute(OG_IMAGE[language]);
   const tags = [
-    tag({ property: "og:type", content: "website" }),
-    tag({ property: "og:site_name", content: "José Sánchez" }),
-    tag({ property: "og:title", content: meta.title }),
-    tag({ property: "og:description", content: meta.ogDescription }),
-    tag({ property: "og:locale", content: OG_LOCALE[language] }),
+    metaTag({ property: "og:type", content: "website" }),
+    metaTag({ property: "og:site_name", content: "José Sánchez" }),
+    metaTag({ property: "og:title", content: meta.title }),
+    metaTag({ property: "og:description", content: meta.ogDescription }),
+    metaTag({ property: "og:locale", content: OG_LOCALE[language] }),
     ...LANGUAGES.filter((other) => other !== language).map((other) =>
-      tag({ property: "og:locale:alternate", content: OG_LOCALE[other] }),
+      metaTag({ property: "og:locale:alternate", content: OG_LOCALE[other] }),
     ),
-    tag({ property: "og:image", content: image }),
-    tag({ property: "og:image:type", content: "image/jpeg" }),
-    tag({ property: "og:image:width", content: String(OG_IMAGE_SIZE.width) }),
-    tag({ property: "og:image:height", content: String(OG_IMAGE_SIZE.height) }),
-    tag({ property: "og:image:alt", content: meta.title }),
-    tag({ name: "twitter:card", content: "summary_large_image" }),
-    tag({ name: "twitter:title", content: meta.title }),
-    tag({ name: "twitter:description", content: meta.ogDescription }),
-    tag({ name: "twitter:image", content: image }),
+    metaTag({ property: "og:image", content: image }),
+    metaTag({ property: "og:image:type", content: "image/jpeg" }),
+    metaTag({ property: "og:image:width", content: String(OG_IMAGE_SIZE.width) }),
+    metaTag({ property: "og:image:height", content: String(OG_IMAGE_SIZE.height) }),
+    metaTag({ property: "og:image:alt", content: meta.title }),
+    metaTag({ name: "twitter:card", content: "summary_large_image" }),
+    metaTag({ name: "twitter:title", content: meta.title }),
+    metaTag({ name: "twitter:description", content: meta.ogDescription }),
+    metaTag({ name: "twitter:image", content: image }),
   ];
 
   if (siteUrl) {
     const pageUrl = absolute(pathForLanguage(language));
     tags.push(
-      tag({ property: "og:url", content: pageUrl }),
-      `<link rel="canonical" href="${escapeHtml(pageUrl)}" />`,
-      ...LANGUAGES.map(
-        (other) =>
-          `<link rel="alternate" hreflang="${other}" href="${escapeHtml(absolute(pathForLanguage(other)))}" />`,
+      metaTag({ property: "og:url", content: pageUrl }),
+      linkTag({ rel: "canonical", href: pageUrl }),
+      ...LANGUAGES.map((other) =>
+        linkTag({ rel: "alternate", hreflang: other, href: absolute(pathForLanguage(other)) }),
       ),
-      `<link rel="alternate" hreflang="x-default" href="${escapeHtml(absolute(pathForLanguage(DEFAULT_LANGUAGE)))}" />`,
+      linkTag({
+        rel: "alternate",
+        hreflang: "x-default",
+        href: absolute(pathForLanguage(DEFAULT_LANGUAGE)),
+      }),
     );
   }
 
-  return tags.join("\n    ");
+  return tags;
 };
-
-/** Rellena la plantilla index.html ({{lang}}, {{title}}, {{description}} y {{seo}}) para un idioma. */
-export const applyTemplate = (
-  template: string,
-  language: Language,
-  meta: SeoMeta,
-  siteUrl: string | null,
-): string =>
-  template
-    .split("{{lang}}").join(language)
-    .split("{{title}}").join(escapeHtml(meta.title))
-    .split("{{description}}").join(escapeHtml(meta.description))
-    .split("{{seo}}").join(buildSeoHead(language, meta, siteUrl));
 
 /** sitemap.xml con una entrada por idioma y sus alternativas (hreflang). */
 export const buildSitemap = (siteUrl: string): string => {

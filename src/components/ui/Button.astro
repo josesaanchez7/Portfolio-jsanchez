@@ -1,0 +1,52 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import Icon from "./Icon.astro";
+import type { IconName } from "./icons";
+
+type Variant = "primary" | "secondary" | "ghost";
+
+/**
+ * Enlace (si recibe `href`) o botón (si no) con estilos coherentes. El resto de atributos
+ * (aria-*, data-*, download…) se pasan tal cual al elemento.
+ */
+interface Props extends Omit<HTMLAttributes<"a">, "class" | "target" | "rel"> {
+  variant?: Variant;
+  icon?: IconName;
+  /** Abre en una pestaña nueva (enlaces externos). */
+  external?: boolean;
+}
+
+const BASE = [
+  "inline-flex items-center justify-center gap-[0.55rem] py-[0.7rem]",
+  "rounded-sm border text-[0.95rem] leading-[1.2] font-semibold cursor-pointer",
+  "transition-[background-color,border-color,color,translate] duration-200 ease-[ease]",
+  "hover:-translate-y-px active:translate-y-0",
+  "disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50",
+  "[&_svg]:shrink-0",
+].join(" ");
+
+const VARIANT: Record<Variant, string> = {
+  primary:
+    "border-transparent bg-accent px-5 text-accent-contrast hover:bg-accent-hover hover:text-accent-contrast",
+  secondary:
+    "border-border-strong bg-transparent px-5 text-fg hover:border-accent hover:text-accent",
+  ghost: "border-transparent bg-transparent px-2 text-fg-muted hover:text-accent",
+};
+
+const { variant = "primary", icon, external, href, ...attributes } = Astro.props;
+const className = `${BASE} ${VARIANT[variant]}`;
+---
+
+{
+  href !== undefined ? (
+    <a {...attributes} href={href} class={className} {...(external && { target: "_blank", rel: "noopener noreferrer" })}>
+      {icon && <Icon name={icon} />}
+      <slot />
+    </a>
+  ) : (
+    <button {...attributes} type="button" class={className}>
+      {icon && <Icon name={icon} />}
+      <slot />
+    </button>
+  )
+}

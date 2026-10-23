@@ -1,0 +1,24 @@
+---
+import { ICONS, type IconName } from "./icons";
+
+interface Props {
+  name: IconName;
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+const { viewBox, path } = ICONS[name];
+---
+
+{/* Siempre decorativo: el significado lo da el texto o el aria-label del botón que lo contiene. */}
+<svg
+  aria-hidden="true"
+  focusable="false"
+  viewBox={viewBox}
+  width="1em"
+  height="1em"
+  fill="currentColor"
+  class={className}
+>
+  <path d={path}></path>
+</svg>

@@ -1,0 +1,48 @@
+---
+import BootScreen from "../../components/boot/BootScreen.astro";
+import ConsoleDialog from "../../components/console/ConsoleDialog.astro";
+import Footer from "../../components/layout/Footer.astro";
+import Header from "../../components/layout/Header.astro";
+import AboutSection from "../../components/sections/AboutSection.astro";
+import ContactSection from "../../components/sections/ContactSection.astro";
+import ExperienceSection from "../../components/sections/ExperienceSection.astro";
+import HeroSection from "../../components/sections/HeroSection.astro";
+import ProjectsSection from "../../components/sections/ProjectsSection.astro";
+import StackSection from "../../components/sections/StackSection.astro";
+import { getI18n } from "../../i18n";
+import Layout from "../../layouts/Layout.astro";
+import { DEFAULT_LANGUAGE, LANGUAGES } from "../../lib/language";
+
+// Una página por idioma: "/" (idioma por defecto) y "/en/".
+export function getStaticPaths() {
+  return LANGUAGES.map((language) => ({
+    params: { lang: language === DEFAULT_LANGUAGE ? undefined : language },
+  }));
+}
+
+const { t } = getI18n(Astro.currentLocale);
+---
+
+<Layout>
+  <BootScreen />
+  {/* La web ya está montada detrás de la pantalla de carga; mientras se ve, su script la marca como inert. */}
+  <div id="page">
+    <a
+      href="#main"
+      class="absolute top-3 left-3 z-[2000] -translate-y-[200%] rounded-sm bg-accent px-4 py-[0.6rem] font-semibold text-accent-contrast focus:translate-y-0"
+    >
+      {t.skipToContent}
+    </a>
+    <Header />
+    <main id="main">
+      <HeroSection />
+      <ProjectsSection />
+      <ExperienceSection />
+      <StackSection />
+      <AboutSection />
+      <ContactSection />
+    </main>
+    <Footer />
+  </div>
+  <ConsoleDialog />
+</Layout>

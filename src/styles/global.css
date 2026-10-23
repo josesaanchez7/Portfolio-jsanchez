@@ -61,7 +61,7 @@
 @theme static {
   --color-boot-bg: #0d1017;
   --color-boot-text: #d7dce6;
-  --color-boot-dim: #6f7a8e;
+  --color-boot-dim: #79849a; /* contraste ≥ 4,5:1 sobre --color-boot-bg */
   --color-boot-ok: #5bd49a;
   --color-boot-prompt: #9aa5ff;
   --color-boot-warn: #f2c14e;
@@ -148,4 +148,13 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/*
+ * Sin scroll de fondo mientras se ve la pantalla de carga (<html data-boot>) o la consola
+ * (<html data-console-open>). Fuera de @layer a propósito: debe ganar a las utilidades del <body>.
+ */
+html[data-boot] body,
+html[data-console-open] body {
+  overflow: hidden;
 }

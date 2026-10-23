@@ -1,0 +1,78 @@
+---
+import { getI18n } from "../../i18n";
+import type { Project } from "../../types/content";
+import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
+import ProjectCaseStudy from "./ProjectCaseStudy.astro";
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const { t, localize } = getI18n(Astro.currentLocale);
+const titleId = `project-${project.id}-title`;
+const title = localize(project.title);
+---
+
+<article
+  class="flex flex-col overflow-hidden rounded-lg border border-border bg-surface transition-[border-color,translate] duration-250 ease-[ease] hover:-translate-y-[3px] hover:border-accent"
+  aria-labelledby={titleId}
+>
+  <div class="aspect-[16/10] border-b border-border bg-page">
+    {
+      project.image ? (
+        <img
+          src={project.image}
+          alt={t.projects.screenshotAlt(title)}
+          class="h-full w-full object-cover"
+          loading="lazy"
+          width={640}
+          height={400}
+        />
+      ) : (
+        // Vista previa provisional: sustitúyela añadiendo `image` al proyecto.
+        <div
+          class="flex h-full w-full flex-col items-center justify-center gap-3 bg-[linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] bg-size-[32px_32px] bg-center p-6 text-center font-code text-[0.85rem] text-fg-muted"
+          aria-hidden="true"
+        >
+          <Icon name="code" class="text-[1.75rem] text-accent" />
+          <span>{title}</span>
+        </div>
+      )
+    }
+  </div>
+
+  <div class="flex flex-1 flex-col gap-4 p-6">
+    <h3 id={titleId} class="text-[1.3rem]">{title}</h3>
+    <p class="text-fg-muted">{localize(project.description)}</p>
+
+    <ul class="flex flex-wrap gap-2" aria-label={t.projects.techLabel}>
+      {
+        project.tags.map((tag) => (
+          <li class="rounded-full bg-accent-soft px-[0.65rem] py-[0.2rem] font-code text-[0.78rem] text-accent">
+            {tag}
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-auto flex flex-wrap gap-3 pt-2">
+      {
+        project.demo && (
+          <Button href={project.demo} external icon="externalLink">
+            {t.projects.demo}
+          </Button>
+        )
+      }
+      {
+        project.code && (
+          <Button href={project.code} external variant="secondary" icon="github">
+            {t.projects.code}
+          </Button>
+        )
+      }
+      {project.caseStudy && <ProjectCaseStudy project={project} caseStudy={project.caseStudy} />}
+    </div>
+  </div>
+</article>

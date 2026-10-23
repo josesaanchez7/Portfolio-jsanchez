@@ -1,0 +1,249 @@
+---
+import { getI18n } from "../../i18n";
+
+const { t } = getI18n(Astro.currentLocale);
+
+const WINDOW_TITLE = "jose@portfolio — zsh";
+
+// Siempre oscura, como la pantalla de carga: usa sus colores (--color-boot-*), no los del tema.
+const DIALOG =
+  "scheme-dark m-auto h-[min(460px,calc(100dvh-2rem))] w-[min(720px,calc(100%-2rem))] overflow-hidden rounded-lg border border-boot-dot bg-boot-bg p-0 font-boot text-[14px] leading-[1.6] text-boot-text shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop:bg-[rgba(8,10,16,0.7)]";
+---
+
+{/*
+  Consola interactiva que simula una terminal. Se mantiene en la página (cerrada) para conservar
+  la transcripción y el historial de comandos mientras esté abierta. El comportamiento está en el
+  <script> de abajo; los comandos, en src/scripts/console/commands.ts.
+*/}
+<dialog aria-label={t.console.title} class={DIALOG} data-console>
+  <div class="flex h-full flex-col">
+    <header
+      class="flex shrink-0 items-center justify-between border-b border-boot-dot py-[0.35rem] pr-2 pl-4 text-[0.9em] text-boot-dim"
+    >
+      <span>{WINDOW_TITLE}</span>
+      <button
+        type="button"
+        aria-label={t.console.close}
+        data-console-close
+        class="grid h-7 w-7 cursor-pointer place-items-center rounded-sm text-[1.5em] leading-none text-boot-dim transition-colors duration-200 hover:text-boot-text focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-boot-prompt"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <div
+      role="log"
+      aria-live="polite"
+      aria-relevant="additions"
+      data-console-log
+      class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 [overflow-wrap:anywhere] whitespace-pre-wrap"
+    >
+    </div>
+
+    <form
+      data-console-form
+      class="flex shrink-0 items-center gap-2 border-t border-boot-dot px-4 py-2"
+    >
+      <span class="text-boot-prompt" aria-hidden="true">~ $</span>
+      <input
+        data-console-input
+        aria-label={t.console.inputLabel}
+        placeholder={t.console.placeholder}
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        enterkeyhint="send"
+        class="min-w-0 flex-1 border-0 bg-transparent p-0 text-inherit outline-none placeholder:text-boot-dim max-phone:text-[16px]"
+      />
+    </form>
+  </div>
+</dialog>
+
+<script>
+  import { cvUrl } from "../../data/cv";
+  import { profile } from "../../data/profile";
+  import { projects } from "../../data/projects";
+  import { messages } from "../../i18n/messages";
+  import { DEFAULT_LANGUAGE, parseLanguage } from "../../lib/language";
+  import { welcomeLine } from "../../scripts/console/commands";
+  import type {
+    CommandContext,
+    ConsoleEffect,
+    ConsoleLine,
+    ConsoleTone,
+  } from "../../scripts/console/consoleTypes";
+  import { createConsoleSession } from "../../scripts/console/session";
+  import { isDebugEnabled, toggleDebug } from "../../scripts/debug";
+
+  const TONE_CLASS: Record<ConsoleTone, string> = {
+    ok: "text-boot-ok",
+    dim: "text-boot-dim",
+    warn: "text-boot-warn",
+    info: "text-boot-prompt",
+  };
+
+  const dialog = document.querySelector<HTMLDialogElement>("[data-console]");
+  const log = dialog?.querySelector<HTMLElement>("[data-console-log]");
+  const form = dialog?.querySelector<HTMLFormElement>("[data-console-form]");
+  const input = dialog?.querySelector<HTMLInputElement>("[data-console-input]");
+  const closeButton = dialog?.querySelector<HTMLButtonElement>("[data-console-close]");
+
+  if (dialog && log && form && input && closeButton) {
+    const language = parseLanguage(document.documentElement.lang) ?? DEFAULT_LANGUAGE;
+
+    const getContext = (): CommandContext => ({
+      t: messages[language],
+      language,
+      localize: (text) => text[language],
+      profile,
+      projects,
+      debugEnabled: isDebugEnabled(),
+      // Preparado: hasta que exista la página 404, el comando `404` solo avisa.
+      canShowNotFound: false,
+    });
+
+    /** Una línea de resultados. Todo el texto se pinta como texto plano: nunca se interpreta como HTML. */
+    const renderLine = (line: ConsoleLine): HTMLDivElement => {
+      const row = document.createElement("div");
+      row.className = "min-h-[1.6em]";
+
+      for (const segment of line) {
+        const tone = segment.tone ? TONE_CLASS[segment.tone] : undefined;
+        if (segment.href) {
+          const link = document.createElement("a");
+          link.href = segment.href;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.className = `underline underline-offset-2 hover:text-boot-text ${tone ?? TONE_CLASS.info}`;
+          link.textContent = segment.text;
+          row.append(link);
+        } else {
+          const span = document.createElement("span");
+          if (tone) span.className = tone;
+          span.textContent = segment.text;
+          row.append(span);
+        }
+      }
+      return row;
+    };
+
+    const append = (lines: readonly ConsoleLine[]) => {
+      log.append(...lines.map(renderLine));
+      // Los resultados nuevos bajan solos. Con la consola cerrada no se mide nada: leer scrollHeight
+      // obligaría al navegador a recalcular todo el diseño de la página al cargar.
+      if (dialog.open) log.scrollTop = log.scrollHeight;
+    };
+
+    const handleEffect = (effect: ConsoleEffect) => {
+      switch (effect) {
+        case "close":
+          dialog.close();
+          break;
+        case "openCv":
+          window.open(cvUrl, "_blank", "noopener,noreferrer");
+          break;
+        case "toggleDebug":
+          toggleDebug();
+          break;
+        case "show404":
+          // Sin página 404 todavía: el comando nunca pide este efecto (canShowNotFound es false).
+          break;
+      }
+    };
+
+    const session = createConsoleSession({
+      getContext,
+      onEffect: handleEffect,
+      onAppend: append,
+      onClear: () => log.replaceChildren(),
+      onBusyChange: (busy) => {
+        input.readOnly = busy;
+        input.setAttribute("aria-busy", String(busy));
+      },
+    });
+    append([welcomeLine(getContext())]);
+
+    // --- Abrir y cerrar -------------------------------------------------------------------
+    let returnFocus: HTMLElement | null = null;
+
+    // La consola no se puede abrir mientras se muestra la pantalla de carga (<html data-boot>).
+    const isBooting = () => "boot" in document.documentElement.dataset;
+
+    const open = () => {
+      if (dialog.open || isBooting()) return;
+      returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      // Mientras está abierta, la página de detrás no hace scroll (ver global.css).
+      document.documentElement.toggleAttribute("data-console-open", true);
+      dialog.showModal();
+      log.scrollTop = log.scrollHeight;
+      input.focus();
+    };
+
+    // Cualquier cierre (Esc, ×, clic fuera, Ctrl+K, exit…) acaba aquí: devuelve el foco a quien abrió.
+    dialog.addEventListener("close", () => {
+      document.documentElement.removeAttribute("data-console-open");
+      returnFocus?.focus();
+      returnFocus = null;
+    });
+    closeButton.addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => {
+      // Clic en el fondo (fuera de la ventana) cierra la consola.
+      if (event.target === dialog) dialog.close();
+    });
+    for (const trigger of document.querySelectorAll<HTMLElement>("[data-console-open]")) {
+      trigger.addEventListener("click", open);
+    }
+
+    // --- Atajos globales: Ctrl/Cmd + K abre y cierra; ` abre si no se está escribiendo ----------
+    const isTypingTarget = (target: EventTarget | null): boolean =>
+      target instanceof HTMLElement &&
+      (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
+
+    // La tecla ` es una tecla muerta en el teclado español (key "Dead", en la tecla a la derecha de la P),
+    // así que se reconoce también por su posición física cuando no se pulsa con Mayús (Mayús+tecla = ^).
+    const isGraveKey = (event: KeyboardEvent): boolean =>
+      event.key === "`" || (event.key === "Dead" && event.code === "BracketLeft" && !event.shiftKey);
+
+    document.addEventListener("keydown", (event) => {
+      if (isBooting() || event.repeat) return;
+
+      if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        if (dialog.open) dialog.close();
+        else open();
+        return;
+      }
+
+      if (
+        isGraveKey(event) &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey &&
+        !isTypingTarget(event.target)
+      ) {
+        event.preventDefault();
+        open();
+      }
+    });
+
+    // --- Línea de comandos ----------------------------------------------------------------
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      session.submit(input.value);
+      input.value = "";
+    });
+
+    input.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+      event.preventDefault();
+      const recalled = event.key === "ArrowUp" ? session.previous(input.value) : session.next();
+      if (recalled !== null) input.value = recalled;
+    });
+
+    log.addEventListener("click", () => {
+      // Un clic en los resultados enfoca la línea de comandos, salvo que se esté seleccionando texto.
+      if (!window.getSelection()?.toString()) input.focus();
+    });
+  }
+</script>

@@ -30,7 +30,7 @@ export const en: Messages = {
       exit: "close the console",
     },
     whoami: ({ name, job, employer }) =>
-      `${name}. ${job} at ${employer} and multiplatform developer. I test applications and build them with React and TypeScript.`,
+      `${name}. ${job} at ${employer} and multiplatform developer. I test applications and build them with Astro and TypeScript.`,
     skillsTesting: "Testing:",
     skillsDevelopment: "Development:",
     projectStatus: { done: "Done", "in-progress": "In progress", todo: "To do" },

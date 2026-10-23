@@ -1,0 +1,86 @@
+---
+import { profile } from "../../data/profile";
+import { getI18n } from "../../i18n";
+import Section from "../layout/Section.astro";
+import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
+
+const { t } = getI18n(Astro.currentLocale);
+---
+
+<Section id="Contacto">
+  <div
+    class="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-start gap-[clamp(2rem,5vw,4rem)] max-nav:grid-cols-1"
+    data-contact
+  >
+    <p class="max-w-[44ch] text-[1.1rem] text-fg-muted">{t.contact.intro}</p>
+
+    <div class="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6">
+      <div class="flex items-stretch overflow-hidden rounded-sm border border-border-strong bg-page">
+        <a
+          href={`mailto:${profile.email}`}
+          class="min-w-0 flex-1 px-4 py-[0.8rem] font-code text-[0.92rem] [overflow-wrap:anywhere] text-fg hover:text-accent"
+        >
+          {profile.email}
+        </a>
+        <button
+          type="button"
+          class="group grid w-12 cursor-pointer place-items-center border-l border-border-strong bg-transparent text-[1rem] text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface-hover hover:text-accent"
+          aria-label={t.contact.copyLabel}
+          data-copy-email={profile.email}
+          data-copied-message={t.contact.copied}
+          data-error-message={t.contact.copyError}
+        >
+          <Icon name="copy" class="group-data-copied:hidden" />
+          <Icon name="check" class="hidden group-data-copied:block" />
+        </button>
+      </div>
+      <p
+        class="-mt-[0.4rem] min-h-[1.4em] text-[0.88rem] text-accent"
+        role="status"
+        aria-live="polite"
+        data-copy-status
+      >
+      </p>
+
+      <div class="flex flex-wrap gap-3">
+        <Button href={`mailto:${profile.email}`} icon="envelope">{t.contact.sendEmail}</Button>
+        <Button href={profile.linkedin} external variant="secondary" icon="linkedin">
+          LinkedIn
+        </Button>
+        <Button href={profile.github} external variant="secondary" icon="github">GitHub</Button>
+      </div>
+    </div>
+  </div>
+</Section>
+
+<script>
+  const RESET_DELAY_MS = 2500;
+
+  const root = document.querySelector<HTMLElement>("[data-contact]");
+  const button = root?.querySelector<HTMLButtonElement>("[data-copy-email]");
+  const status = root?.querySelector<HTMLElement>("[data-copy-status]");
+
+  if (button && status) {
+    let resetTimer: number | undefined;
+
+    button.addEventListener("click", async () => {
+      let copied = false;
+      try {
+        await navigator.clipboard.writeText(button.dataset.copyEmail ?? "");
+        copied = true;
+      } catch {
+        // También cubre contextos sin Clipboard API (p. ej. http sin TLS).
+      }
+
+      button.toggleAttribute("data-copied", copied);
+      status.textContent = (copied ? button.dataset.copiedMessage : button.dataset.errorMessage) ?? "";
+
+      window.clearTimeout(resetTimer);
+      resetTimer = window.setTimeout(() => {
+        button.removeAttribute("data-copied");
+        status.textContent = "";
+      }, RESET_DELAY_MS);
+    });
+  }
+</script>

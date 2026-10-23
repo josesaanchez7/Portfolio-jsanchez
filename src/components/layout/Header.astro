@@ -1,0 +1,230 @@
+---
+import { profile } from "../../data/profile";
+import { HERO_ID, SECTIONS } from "../../data/sections";
+import { getI18n } from "../../i18n";
+import { LANGUAGE_CODE } from "../../lib/language";
+import { pathForLanguage } from "../../lib/seo";
+import Icon from "../ui/Icon.astro";
+
+const { language, t, localize } = getI18n(Astro.currentLocale);
+
+// El menú móvil se activa en ≤ 820px. Sin ancho ni display: cada botón añade los suyos.
+const ICON_BUTTON =
+  "h-[38px] place-items-center rounded-sm bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
+
+// El selector muestra y activa el idioma al que se cambiaría.
+const otherLanguage = language === "es" ? "en" : "es";
+---
+
+<header
+  class="sticky top-0 z-[1000] h-(--header-height) border-b border-border bg-[color-mix(in_srgb,var(--bg)_85%,transparent)] backdrop-blur-md"
+  data-header
+>
+  <div class="mx-auto flex h-full max-w-site items-center gap-6 px-6 max-nav:gap-3 max-nav:px-5">
+    <a
+      href={`#${HERO_ID}`}
+      class="inline-flex items-center gap-[0.65rem] font-heading font-bold tracking-[-0.01em] text-fg"
+      aria-label={t.header.homeLabel(profile.name)}
+    >
+      <span
+        class="grid h-8 w-8 place-items-center rounded-sm border border-border bg-surface text-[0.8rem] text-accent"
+        aria-hidden="true"
+      >
+        JS
+      </span>
+      <span class="max-mini:hidden">{profile.name}</span>
+    </a>
+
+    <nav
+      id="main-nav"
+      aria-label={t.header.navLabel}
+      data-nav
+      class="ml-auto max-nav:absolute max-nav:top-(--header-height) max-nav:right-0 max-nav:left-0 max-nav:m-0 max-nav:hidden max-nav:border-b max-nav:border-border max-nav:bg-page max-nav:px-5 max-nav:pt-3 max-nav:pb-5 max-nav:shadow-card max-nav:data-open:block"
+    >
+      <ul class="flex gap-1 max-nav:flex-col">
+        {
+          SECTIONS.map(({ id, navLabel }) => (
+            <li>
+              <a
+                href={`#${id}`}
+                class="relative block rounded-sm px-3 py-[0.45rem] text-[0.92rem] font-medium text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-fg aria-[current=true]:text-fg aria-[current=true]:after:absolute aria-[current=true]:after:right-3 aria-[current=true]:after:bottom-[0.1rem] aria-[current=true]:after:left-3 aria-[current=true]:after:h-0.5 aria-[current=true]:after:rounded-[2px] aria-[current=true]:after:bg-accent aria-[current=true]:after:content-[''] max-nav:px-2 max-nav:py-[0.8rem] max-nav:text-[1rem] max-nav:aria-[current=true]:after:right-auto max-nav:aria-[current=true]:after:left-2 max-nav:aria-[current=true]:after:w-6"
+              >
+                {localize(navLabel)}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div
+      class="flex items-center gap-1 border-l border-border pl-3 max-nav:ml-auto max-nav:border-l-0 max-nav:pl-0"
+    >
+      <a
+        href={profile.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
+        aria-label={t.header.github}
+      >
+        <Icon name="github" />
+      </a>
+      <a
+        href={profile.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        class={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
+        aria-label={t.header.linkedin}
+      >
+        <Icon name="linkedin" />
+      </a>
+      {/* El tema real lo fija el script del <head> antes del primer pintado: el icono sigue a <html data-theme>. */}
+      <button
+        type="button"
+        data-theme-toggle
+        data-label-to-light={t.header.themeToLight}
+        data-label-to-dark={t.header.themeToDark}
+        class={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
+        aria-label={t.header.themeToLight}
+      >
+        <Icon name="moon" class="in-data-[theme=light]:hidden" />
+        <Icon name="sun" class="hidden in-data-[theme=light]:block" />
+      </button>
+      {/* Cambiar de idioma es ir a la otra URL ("/" ↔ "/en/"); el script conserva el ancla y recuerda la elección. */}
+      <a
+        href={pathForLanguage(otherLanguage)}
+        data-language-switch={otherLanguage}
+        hreflang={otherLanguage}
+        lang={otherLanguage}
+        class={`inline-grid w-auto min-w-[38px] px-2 font-code text-[0.8rem] font-semibold tracking-[0.04em] ${ICON_BUTTON}`}
+        aria-label={t.header.switchLanguage[otherLanguage]}
+      >
+        {LANGUAGE_CODE[otherLanguage]}
+      </a>
+      <button
+        type="button"
+        data-menu-toggle
+        data-label-open={t.header.openMenu}
+        data-label-close={t.header.closeMenu}
+        class={`group hidden w-[38px] text-[1.1rem] max-nav:inline-grid ${ICON_BUTTON}`}
+        aria-label={t.header.openMenu}
+        aria-expanded="false"
+        aria-controls="main-nav"
+      >
+        <Icon name="bars" class="group-aria-expanded:hidden" />
+        <Icon name="times" class="hidden group-aria-expanded:block" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  import { parseLanguage, storeLanguage } from "../../lib/language";
+  import { parseTheme, readStoredTheme, storeTheme, type Theme } from "../../lib/theme";
+
+  const header = document.querySelector<HTMLElement>("[data-header]");
+  const nav = header?.querySelector<HTMLElement>("[data-nav]");
+  const menuToggle = header?.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const themeToggle = header?.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+  const languageSwitch = header?.querySelector<HTMLAnchorElement>("[data-language-switch]");
+
+  // --- Menú móvil ---------------------------------------------------------------------------
+  if (header && nav && menuToggle) {
+    const isOpen = () => menuToggle.getAttribute("aria-expanded") === "true";
+    const setOpen = (open: boolean) => {
+      nav.toggleAttribute("data-open", open);
+      menuToggle.setAttribute("aria-expanded", String(open));
+      menuToggle.setAttribute(
+        "aria-label",
+        (open ? menuToggle.dataset.labelClose : menuToggle.dataset.labelOpen) ?? "",
+      );
+    };
+
+    menuToggle.addEventListener("click", () => setOpen(!isOpen()));
+    // Al elegir una sección el menú se cierra.
+    nav.addEventListener("click", (event) => {
+      if (event.target instanceof Element && event.target.closest("a")) setOpen(false);
+    });
+    // Escape cierra el menú y devuelve el foco al botón; un clic fuera del header también lo cierra.
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !isOpen()) return;
+      setOpen(false);
+      menuToggle.focus();
+    });
+    document.addEventListener("pointerdown", (event) => {
+      if (isOpen() && event.target instanceof Node && !header.contains(event.target)) setOpen(false);
+    });
+  }
+
+  // --- Sección activa -----------------------------------------------------------------------
+  // Marca el enlace de la sección que cruza la franja central del viewport.
+  if (nav) {
+    const links = [...nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting);
+        if (!visible) return;
+        for (const link of links) {
+          if (link.hash === `#${visible.target.id}`) link.setAttribute("aria-current", "true");
+          else link.removeAttribute("aria-current");
+        }
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    const hero = document.getElementById("hero");
+    if (hero) observer.observe(hero);
+    for (const link of links) {
+      const section = document.getElementById(link.hash.slice(1));
+      if (section) observer.observe(section);
+    }
+  }
+
+  // --- Tema claro / oscuro ------------------------------------------------------------------
+  // El script del <head> ya aplicó el tema guardado; aquí solo se sincroniza la etiqueta y se alterna.
+  if (themeToggle) {
+    const currentTheme = (): Theme => parseTheme(document.documentElement.dataset.theme) ?? readStoredTheme();
+    const syncLabel = () => {
+      const { labelToLight, labelToDark } = themeToggle.dataset;
+      themeToggle.setAttribute("aria-label", (currentTheme() === "dark" ? labelToLight : labelToDark) ?? "");
+    };
+
+    syncLabel();
+    themeToggle.addEventListener("click", () => {
+      const next: Theme = currentTheme() === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      storeTheme(next);
+      syncLabel();
+    });
+  }
+
+  // --- Cambio de idioma ---------------------------------------------------------------------
+  // Es un enlace normal (funciona sin JavaScript); antes de navegar se recuerda la elección, se
+  // conservan la búsqueda y el ancla, y se evita repetir la pantalla de carga y perder el scroll.
+  const SCROLL_KEY = "scroll-restore";
+
+  if (languageSwitch) {
+    languageSwitch.addEventListener("click", () => {
+      const next = parseLanguage(languageSwitch.dataset.languageSwitch);
+      if (!next) return;
+
+      storeLanguage(next);
+      languageSwitch.href = languageSwitch.pathname + window.location.search + window.location.hash;
+      try {
+        sessionStorage.setItem("skip-boot", "1");
+        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+      } catch {
+        // Sin sessionStorage solo se repite la animación y se empieza arriba.
+      }
+    });
+  }
+
+  try {
+    const saved = Number(sessionStorage.getItem(SCROLL_KEY));
+    sessionStorage.removeItem(SCROLL_KEY);
+    if (saved > 0) {
+      window.addEventListener("load", () => window.scrollTo({ top: saved, behavior: "instant" }), { once: true });
+    }
+  } catch {
+    // Sin sessionStorage se empieza arriba.
+  }
+</script>

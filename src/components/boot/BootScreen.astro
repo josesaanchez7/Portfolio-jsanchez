@@ -1,0 +1,177 @@
+---
+import { getI18n } from "../../i18n";
+import { BOOT_SEQUENCE, PROMPT, type BootTone } from "../../scripts/boot/bootSequence";
+import RichText, { type TagSpec } from "../ui/RichText.astro";
+
+const { t, localize } = getI18n(Astro.currentLocale);
+
+const TONE_CLASS: Record<BootTone, string> = {
+  dim: "text-boot-dim",
+  ok: "text-boot-ok",
+  warn: "text-boot-warn",
+};
+
+const INLINE_TAGS: Record<string, TagSpec> = {
+  ok: { as: "span", class: TONE_CLASS.ok, attributes: { "data-tone": "ok" } },
+  dim: { as: "span", class: TONE_CLASS.dim, attributes: { "data-tone": "dim" } },
+  warn: { as: "span", class: TONE_CLASS.warn, attributes: { "data-tone": "warn" } },
+};
+
+// Oculta salvo que el script del <head> la active con <html data-boot>. Duración del fundido:
+// debe coincidir con EXIT_DURATION_MS (scripts/boot/bootTimeline.ts).
+const ROOT =
+  "fixed inset-0 z-[9999] hidden in-data-[boot]:flex cursor-pointer items-center justify-center overflow-hidden bg-boot-bg p-6 font-boot text-[15px] leading-[1.7] text-boot-text transition-[opacity,scale] duration-500 ease-[ease] [-webkit-tap-highlight-color:transparent] max-phone:text-[13px] data-exiting:pointer-events-none data-exiting:scale-[1.02] data-exiting:opacity-0";
+
+// Las líneas con `data-pending` aún no se han escrito: se mantienen ocultas para reservar su espacio
+// y que el bloque, centrado en vertical, no se desplace ni reajuste el salto de línea al aparecer el texto.
+const LINE = "min-h-[1.7em] [overflow-wrap:anywhere] whitespace-pre-wrap data-pending:invisible";
+
+const CURSOR =
+  "-mr-[0.6em] hidden h-[1.1em] w-[0.6em] animate-blink bg-boot-text align-text-bottom data-active:inline-block";
+
+// Pasos del guion + el prompt final vacío con el cursor parpadeando (paso número BOOT_SEQUENCE.length).
+const lines = [...BOOT_SEQUENCE, undefined];
+---
+
+{/*
+  Pantalla de carga con aspecto de terminal. El HTML ya contiene todo el guion (oculto); el <script>
+  lo va revelando. Se puede saltar con un clic o con Enter, Escape o espacio. No se muestra si el usuario
+  prefiere menos movimiento (el script del <head> no activa data-boot).
+*/}
+<div role="status" aria-label={t.boot.label} class={ROOT} data-boot-screen>
+  {/* El texto que se va escribiendo no se anuncia: se leería carácter a carácter. */}
+  <div class="w-full max-w-[720px]" aria-hidden="true">
+    <div class="mb-5 flex gap-2">
+      <span class="size-[11px] rounded-full bg-boot-dot"></span>
+      <span class="size-[11px] rounded-full bg-boot-dot"></span>
+      <span class="size-[11px] rounded-full bg-boot-dot"></span>
+    </div>
+
+    {
+      lines.map((step, index) => {
+        if (step?.type === "out") {
+          const text = typeof step.text === "string" ? step.text : localize(step.text);
+          return (
+            <div
+              class={`${LINE} ${step.tone ? TONE_CLASS[step.tone] : ""}`}
+              data-step={index}
+              data-tone={step.tone}
+              data-pending
+            >
+              <RichText text={text} tags={INLINE_TAGS} />
+            </div>
+          );
+        }
+        return (
+          <div class={LINE} data-step={index} data-pending>
+            <span class="text-boot-prompt">{PROMPT}</span>
+            {" "}
+            <span data-typed>{step?.text ?? ""}</span>
+            <span class={CURSOR} data-cursor />
+            <span data-rest data-pending />
+          </div>
+        );
+      })
+    }
+  </div>
+
+  <button
+    type="button"
+    class="absolute right-5 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] cursor-pointer rounded-[6px] border border-[color-mix(in_srgb,var(--color-boot-text)_18%,transparent)] bg-transparent px-3 py-[0.4rem] text-[0.85em] text-boot-dim transition-[color,border-color] duration-200 ease-[ease] hover:border-[color-mix(in_srgb,var(--color-boot-text)_35%,transparent)] hover:text-boot-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-boot-prompt"
+    aria-label={t.boot.skipLabel}
+  >
+    {t.boot.skip}{" "}<span aria-hidden="true">⏎</span>
+  </button>
+</div>
+
+<script>
+  import { BOOT_SEQUENCE } from "../../scripts/boot/bootSequence";
+  import { buildTimeline, EXIT_DURATION_MS, type BootFrame } from "../../scripts/boot/bootTimeline";
+
+  const root = document.querySelector<HTMLElement>("[data-boot-screen]");
+  const html = document.documentElement;
+  const page = document.getElementById("page");
+
+  // El script del <head> activa <html data-boot> salvo con "reducir movimiento" o tras cambiar de idioma.
+  if (root && !("boot" in html.dataset)) root.remove();
+  else if (root) runBoot(root);
+
+  function runBoot(screen: HTMLElement) {
+    const lines = [...screen.querySelectorAll<HTMLElement>("[data-step]")];
+    const timeline = buildTimeline(BOOT_SEQUENCE);
+    let index = 0;
+    let timeoutId: number | undefined;
+    let exiting = false;
+
+    /**
+     * Cada línea muestra su estado según el fotograma:
+     * - los pasos anteriores a `shown` están completos;
+     * - si `typed` no es null, el paso `shown` (o el prompt final vacío) se está escribiendo con el cursor.
+     */
+    const render = ({ shown, typed }: BootFrame) => {
+      lines.forEach((line, lineIndex) => {
+        const step = BOOT_SEQUENCE[lineIndex];
+        const done = lineIndex < shown;
+
+        if (step?.type === "out") {
+          line.toggleAttribute("data-pending", !done);
+          return;
+        }
+
+        const text = step?.text ?? "";
+        const typing = typed !== null && lineIndex === shown;
+        const typedChars = typing && typed !== null ? typed : text.length;
+        line.querySelector("[data-typed]")!.textContent = text.slice(0, typedChars);
+        line.querySelector("[data-rest]")!.textContent = text.slice(typedChars);
+        line.querySelector("[data-cursor]")!.toggleAttribute("data-active", typing);
+        // El prompt final (sin paso) aparece en cuanto termina el último; el resto, al empezar a escribirse.
+        line.toggleAttribute("data-pending", step ? !typing && !done : shown < BOOT_SEQUENCE.length);
+      });
+    };
+
+    const finish = () => {
+      document.removeEventListener("keydown", onKeyDown);
+      html.removeAttribute("data-boot");
+      screen.remove();
+      page?.removeAttribute("inert");
+    };
+
+    // Idempotente: lo pueden disparar a la vez el temporizador final, un clic y una tecla.
+    const startExit = () => {
+      if (exiting) return;
+      exiting = true;
+      window.clearTimeout(timeoutId);
+      screen.toggleAttribute("data-exiting", true);
+      window.setTimeout(finish, EXIT_DURATION_MS);
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.key === "Enter" || event.key === "Escape" || event.key === " ") {
+        event.preventDefault();
+        startExit();
+      }
+    };
+
+    // Reproduce la línea de tiempo con un único setTimeout encadenado.
+    const scheduleNext = () => {
+      const event = timeline.events[index];
+      if (!event) {
+        timeoutId = window.setTimeout(startExit, timeline.endDelay);
+        return;
+      }
+      timeoutId = window.setTimeout(() => {
+        render(event.frame);
+        index += 1;
+        scheduleNext();
+      }, event.delay);
+    };
+
+    // La web ya está montada detrás; inert evita tabular hacia ella mientras se ve la pantalla de carga.
+    page?.setAttribute("inert", "");
+    // Un clic en cualquier parte salta la animación; con teclado: Enter, Escape o espacio.
+    screen.addEventListener("click", startExit);
+    document.addEventListener("keydown", onKeyDown);
+    scheduleNext();
+  }
+</script>

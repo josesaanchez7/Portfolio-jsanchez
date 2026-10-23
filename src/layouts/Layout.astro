@@ -1,0 +1,97 @@
+---
+import "../styles/global.css";
+import geistMonoFont from "@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url";
+import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
+import spaceGroteskFont from "@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url";
+import jetbrainsMonoFont from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2?url";
+import { getI18n } from "../i18n";
+import { DEFAULT_LANGUAGE, LANGUAGES } from "../lib/language";
+import { buildSeoTags, pathForLanguage } from "../lib/seo";
+
+const { language, t } = getI18n(Astro.currentLocale);
+const { meta } = t;
+
+// Open Graph, Twitter, canonical y hreflang. Sin `site` (SITE_URL) se omiten los que exigen URL absoluta.
+const siteUrl = Astro.site?.origin ?? null;
+const seoTags = buildSeoTags(language, meta, siteUrl);
+
+// Datos para el script del <head> (inline: no puede importar módulos).
+const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForLanguage(code)]));
+---
+
+<!doctype html>
+<html lang={language} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{meta.title}</title>
+    <meta name="description" content={meta.description} />
+    <meta name="author" content="José Sánchez" />
+    <meta name="theme-color" content="#151923" />
+    {
+      seoTags.map(({ tag: Tag, attributes }) => <Tag {...attributes} />)
+    }
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* Precarga de las fuentes del primer pantallazo (subconjunto latino; Geist Mono es la de la pantalla de carga): evita esperar al CSS para descubrirlas. */}
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={geistMonoFont} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={interFont} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={spaceGroteskFont} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={jetbrainsMonoFont} />
+    <script is:inline define:vars={{ language, defaultLanguage: DEFAULT_LANGUAGE, languagePaths }}>
+      // Se ejecuta antes del primer pintado para evitar parpadeos. Duplica a propósito parte de
+      // src/lib/theme.ts y src/lib/language.ts (un script inline no puede importar módulos): mantener en sincronía.
+      var root = document.documentElement;
+
+      // Tema guardado. Sin localStorage se mantiene el oscuro por defecto.
+      try {
+        root.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";
+      } catch (e) {
+        // Sin persistencia se queda el tema por defecto.
+      }
+
+      // Pantalla de carga: se activa con data-boot, salvo con "reducir movimiento" o justo después de
+      // cambiar de idioma (el selector deja "skip-boot" para no repetir la animación).
+      var skipBoot = false;
+      try {
+        skipBoot = sessionStorage.getItem("skip-boot") === "1";
+        sessionStorage.removeItem("skip-boot");
+      } catch (e) {
+        // Sin sessionStorage la animación se mostrará siempre.
+      }
+      if (!skipBoot && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        root.dataset.boot = "running";
+      }
+
+      // En la URL sin prefijo manda el idioma que eligió el usuario y, si nunca eligió, el del navegador.
+      // En /en/ manda la URL.
+      if (language === defaultLanguage) {
+        var known = function (code) {
+          return Object.prototype.hasOwnProperty.call(languagePaths, code);
+        };
+        var preferred = null;
+        try {
+          preferred = localStorage.getItem("language");
+        } catch (e) {
+          // Sin localStorage se usa el idioma del navegador.
+        }
+        if (!known(preferred)) {
+          preferred = null;
+          var tags = navigator.languages || [];
+          for (var i = 0; i < tags.length; i++) {
+            var code = tags[i].toLowerCase().split("-")[0];
+            if (known(code)) {
+              preferred = code;
+              break;
+            }
+          }
+        }
+        if (preferred && preferred !== language) {
+          window.location.replace(languagePaths[preferred] + window.location.search + window.location.hash);
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-page font-sans text-base leading-[1.65] text-fg antialiased overflow-x-clip">
+    <slot />
+  </body>
+</html>

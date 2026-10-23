@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  applyTemplate,
   buildRobots,
-  buildSeoHead,
+  buildSeoTags,
   buildSitemap,
   escapeHtml,
   pathForLanguage,
@@ -61,65 +60,58 @@ describe("resolveSiteUrl", () => {
   });
 });
 
-describe("buildSeoHead", () => {
-  const head = buildSeoHead("es", meta, "https://example.com");
+describe("buildSeoTags", () => {
+  const tags = buildSeoTags("es", meta, "https://example.com");
+  const find = (key: "property" | "name", value: string) =>
+    tags.filter((tag) => tag.attributes[key] === value);
+  const content = (key: "property" | "name", value: string) =>
+    find(key, value).map((tag) => tag.attributes.content);
+  const links = (rel: string) => tags.filter((tag) => tag.tag === "link" && tag.attributes.rel === rel);
 
   it("incluye Open Graph con imagen absoluta, tamaño y locale", () => {
-    expect(head).toContain('property="og:image" content="https://example.com/og-es.jpg"');
-    expect(head).toContain('property="og:image:width" content="1200"');
-    expect(head).toContain('property="og:image:height" content="630"');
-    expect(head).toContain('property="og:locale" content="es_ES"');
-    expect(head).toContain('property="og:locale:alternate" content="en_US"');
-    expect(head).toContain('property="og:url" content="https://example.com/"');
+    expect(content("property", "og:image")).toEqual(["https://example.com/og-es.jpg"]);
+    expect(content("property", "og:image:width")).toEqual(["1200"]);
+    expect(content("property", "og:image:height")).toEqual(["630"]);
+    expect(content("property", "og:locale")).toEqual(["es_ES"]);
+    expect(content("property", "og:locale:alternate")).toEqual(["en_US"]);
+    expect(content("property", "og:url")).toEqual(["https://example.com/"]);
   });
 
   it("incluye la tarjeta de Twitter con imagen grande", () => {
-    expect(head).toContain('name="twitter:card" content="summary_large_image"');
-    expect(head).toContain('name="twitter:image" content="https://example.com/og-es.jpg"');
+    expect(content("name", "twitter:card")).toEqual(["summary_large_image"]);
+    expect(content("name", "twitter:image")).toEqual(["https://example.com/og-es.jpg"]);
   });
 
   it("declara canonical y hreflang para cada idioma y x-default", () => {
-    expect(head).toContain('<link rel="canonical" href="https://example.com/" />');
-    expect(head).toContain('hreflang="es" href="https://example.com/"');
-    expect(head).toContain('hreflang="en" href="https://example.com/en/"');
-    expect(head).toContain('hreflang="x-default" href="https://example.com/"');
+    expect(links("canonical").map((tag) => tag.attributes.href)).toEqual(["https://example.com/"]);
+    expect(links("alternate").map((tag) => [tag.attributes.hreflang, tag.attributes.href])).toEqual([
+      ["es", "https://example.com/"],
+      ["en", "https://example.com/en/"],
+      ["x-default", "https://example.com/"],
+    ]);
   });
 
   it("la versión en inglés apunta a /en/ y a su propia imagen", () => {
-    const en = buildSeoHead("en", meta, "https://example.com");
+    const en = buildSeoTags("en", meta, "https://example.com");
+    const contentEn = (value: string) =>
+      en.filter((tag) => tag.attributes.property === value).map((tag) => tag.attributes.content);
 
-    expect(en).toContain('<link rel="canonical" href="https://example.com/en/" />');
-    expect(en).toContain('property="og:image" content="https://example.com/og-en.jpg"');
-    expect(en).toContain('property="og:locale" content="en_US"');
-    expect(en).toContain('property="og:locale:alternate" content="es_ES"');
+    expect(en.find((tag) => tag.attributes.rel === "canonical")?.attributes.href).toBe("https://example.com/en/");
+    expect(contentEn("og:image")).toEqual(["https://example.com/og-en.jpg"]);
+    expect(contentEn("og:locale")).toEqual(["en_US"]);
+    expect(contentEn("og:locale:alternate")).toEqual(["es_ES"]);
   });
 
-  it("escapa los textos para no romper los atributos", () => {
-    expect(head).toContain("José &quot;JS&quot; Sánchez &amp; Co &lt;QA&gt;");
-    expect(head).not.toContain('"JS"');
+  it("entrega los textos tal cual: escapar los atributos es cosa del renderizado", () => {
+    expect(content("property", "og:title")).toEqual([meta.title]);
   });
 
   it("sin URL pública omite canonical, hreflang y og:url, y deja la imagen relativa", () => {
-    const local = buildSeoHead("es", meta, null);
+    const local = buildSeoTags("es", meta, null);
 
-    expect(local).not.toContain("canonical");
-    expect(local).not.toContain("hreflang");
-    expect(local).not.toContain("og:url");
-    expect(local).toContain('property="og:image" content="/og-es.jpg"');
-  });
-});
-
-describe("applyTemplate", () => {
-  const template = '<html lang="{{lang}}"><title>{{title}}</title><meta content="{{description}}">{{seo}}';
-
-  it("rellena idioma, título, descripción y bloque SEO", () => {
-    const html = applyTemplate(template, "en", meta, "https://example.com");
-
-    expect(html).toContain('<html lang="en">');
-    expect(html).toContain("<title>José &quot;JS&quot; Sánchez &amp; Co &lt;QA&gt;</title>");
-    expect(html).toContain('content="Descripción de prueba"');
-    expect(html).toContain('hreflang="en"');
-    expect(html).not.toContain("{{");
+    expect(local.some((tag) => tag.tag === "link")).toBe(false);
+    expect(local.some((tag) => tag.attributes.property === "og:url")).toBe(false);
+    expect(local.find((tag) => tag.attributes.property === "og:image")?.attributes.content).toBe("/og-es.jpg");
   });
 });
 

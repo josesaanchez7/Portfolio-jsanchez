@@ -1,0 +1,11 @@
+---
+import { experience } from "../../data/experience";
+import Section from "../layout/Section.astro";
+import ExperienceEntry from "./ExperienceEntry.astro";
+---
+
+<Section id="Experience">
+  <ol class="ml-[0.4rem] flex flex-col border-l border-border-strong">
+    {experience.map((item) => <ExperienceEntry item={item} />)}
+  </ol>
+</Section>
