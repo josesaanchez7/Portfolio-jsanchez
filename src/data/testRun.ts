@@ -45,7 +45,7 @@ export const TEST_RUN_LINES: readonly TestRunLine[] = [
   {
     text: {
       es: "  <ok>✓</ok> dev › desarrolla con Astro + TypeScript",
-      en: "  <ok>✓</ok> dev › builds with React + TypeScript",
+      en: "  <ok>✓</ok> dev › builds with Astro + TypeScript",
     },
   },
   { text: "  <ok>5 passed</ok> <dim>(1.9s)</dim>" },
