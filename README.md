@@ -4,7 +4,7 @@ Portfolio personal construido con [Astro](https://astro.build) 7, TypeScript y T
 componentes `.astro` (HTML + CSS + JavaScript de servidor en el frontmatter); no hay React ni ningún otro
 framework de UI. La web se genera como HTML estático y la interactividad (menú, tema, idioma, pantalla de
 carga, consola…) es JavaScript vanilla en etiquetas `<script>` dentro de los propios componentes.
-Todos los estilos son utilidades de Tailwind (no hay hojas CSS por componente).
+Todos los estilos son utilidades de Tailwind (no hay hojas CSS por componente)
 
 Requisitos: Node 24 (LTS; fijado con `engines` en `package.json` para que Vercel no cambie de versión mayor por su cuenta) y [pnpm](https://pnpm.io) (la versión está fijada en `packageManager`;
 con Corepack basta `corepack enable`)
