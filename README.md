@@ -7,7 +7,7 @@ carga, consola…) es JavaScript vanilla en etiquetas `<script>` dentro de los p
 Todos los estilos son utilidades de Tailwind (no hay hojas CSS por componente).
 
 Requisitos: Node 24 (LTS; fijado con `engines` en `package.json` para que Vercel no cambie de versión mayor por su cuenta) y [pnpm](https://pnpm.io) (la versión está fijada en `packageManager`;
-con Corepack basta `corepack enable`).
+con Corepack basta `corepack enable`)
 
 ## Scripts
 
