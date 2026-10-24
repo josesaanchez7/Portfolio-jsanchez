@@ -8,7 +8,7 @@ import Icon from "../ui/Icon.astro";
 
 const { language, t, localize } = getI18n(Astro.currentLocale);
 
-// El menú móvil se activa en ≤ 820px. Sin ancho ni display: cada botón añade los suyos.
+// El menú móvil se activa en ≤ 900px (max-menu:). Sin ancho ni display: cada botón añade los suyos.
 const ICON_BUTTON =
   "h-[38px] place-items-center rounded-sm bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
 
@@ -20,7 +20,7 @@ const otherLanguage = language === "es" ? "en" : "es";
   class="sticky top-0 z-[1000] h-(--header-height) border-b border-border bg-[color-mix(in_srgb,var(--bg)_85%,transparent)] backdrop-blur-md"
   data-header
 >
-  <div class="mx-auto flex h-full max-w-site items-center gap-6 px-6 max-nav:gap-3 max-nav:px-5">
+  <div class="mx-auto flex h-full max-w-site items-center gap-6 px-6 max-menu:gap-3 max-menu:px-5">
     <a
       href={`#${HERO_ID}`}
       class="inline-flex items-center gap-[0.65rem] font-heading font-bold tracking-[-0.01em] text-fg"
@@ -39,15 +39,15 @@ const otherLanguage = language === "es" ? "en" : "es";
       id="main-nav"
       aria-label={t.header.navLabel}
       data-nav
-      class="ml-auto max-nav:absolute max-nav:top-(--header-height) max-nav:right-0 max-nav:left-0 max-nav:m-0 max-nav:hidden max-nav:border-b max-nav:border-border max-nav:bg-page max-nav:px-5 max-nav:pt-3 max-nav:pb-5 max-nav:shadow-card max-nav:data-open:block"
+      class="ml-auto max-menu:absolute max-menu:top-(--header-height) max-menu:right-0 max-menu:left-0 max-menu:m-0 max-menu:hidden max-menu:border-b max-menu:border-border max-menu:bg-page max-menu:px-5 max-menu:pt-3 max-menu:pb-5 max-menu:shadow-card max-menu:data-open:block"
     >
-      <ul class="flex gap-1 max-nav:flex-col">
+      <ul class="flex gap-1 max-menu:flex-col">
         {
           SECTIONS.map(({ id, navLabel }) => (
             <li>
               <a
                 href={`#${id}`}
-                class="relative block rounded-sm px-3 py-[0.45rem] text-[0.92rem] font-medium text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-fg aria-[current=true]:text-fg aria-[current=true]:after:absolute aria-[current=true]:after:right-3 aria-[current=true]:after:bottom-[0.1rem] aria-[current=true]:after:left-3 aria-[current=true]:after:h-0.5 aria-[current=true]:after:rounded-[2px] aria-[current=true]:after:bg-accent aria-[current=true]:after:content-[''] max-nav:px-2 max-nav:py-[0.8rem] max-nav:text-[1rem] max-nav:aria-[current=true]:after:right-auto max-nav:aria-[current=true]:after:left-2 max-nav:aria-[current=true]:after:w-6"
+                class="relative block rounded-sm px-3 py-[0.45rem] text-[0.92rem] font-medium text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-fg aria-[current=true]:text-fg aria-[current=true]:after:absolute aria-[current=true]:after:right-3 aria-[current=true]:after:bottom-[0.1rem] aria-[current=true]:after:left-3 aria-[current=true]:after:h-0.5 aria-[current=true]:after:rounded-[2px] aria-[current=true]:after:bg-accent aria-[current=true]:after:content-[''] max-menu:px-2 max-menu:py-[0.8rem] max-menu:text-[1rem] max-menu:aria-[current=true]:after:right-auto max-menu:aria-[current=true]:after:left-2 max-menu:aria-[current=true]:after:w-6"
               >
                 {localize(navLabel)}
               </a>
@@ -58,7 +58,7 @@ const otherLanguage = language === "es" ? "en" : "es";
     </nav>
 
     <div
-      class="flex items-center gap-1 border-l border-border pl-3 max-nav:ml-auto max-nav:border-l-0 max-nav:pl-0"
+      class="flex items-center gap-1 border-l border-border pl-3 max-menu:ml-auto max-menu:border-l-0 max-menu:pl-0"
     >
       <a
         href={profile.github}
@@ -106,7 +106,7 @@ const otherLanguage = language === "es" ? "en" : "es";
         data-menu-toggle
         data-label-open={t.header.openMenu}
         data-label-close={t.header.closeMenu}
-        class={`group hidden w-[38px] text-[1.1rem] max-nav:inline-grid ${ICON_BUTTON}`}
+        class={`group hidden w-[38px] text-[1.1rem] max-menu:inline-grid ${ICON_BUTTON}`}
         aria-label={t.header.openMenu}
         aria-expanded="false"
         aria-controls="main-nav"
@@ -199,7 +199,7 @@ const otherLanguage = language === "es" ? "en" : "es";
 
   // --- Cambio de idioma ---------------------------------------------------------------------
   // Es un enlace normal (funciona sin JavaScript); antes de navegar se recuerda la elección, se
-  // conservan la búsqueda y el ancla, y se evita repetir la pantalla de carga y perder el scroll.
+  // conservan la búsqueda y el ancla, y se mantiene el scroll (la pantalla de carga no se repite: solo sale una vez por sesión).
   const SCROLL_KEY = "scroll-restore";
 
   if (languageSwitch) {
@@ -210,10 +210,9 @@ const otherLanguage = language === "es" ? "en" : "es";
       storeLanguage(next);
       languageSwitch.href = languageSwitch.pathname + window.location.search + window.location.hash;
       try {
-        sessionStorage.setItem("skip-boot", "1");
         sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
       } catch {
-        // Sin sessionStorage solo se repite la animación y se empieza arriba.
+        // Sin sessionStorage se empieza arriba.
       }
     });
   }

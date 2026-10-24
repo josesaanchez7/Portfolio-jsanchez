@@ -42,7 +42,7 @@ que importa [`Layout.astro`](src/layouts/Layout.astro):
   `font-heading` (Space Grotesk), `font-code` (JetBrains Mono) y `font-boot` (Geist Mono, pantalla de carga).
   Las tres de la primera pantalla se precargan desde `Layout.astro`.
 - **Radios y ancho:** `rounded-sm|md|lg` (8/12/16 px) y `max-w-site` (1040 px).
-- **Puntos de corte con nombre:** `max-nav:` (≤ 820 px), `max-tablet:` (≤ 768), `max-tight:` (≤ 640),
+- **Puntos de corte con nombre:** `max-menu:` (≤ 900 px, menú móvil), `max-nav:` (≤ 820 px, diseños a una columna), `max-tablet:` (≤ 768), `max-tight:` (≤ 640),
   `max-phone:` (≤ 600) y `max-mini:` (≤ 420). Tailwind aplica `max-*` con «ancho < valor», por eso en
   `@theme` cada uno vale N + 1.
 - **Base:** los estilos de elementos (tipografía de los títulos, foco visible, `scroll-behavior`) están en
@@ -75,7 +75,7 @@ que importa [`Layout.astro`](src/layouts/Layout.astro):
 ```text
 astro.config.mjs    Astro: URL pública, idiomas (i18n), trailingSlash y plugin de Tailwind
 src/
-├── pages/          rutas: [...lang]/index.astro (/ y /en/), sitemap.xml.ts y robots.txt.ts
+├── pages/          rutas: [...lang]/index.astro (/ y /en/), 404.astro, sitemap.xml.ts y robots.txt.ts
 ├── layouts/        Layout.astro: <html>, <head> (SEO, fuentes, script anti-parpadeo) y <body>
 ├── components/
 │   ├── layout/     Header, Footer, Section (estructura de página)
@@ -90,12 +90,12 @@ src/
 ├── lib/            funciones puras (tema, idioma, formato, SEO) y utilidades de estilo
 ├── styles/         global.css: Tailwind, tokens de diseño y base
 ├── assets/         imágenes y CV que procesa Astro (con hash en el build)
-└── test/           utilidades de los tests (renderComponent) y el test de la página
+└── test/           utilidades de los tests (renderComponent) y los tests de las páginas
 ```
 
 Dirección de dependencias: `pages` → `layouts`, `components` → `scripts`, `i18n`, `data` → `lib`, `types`.
 Las páginas son lo único que mira el router: en `src/pages` solo puede haber rutas (cualquier archivo ahí
-se publica), por eso el test de la página vive en `src/test`.
+se publica), por eso los tests de las páginas viven en `src/test`.
 
 ## Interactividad (JavaScript en el cliente)
 
@@ -121,13 +121,21 @@ DOM (`<html data-theme | data-debug | data-boot | data-console-open>`).
 - **Idioma de una página:** sale de la URL (`/en/` → inglés). Cada componente lo obtiene en su frontmatter con
   `getI18n(Astro.currentLocale)`, que devuelve `t` (textos de interfaz) y `localize` (contenido).
 - **Cambiar de idioma** es ir a la otra URL (`/` ↔ `/en/`): el botón de la cabecera es un enlace normal. Su script
-  guarda la elección en `localStorage`, conserva la búsqueda y el ancla (`#Proyectos`), mantiene el scroll y evita
-  repetir la pantalla de carga.
+  guarda la elección en `localStorage`, conserva la búsqueda y el ancla (`#Proyectos`) y mantiene el scroll.
 - **Primera visita a `/`:** un script inline del `<head>` redirige a `/en/` si el usuario eligió inglés antes o, si
   nunca eligió, si su navegador prefiere inglés. En cualquier otro caso se queda en español.
 - **Añadir un idioma:** añadirlo a `LANGUAGES` en [`src/lib/language.ts`](src/lib/language.ts) y el compilador
   señala cada texto que falta; la página y el sitemap lo recogen solos.
 - Los nombres de tecnologías y de marcas (React, GitHub…) no se traducen.
+
+## Página 404
+
+[`src/pages/404.astro`](src/pages/404.astro) genera `dist/404.html`, que Vercel sirve (con estado 404) para
+cualquier ruta que no exista. Como el servidor no sabe a qué URL iba el visitante, es una sola página con
+los dos idiomas en el HTML y un script inline que deja visible el que toca: el de la URL (`/en/…`), si no el
+que eligió con el selector y, si nunca eligió, el del navegador. Lleva `noindex`, no tiene pantalla de carga
+(`<Layout home>` solo la activa en la home) y muestra la ruta pedida con aspecto de terminal. Los textos
+están en `notFound` de `src/i18n/messages`.
 
 ## Pantalla de carga (consola)
 
@@ -142,8 +150,10 @@ terminal simulada que se desvanece y deja ver el portfolio, que ya está montado
 - **Tiempos:** constantes en [`bootTimeline.ts`](src/scripts/boot/bootTimeline.ts) (18 ms por carácter,
   120 ms entre salidas, 220 ms entre comandos, 700 ms de cursor final, 0,5 s de fundido).
 - **Saltar:** clic en cualquier parte, Enter, Escape o espacio, o el botón «Saltar».
-- Solo se muestra si el script del `<head>` activa `<html data-boot>`: no lo hace con `prefers-reduced-motion: reduce`
-  ni justo después de cambiar de idioma. Mientras se ve, el scroll está bloqueado y la web de detrás es `inert`.
+- **Una vez por sesión:** solo se muestra si el script del `<head>` activa `<html data-boot>`. Lo hace la primera vez
+  que se abre la home en una pestaña (guarda `boot-seen` en `sessionStorage`), y no con
+  `prefers-reduced-motion: reduce`. Recargar, cambiar de idioma o volver desde la 404 no la repiten; para verla de
+  nuevo, abre la web en otra pestaña o borra esa clave. Mientras se ve, el scroll está bloqueado y la web de detrás es `inert`.
 
 ## Consola interactiva
 
@@ -166,8 +176,8 @@ terminal simulada que se desvanece y deja ver el portfolio, que ya está montado
   `ConsoleDialog.astro`, que pinta todo como texto plano. Los textos traducibles van en `src/i18n/messages`.
 - **Datos:** `proyectos` lee `src/data/projects.ts` (campo `status`) y `run tests` usa las mismas líneas que
   la pantalla de carga (`src/data/testRun.ts`).
-- **404:** el comando está preparado, pero mientras no exista la página (`canShowNotFound` en el script de
-  `ConsoleDialog.astro`) solo avisa de que no está disponible.
+- **404:** navega a una ruta que no existe a propósito (`notFoundPath` en [`seo.ts`](src/lib/seo.ts):
+  `/esta-pagina-no-existe/` o `/en/this-page-does-not-exist/`), así que la responde la página 404 real.
 
 ## Pie de página (barra de estado)
 
@@ -179,7 +189,7 @@ El año del copyright se calcula al construir la web.
 - **Debug:** activa el modo debug (`<html data-debug="true">`, estilos en
   [`src/lib/debugSection.ts`](src/lib/debugSection.ts)): cada sección muestra un borde discontinuo y su ancla.
   El comando `debug` de la consola cambia el mismo estado.
-- **404:** botón preparado. Queda inactivo (`aria-disabled`) hasta que exista la página 404.
+- **404:** enlace a esa misma ruta inexistente, para ver la página de error de verdad.
 - En móvil se ocultan los elementos secundarios y respeta las zonas seguras (`env(safe-area-inset-*)`).
 
 ## Tests
@@ -201,5 +211,13 @@ y los `TODO` marcan la información pendiente de completar.
 
 - **Proyectos** ([`projects.ts`](src/data/projects.ts)): añade `image`, `code`, `demo` (URLs `https://…`)
   y, opcionalmente, `caseStudy` (problema, solución, decisiones, resultados) para mostrar "Ver detalle".
+- **Experiencia y educación** ([`experience.ts`](src/data/experience.ts)): cada entrada lleva `start` y, si ya
+  terminó, `end` (`"AAAA-MM"`, o `"AAAA"` si no se sabe el mes). Con ellas se ordena sola, de la más reciente a
+  la más antigua (lo que sigue en curso, sin `end`, va primero), así que da igual en qué punto del archivo
+  la añadas. El texto que se ve es `period`. Los puestos (`kind: "work"`) salen en Experiencia; los estudios y
+  certificaciones, en Educación.
+- **Sobre mí:** el relato de la izquierda (origen, recorrido y lo que aportas) son los tres textos `about` de
+  [`src/i18n/messages`](src/i18n/messages); la tarjeta de la derecha, `aboutFacts` en
+  [`profile.ts`](src/data/profile.ts) (la ubicación sale de `statusBar.ts`).
 - **Secciones** ([`sections.ts`](src/data/sections.ts)): ids, títulos y orden. De aquí salen la
   navegación y la numeración (01, 02…) de las secciones.

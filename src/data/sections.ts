@@ -17,7 +17,12 @@ export const SECTIONS = [
   {
     id: "Experience",
     navLabel: { es: "Experiencia", en: "Experience" },
-    title: { es: "Experiencia y formación", en: "Experience and education" },
+    title: { es: "Experiencia", en: "Experience" },
+  },
+  {
+    id: "Education",
+    navLabel: { es: "Educación", en: "Education" },
+    title: { es: "Educación y certificaciones", en: "Education and certifications" },
   },
   {
     id: "Stack",

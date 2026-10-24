@@ -37,8 +37,7 @@ export const es: Messages = {
     openingCv: "Abriendo CHANGELOG.md…",
     debugOn: "Modo debug activado.",
     debugOff: "Modo debug desactivado.",
-    navigatingToNotFound: "Navegando a /esta-pagina-no-existe…",
-    notFoundUnavailable: "La página 404 todavía no está disponible.",
+    navigatingToNotFound: (path) => `Navegando a ${path}…`,
     sudoGranted: (email) => `Permiso concedido. Escríbeme a ${email} 😉`,
     sudoDenied: "Buen intento. Prueba con sudo contratar",
     unknownCommand: (input) => `comando no encontrado: ${input}. Escribe help.`,
@@ -90,10 +89,11 @@ export const es: Messages = {
     showCredential: "Mostrar credencial",
   },
   about: {
-    intro: ({ fullName, nickname }) =>
-      `Me llamo ${fullName}, aunque mis amigos me llaman ${nickname}. Empecé en la programación a los 16 años.`,
-    current: ({ job, employer }) =>
-      `Actualmente soy ${job} en ${employer}, asegurando la calidad y el buen funcionamiento de las aplicaciones.`,
+    intro: ({ fullName }) =>
+      `Soy ${fullName}. Empecé a programar a los 16 años y me formé como desarrollador de aplicaciones multiplataforma.`,
+    path: ({ job, employer }) =>
+      `En ${employer} empecé en soporte técnico, resolviendo incidencias y, el último año, desarrollando funcionalidades en PHP. Hoy trabajo como <b>${job}</b>: pruebas manuales y exploratorias, validación de APIs y automatización con Playwright.`,
+    edge: "Venir del desarrollo me da ventaja al probar: sé cómo se construye una aplicación, dónde suele fallar y cómo explicárselo con claridad a quien tiene que arreglarlo.",
   },
   contact: {
     intro:
@@ -113,6 +113,13 @@ export const es: Messages = {
     notFoundLabel: "Mostrar la página de error 404",
     console: "Ctrl+K",
     consoleLabel: "Abrir la consola interactiva (Ctrl+K)",
-    comingSoon: "Próximamente",
+  },
+  notFound: {
+    title: "404 · Página no encontrada",
+    heading: "Página no encontrada",
+    description: "La dirección que buscas no existe o se ha movido.",
+    noSuchFile: "zsh: no existe el archivo o directorio:",
+    bug: "⚠ Bug encontrado: esta página no existe.",
+    home: "Volver al inicio",
   },
 };

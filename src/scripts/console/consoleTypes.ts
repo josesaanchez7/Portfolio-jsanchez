@@ -35,6 +35,4 @@ export interface CommandContext {
   profile: Profile;
   projects: readonly Project[];
   debugEnabled: boolean;
-  /** Hay una página 404 a la que navegar. */
-  canShowNotFound: boolean;
 }

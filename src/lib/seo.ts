@@ -16,6 +16,15 @@ const OG_LOCALE: Record<Language, string> = { es: "es_ES", en: "en_US" };
 export const pathForLanguage = (language: Language): string =>
   language === DEFAULT_LANGUAGE ? "/" : `/${language}/`;
 
+/** Ruta que no existe a propósito (botón 404 del footer y comando `404`): la sirve la página 404. */
+const NOT_FOUND_SLUG: Record<Language, string> = {
+  es: "esta-pagina-no-existe",
+  en: "this-page-does-not-exist",
+};
+
+export const notFoundPath = (language: Language): string =>
+  `${pathForLanguage(language)}${NOT_FOUND_SLUG[language]}/`;
+
 const HTML_ESCAPES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
 
 export const escapeHtml = (value: string): string =>

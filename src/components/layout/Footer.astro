@@ -3,17 +3,17 @@ import { profile } from "../../data/profile";
 import { statusBar } from "../../data/statusBar";
 import { getI18n } from "../../i18n";
 import { formatInteger } from "../../lib/format";
+import { notFoundPath } from "../../lib/seo";
 
 const { language, t, localize } = getI18n(Astro.currentLocale);
 
 const ITEM = "inline-flex items-center gap-1.5 px-2.5 py-1 whitespace-nowrap";
 
-// Botones que no parecen botones: sin borde ni fondo propio; al pasar el ratón se oscurece el fondo.
+// Botones y enlaces que no lo parecen: sin borde ni fondo propio; al pasar el ratón se oscurece el fondo.
 const BUTTON = [
   ITEM,
   "cursor-pointer border-0 bg-transparent font-[inherit] text-inherit",
   "hover:bg-black/20 aria-pressed:bg-black/30",
-  "aria-disabled:cursor-default aria-disabled:opacity-60 aria-disabled:hover:bg-transparent",
   "focus-visible:rounded-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-contrast",
 ].join(" ");
 
@@ -76,16 +76,10 @@ const SECONDARY = "max-sm:hidden";
         </button>
       </li>
       <li>
-        {/* Preparado: inactivo hasta que exista la página 404. */}
-        <button
-          type="button"
-          class={BUTTON}
-          aria-label={t.footer.notFoundLabel}
-          aria-disabled="true"
-          title={t.footer.comingSoon}
-        >
+        {/* Una ruta que no existe a propósito: la responde la página 404 real. */}
+        <a href={notFoundPath(language)} class={BUTTON} aria-label={t.footer.notFoundLabel}>
           {t.footer.notFound}
-        </button>
+        </a>
       </li>
       <li>
         <button type="button" class={BUTTON} aria-label={t.footer.consoleLabel} data-console-open>

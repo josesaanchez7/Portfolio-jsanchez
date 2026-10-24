@@ -16,7 +16,6 @@ const buildContext = (language: Language = "es", overrides: Partial<CommandConte
   profile,
   projects,
   debugEnabled: false,
-  canShowNotFound: false,
   ...overrides,
 });
 
@@ -216,18 +215,15 @@ describe("debug", () => {
 });
 
 describe("404", () => {
-  it("queda preparado pero inactivo mientras no exista la página", () => {
+  it("navega a una ruta que no existe y cierra la consola", () => {
     const result = run("404");
 
-    expect(result.effects).toBeUndefined();
-    expect(result.lines.map(plain)).toEqual(["La página 404 todavía no está disponible."]);
+    expect(result.lines.map(plain)).toEqual(["Navegando a /esta-pagina-no-existe/…"]);
+    expect(result.effects).toEqual(["show404", "close"]);
   });
 
-  it("si existe la página, navega y cierra la consola", () => {
-    const result = run("404", "es", { canShowNotFound: true });
-
-    expect(result.lines.map(plain)).toEqual(["Navegando a /esta-pagina-no-existe…"]);
-    expect(result.effects).toEqual(["show404", "close"]);
+  it("la ruta lleva el prefijo del idioma", () => {
+    expect(run("404", "en").lines.map(plain)).toEqual(["Navigating to /en/this-page-does-not-exist/…"]);
   });
 });
 

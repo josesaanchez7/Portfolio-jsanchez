@@ -43,7 +43,8 @@
    * Puntos de corte. Tailwind aplica `max-*` con "width < valor", así que cada uno vale N+1:
    * `max-nav:` equivale a "ancho ≤ 820px".
    */
-  --breakpoint-nav: 821px; /* menú móvil y diseños a una columna */
+  --breakpoint-menu: 901px; /* menú móvil de la cabecera (con 6 secciones no cabe antes) */
+  --breakpoint-nav: 821px; /* diseños a una columna */
   --breakpoint-tablet: 769px; /* secciones con menos margen */
   --breakpoint-tight: 641px; /* línea de tiempo */
   --breakpoint-phone: 601px; /* pantalla de carga */

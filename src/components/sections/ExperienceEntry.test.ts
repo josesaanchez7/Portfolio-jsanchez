@@ -7,6 +7,7 @@ import ExperienceEntry from "./ExperienceEntry.astro";
 
 const certification: ExperienceItem = {
   kind: "certification",
+  start: "2026-01",
   title: { es: "Certificación de ejemplo", en: "Example certification" },
   organization: { es: "Entidad de ejemplo", en: "Example issuer" },
   period: { es: "ene. 2026", en: "Jan 2026" },

@@ -40,9 +40,8 @@ export interface Messages {
     openingCv: string;
     debugOn: string;
     debugOff: string;
-    navigatingToNotFound: string;
-    /** El comando 404 está preparado, pero la página 404 todavía no existe. */
-    notFoundUnavailable: string;
+    /** Recibe la ruta a la que se navega. */
+    navigatingToNotFound: (path: string) => string;
     sudoGranted: (email: string) => string;
     sudoDenied: string;
     unknownCommand: (input: string) => string;
@@ -93,8 +92,12 @@ export interface Messages {
     showCredential: string;
   };
   about: {
-    intro: (values: { fullName: string; nickname: string }) => string;
-    current: (values: { job: string; employer: string }) => string;
+    /** Presentación y origen: cómo empezó. */
+    intro: (values: { fullName: string }) => string;
+    /** Recorrido hasta hoy. Admite <b>…</b>. */
+    path: (values: { job: string; employer: string }) => string;
+    /** Qué aporta combinar desarrollo y pruebas. */
+    edge: string;
   };
   contact: {
     intro: string;
@@ -113,6 +116,15 @@ export interface Messages {
     notFoundLabel: string;
     console: string;
     consoleLabel: string;
-    comingSoon: string;
+  };
+  /** Página 404: se elige el idioma en el navegador (un 404 no sabe a qué URL iba el visitante). */
+  notFound: {
+    title: string;
+    heading: string;
+    description: string;
+    /** Prefijo del error de la terminal; le sigue la ruta pedida. */
+    noSuchFile: string;
+    bug: string;
+    home: string;
   };
 }

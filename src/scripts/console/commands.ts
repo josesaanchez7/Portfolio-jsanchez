@@ -2,6 +2,7 @@ import { TEST_RUN_LINES } from "../../data/testRun";
 import { parseTags } from "../../i18n/parseTags";
 import type { ConsoleHelpKey } from "../../i18n/messages/types";
 import type { LocalizedText } from "../../lib/language";
+import { notFoundPath } from "../../lib/seo";
 import type { HttpsUrl, ProjectStatus } from "../../types/content";
 import type {
   CommandContext,
@@ -173,11 +174,11 @@ export const COMMANDS: readonly CommandDefinition[] = [
     aliases: ["404"],
     displayName: same("404"),
     helpKey: "notFound",
-    // Preparado: hasta que exista la página 404 (canShowNotFound), solo avisa.
-    run: ({ t, canShowNotFound }) =>
-      canShowNotFound
-        ? { lines: [text(t.console.navigatingToNotFound)], effects: ["show404", "close"] }
-        : { lines: [text(t.console.notFoundUnavailable, "dim")] },
+    // Navega a una ruta que no existe a propósito: la responde la página 404 real.
+    run: ({ t, language }) => ({
+      lines: [text(t.console.navigatingToNotFound(notFoundPath(language)))],
+      effects: ["show404", "close"],
+    }),
   },
   {
     aliases: ["clear"],

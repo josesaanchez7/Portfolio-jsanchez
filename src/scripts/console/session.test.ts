@@ -14,7 +14,6 @@ const buildContext = (language: Language = "es", overrides: Partial<CommandConte
   profile,
   projects,
   debugEnabled: false,
-  canShowNotFound: false,
   ...overrides,
 });
 
@@ -109,13 +108,13 @@ describe("sesión de la consola: uso", () => {
     expect(lines()[3]).toBe(messages.es.console.debugOff);
   });
 
-  it("404 queda preparado: avisa de que la página aún no existe y no pide ningún efecto", () => {
+  it("404 pide navegar a la página de error y cerrar la consola", () => {
     const { session, effects, lines } = setup();
 
     session.submit("404");
 
-    expect(lines()[1]).toBe(messages.es.console.notFoundUnavailable);
-    expect(effects).toEqual([]);
+    expect(lines()[1]).toBe("Navegando a /esta-pagina-no-existe/…");
+    expect(effects).toEqual(["show404", "close"]);
   });
 
   it("run tests muestra las líneas una a una con una pausa y bloquea la entrada mientras tanto", () => {

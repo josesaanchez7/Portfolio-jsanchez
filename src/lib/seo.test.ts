@@ -4,6 +4,7 @@ import {
   buildSeoTags,
   buildSitemap,
   escapeHtml,
+  notFoundPath,
   pathForLanguage,
   resolveSiteUrl,
   type SeoMeta,
@@ -19,6 +20,13 @@ describe("pathForLanguage", () => {
   it("el español vive en / y el inglés en /en/", () => {
     expect(pathForLanguage("es")).toBe("/");
     expect(pathForLanguage("en")).toBe("/en/");
+  });
+});
+
+describe("notFoundPath", () => {
+  it("es una ruta inexistente dentro de la versión de cada idioma", () => {
+    expect(notFoundPath("es")).toBe("/esta-pagina-no-existe/");
+    expect(notFoundPath("en")).toBe("/en/this-page-does-not-exist/");
   });
 });
 

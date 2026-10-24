@@ -52,19 +52,25 @@ describe("Footer (barra de estado)", () => {
   });
 });
 
-describe("Footer: botones", () => {
+describe("Footer: botones y enlaces", () => {
   it("Debug parte desactivado (el script lo alterna)", async () => {
     const { getByRole } = await renderComponent(Footer);
 
     expect(getByRole("button", { name: "Debug" })).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("404 queda preparado pero inactivo mientras no exista la página", async () => {
-    const { getByRole } = await renderComponent(Footer);
-    const notFound = getByRole("button", { name: "Mostrar la página de error 404" });
+  it("404 es un enlace a una ruta que no existe, dentro del idioma de la página", async () => {
+    const es = await renderComponent(Footer);
+    expect(es.getByRole("link", { name: "Mostrar la página de error 404" })).toHaveAttribute(
+      "href",
+      "/esta-pagina-no-existe/",
+    );
 
-    expect(notFound).toHaveAttribute("aria-disabled", "true");
-    expect(notFound).toHaveAttribute("title", "Próximamente");
+    const en = await renderComponent(Footer, { language: "en" });
+    expect(en.getByRole("link", { name: "Show the 404 error page" })).toHaveAttribute(
+      "href",
+      "/en/this-page-does-not-exist/",
+    );
   });
 
   it("el botón de la consola está activo y el script lo reconoce", async () => {
@@ -78,7 +84,7 @@ describe("Footer: botones", () => {
   it("sus nombres accesibles contienen el texto visible (404 y Ctrl+K)", async () => {
     const { getByRole } = await renderComponent(Footer);
 
-    expect(getByRole("button", { name: /404/ })).toHaveTextContent("404");
+    expect(getByRole("link", { name: /404/ })).toHaveTextContent("404");
     expect(getByRole("button", { name: /Ctrl\+K/ })).toHaveTextContent("Ctrl+K");
   });
 });

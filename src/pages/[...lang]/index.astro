@@ -5,6 +5,7 @@ import Footer from "../../components/layout/Footer.astro";
 import Header from "../../components/layout/Header.astro";
 import AboutSection from "../../components/sections/AboutSection.astro";
 import ContactSection from "../../components/sections/ContactSection.astro";
+import EducationSection from "../../components/sections/EducationSection.astro";
 import ExperienceSection from "../../components/sections/ExperienceSection.astro";
 import HeroSection from "../../components/sections/HeroSection.astro";
 import ProjectsSection from "../../components/sections/ProjectsSection.astro";
@@ -23,7 +24,7 @@ export function getStaticPaths() {
 const { t } = getI18n(Astro.currentLocale);
 ---
 
-<Layout>
+<Layout home>
   <BootScreen />
   {/* La web ya está montada detrás de la pantalla de carga; mientras se ve, su script la marca como inert. */}
   <div id="page">
@@ -38,6 +39,7 @@ const { t } = getI18n(Astro.currentLocale);
       <HeroSection />
       <ProjectsSection />
       <ExperienceSection />
+      <EducationSection />
       <StackSection />
       <AboutSection />
       <ContactSection />

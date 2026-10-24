@@ -1,0 +1,119 @@
+---
+import Button from "../components/ui/Button.astro";
+import { messages } from "../i18n/messages";
+import Layout from "../layouts/Layout.astro";
+import { DEFAULT_LANGUAGE, LANGUAGES } from "../lib/language";
+import { pathForLanguage } from "../lib/seo";
+import { PROMPT } from "../scripts/boot/bootSequence";
+---
+
+{
+  /*
+  Página 404 (dist/404.html: Vercel la sirve con estado 404 para cualquier ruta que no exista).
+  Es una sola página para los dos idiomas: el servidor no sabe a qué URL iba el visitante, así que
+  el HTML trae ambos y el script del final deja visible el que corresponde.
+*/
+}
+<Layout noindex title={messages[DEFAULT_LANGUAGE].notFound.title}>
+  <main class="grid min-h-dvh place-items-center px-6 py-16">
+    {
+      LANGUAGES.map((language) => {
+        const t = messages[language].notFound;
+        return (
+          <section
+            lang={language}
+            data-not-found={language}
+            data-title={t.title}
+            hidden={language !== DEFAULT_LANGUAGE}
+            aria-labelledby={`not-found-title-${language}`}
+            class="flex w-full max-w-[560px] flex-col items-start gap-6"
+          >
+            <p class="font-code text-[0.9rem] text-accent" aria-hidden="true">
+              404
+            </p>
+            <h1
+              id={`not-found-title-${language}`}
+              class="text-[clamp(2.4rem,6vw,4rem)] leading-[1.05] tracking-[-0.035em] text-balance"
+            >
+              {t.heading}
+            </h1>
+            <p class="max-w-[48ch] text-[1.1rem] text-fg-muted">{t.description}</p>
+
+            {/* Decorativa: el título y la descripción ya dicen lo mismo. */}
+            <div
+              class="w-full rounded-lg border border-boot-dot bg-boot-bg p-4 font-boot text-[14px] leading-[1.6] text-boot-text [overflow-wrap:anywhere]"
+              aria-hidden="true"
+            >
+              <div>
+                <span class="text-boot-prompt">{PROMPT}</span>
+                {" "}cd <span data-requested-path>/</span>
+              </div>
+              <div class="text-boot-dim">
+                {t.noSuchFile}
+                {" "}<span data-requested-path>/</span>
+              </div>
+              <div class="text-boot-warn">{t.bug}</div>
+            </div>
+
+            <Button href={pathForLanguage(language)} icon="arrowRight">
+              {t.home}
+            </Button>
+          </section>
+        );
+      })
+    }
+  </main>
+
+  <script is:inline define:vars={{ pageLanguages: LANGUAGES, pageDefault: DEFAULT_LANGUAGE }}>
+    // Elige el idioma: el de la URL (/en/…), si no el que eligió el usuario con el selector de la cabecera
+    // y, si nunca eligió, el del navegador. Duplica a propósito la lógica de src/lib/language.ts y del script
+    // de Layout.astro (un script inline no puede importar módulos): mantener en sincronía.
+    var known = function (code) {
+      return pageLanguages.indexOf(code) !== -1;
+    };
+    var chosen = null;
+
+    var fromPath = window.location.pathname.split("/")[1];
+    if (known(fromPath)) chosen = fromPath;
+
+    if (!chosen) {
+      try {
+        var stored = window.localStorage.getItem("language");
+        if (known(stored)) chosen = stored;
+      } catch (e) {
+        // Sin localStorage se usa el idioma del navegador.
+      }
+    }
+
+    if (!chosen) {
+      var preferred = navigator.languages || [];
+      for (var i = 0; i < preferred.length; i++) {
+        var code = preferred[i].toLowerCase().split("-")[0];
+        if (known(code)) {
+          chosen = code;
+          break;
+        }
+      }
+    }
+
+    chosen = chosen || pageDefault;
+    document.documentElement.lang = chosen;
+
+    document.querySelectorAll("[data-not-found]").forEach(function (section) {
+      var active = section.getAttribute("data-not-found") === chosen;
+      section.hidden = !active;
+      if (active) document.title = section.getAttribute("data-title");
+    });
+    // Se muestra la ruta pedida en la terminal, legible (/sección en vez de /secci%C3%B3n).
+    // textContent: nunca se interpreta como HTML.
+    var requested = window.location.pathname;
+    try {
+      requested = decodeURIComponent(requested);
+    } catch (e) {
+      // Codificación inválida: se muestra tal cual.
+    }
+    document.querySelectorAll("[data-requested-path]").forEach(function (node) {
+      node.textContent = requested;
+    });
+  </script>
+</Layout>

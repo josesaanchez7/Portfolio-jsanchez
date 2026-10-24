@@ -37,8 +37,7 @@ export const en: Messages = {
     openingCv: "Opening CHANGELOG.md…",
     debugOn: "Debug mode enabled.",
     debugOff: "Debug mode disabled.",
-    navigatingToNotFound: "Navigating to /this-page-does-not-exist…",
-    notFoundUnavailable: "The 404 page is not available yet.",
+    navigatingToNotFound: (path) => `Navigating to ${path}…`,
     sudoGranted: (email) => `Permission granted. Write to me at ${email} 😉`,
     sudoDenied: "Nice try. Try sudo hire",
     unknownCommand: (input) => `command not found: ${input}. Type help.`,
@@ -90,10 +89,11 @@ export const en: Messages = {
     showCredential: "Show credential",
   },
   about: {
-    intro: ({ fullName, nickname }) =>
-      `My name is ${fullName}, though my friends call me ${nickname}. I started programming at 16.`,
-    current: ({ job, employer }) =>
-      `I'm currently a ${job} at ${employer}, ensuring the quality and proper functioning of applications.`,
+    intro: ({ fullName }) =>
+      `I'm ${fullName}. I started programming at 16 and trained as a multiplatform application developer.`,
+    path: ({ job, employer }) =>
+      `At ${employer} I started in technical support, resolving incidents and, in my last year, building PHP features. Today I work as a <b>${job}</b>: manual and exploratory testing, API validation and automation with Playwright.`,
+    edge: "Coming from development gives me an edge when testing: I know how an application is built, where it tends to break and how to explain it clearly to whoever has to fix it.",
   },
   contact: {
     intro:
@@ -113,6 +113,13 @@ export const en: Messages = {
     notFoundLabel: "Show the 404 error page",
     console: "Ctrl+K",
     consoleLabel: "Open the interactive console (Ctrl+K)",
-    comingSoon: "Coming soon",
+  },
+  notFound: {
+    title: "404 · Page not found",
+    heading: "Page not found",
+    description: "The address you are looking for does not exist or has moved.",
+    noSuchFile: "zsh: no such file or directory:",
+    bug: "⚠ Bug found: this page does not exist.",
+    home: "Back to home",
   },
 };

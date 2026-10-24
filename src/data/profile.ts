@@ -1,6 +1,7 @@
 // Contenido personal. Los TODO marcan información pendiente de completar.
 // Cada texto traducible lleva una versión en español (es) y otra en inglés (en).
 import type { AboutFact, Profile } from "../types/content";
+import { statusBar } from "./statusBar";
 
 export const profile: Profile = {
   name: "José Sánchez",
@@ -19,23 +20,20 @@ export const profile: Profile = {
   linkedin: "https://www.linkedin.com/in/josesanchezaldana",
 };
 
-// Datos breves para "Sobre mí" (formación, idiomas y habilidades: CV y perfil de LinkedIn).
-// Añade aquí tu enfoque, intereses, forma de trabajar y objetivos.
+// Datos breves de la tarjeta de "Sobre mí". La formación y el puesto actual ya están en Educación y Experiencia,
+// y la ubicación sale de statusBar. El relato de la izquierda está en src/i18n/messages (about).
+// Añade aquí intereses, forma de trabajar y objetivos.
 export const aboutFacts: AboutFact[] = [
   {
-    label: { es: "Empecé a programar", en: "Started programming" },
-    value: { es: "A los 16 años", en: "At 16" },
+    label: { es: "Ubicación", en: "Location" },
+    value: statusBar.location,
   },
   {
-    label: { es: "Formación", en: "Education" },
+    label: { es: "Enfoque", en: "Focus" },
     value: {
-      es: "Desarrollo de Aplicaciones Multiplataforma (2021 – 2024)",
-      en: "Multiplatform Application Development (2021 – 2024)",
+      es: "Pruebas manuales, exploratorias y de API; automatización con Playwright",
+      en: "Manual, exploratory and API testing; automation with Playwright",
     },
-  },
-  {
-    label: { es: "Ahora", en: "Now" },
-    value: { es: "QA Tester en Torcal", en: "QA Tester at Torcal" },
   },
   {
     label: { es: "Idiomas", en: "Languages" },

@@ -51,8 +51,18 @@ export interface Credential {
   url?: HttpsUrl;
 }
 
+/** Fecha para ordenar: "AAAA-MM", o solo "AAAA" cuando no se conoce el mes. */
+export type SortableDate = string;
+
 export interface ExperienceItem {
   kind: ExperienceKind;
+  /**
+   * Inicio del periodo. Con `end` fija el orden de la línea de tiempo (más reciente primero); el texto
+   * que se muestra es `period`. En una certificación, la fecha en que se obtuvo.
+   */
+  start: SortableDate;
+  /** Fin del periodo. Si falta, sigue en curso y la entrada va la primera. */
+  end?: SortableDate;
   title: LocalizedText;
   /** Opcional: una certificación puede no indicar la entidad. */
   organization?: LocalizedText;

@@ -8,12 +8,25 @@ import { getI18n } from "../i18n";
 import { DEFAULT_LANGUAGE, LANGUAGES } from "../lib/language";
 import { buildSeoTags, pathForLanguage } from "../lib/seo";
 
+interface Props {
+  /**
+   * Página de entrada (la home): activa la pantalla de carga y la redirección al idioma preferido.
+   * Las demás páginas (el 404) no las llevan.
+   */
+  home?: boolean;
+  /** Excluye la página de buscadores y omite Open Graph, canonical y hreflang. */
+  noindex?: boolean;
+  /** Sustituye el título del documento (por defecto, el de la home en el idioma de la página). */
+  title?: string;
+}
+
+const { home = false, noindex = false, title } = Astro.props;
 const { language, t } = getI18n(Astro.currentLocale);
-const { meta } = t;
+const meta = { ...t.meta, ...(title && { title }) };
 
 // Open Graph, Twitter, canonical y hreflang. Sin `site` (SITE_URL) se omiten los que exigen URL absoluta.
 const siteUrl = Astro.site?.origin ?? null;
-const seoTags = buildSeoTags(language, meta, siteUrl);
+const seoTags = noindex ? [] : buildSeoTags(language, meta, siteUrl);
 
 // Datos para el script del <head> (inline: no puede importar módulos).
 const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForLanguage(code)]));
@@ -26,6 +39,7 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{meta.title}</title>
     <meta name="description" content={meta.description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <meta name="author" content="José Sánchez" />
     <meta name="theme-color" content="#151923" />
     {
@@ -37,7 +51,7 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
     <link rel="preload" as="font" type="font/woff2" crossorigin href={interFont} />
     <link rel="preload" as="font" type="font/woff2" crossorigin href={spaceGroteskFont} />
     <link rel="preload" as="font" type="font/woff2" crossorigin href={jetbrainsMonoFont} />
-    <script is:inline define:vars={{ language, defaultLanguage: DEFAULT_LANGUAGE, languagePaths }}>
+    <script is:inline define:vars={{ home, language, defaultLanguage: DEFAULT_LANGUAGE, languagePaths }}>
       // Se ejecuta antes del primer pintado para evitar parpadeos. Duplica a propósito parte de
       // src/lib/theme.ts y src/lib/language.ts (un script inline no puede importar módulos): mantener en sincronía.
       var root = document.documentElement;
@@ -49,22 +63,10 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
         // Sin persistencia se queda el tema por defecto.
       }
 
-      // Pantalla de carga: se activa con data-boot, salvo con "reducir movimiento" o justo después de
-      // cambiar de idioma (el selector deja "skip-boot" para no repetir la animación).
-      var skipBoot = false;
-      try {
-        skipBoot = sessionStorage.getItem("skip-boot") === "1";
-        sessionStorage.removeItem("skip-boot");
-      } catch (e) {
-        // Sin sessionStorage la animación se mostrará siempre.
-      }
-      if (!skipBoot && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        root.dataset.boot = "running";
-      }
-
-      // En la URL sin prefijo manda el idioma que eligió el usuario y, si nunca eligió, el del navegador.
+      // En la home, en la URL sin prefijo manda el idioma que eligió el usuario y, si nunca eligió, el del navegador.
       // En /en/ manda la URL.
-      if (language === defaultLanguage) {
+      var redirecting = false;
+      if (home && language === defaultLanguage) {
         var known = function (code) {
           return Object.prototype.hasOwnProperty.call(languagePaths, code);
         };
@@ -86,8 +88,23 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
           }
         }
         if (preferred && preferred !== language) {
+          redirecting = true;
           window.location.replace(languagePaths[preferred] + window.location.search + window.location.hash);
         }
+      }
+
+      // Pantalla de carga (solo en la home): se activa con data-boot, salvo con "reducir movimiento" y una
+      // vez por sesión (por pestaña): al verla se guarda "boot-seen" en sessionStorage. Si la página va a
+      // redirigir al otro idioma no se marca: la animación se verá en la página de destino.
+      if (home && !redirecting && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        var seen = false;
+        try {
+          seen = sessionStorage.getItem("boot-seen") === "1";
+          if (!seen) sessionStorage.setItem("boot-seen", "1");
+        } catch (e) {
+          // Sin sessionStorage la animación se mostrará en cada visita.
+        }
+        if (!seen) root.dataset.boot = "running";
       }
     </script>
   </head>
