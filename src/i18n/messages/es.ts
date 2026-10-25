@@ -81,12 +81,6 @@ export const es: Messages = {
     closeImage: "Cerrar imagen ampliada",
     demo: "Demo",
     code: "Código",
-    viewDetail: "Ver detalle",
-    closeDetail: "Cerrar detalle",
-    problem: "Problema",
-    solution: "Solución",
-    decisions: "Decisiones técnicas",
-    results: "Resultados",
     moreTitle: "Más proyectos en camino",
     moreDescription:
       "Voy añadiendo trabajo nuevo con el tiempo. Mientras tanto, puedes ver mi código en GitHub.",

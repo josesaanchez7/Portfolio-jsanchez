@@ -88,51 +88,5 @@ export const projects: Project[] = [
     ],
     code: "https://github.com/josesaanchez7/Portfolio-jsanchez",
     demo: "https://jose-sanchez.vercel.app",
-    caseStudy: {
-      problem: {
-        es: "Presentar mi perfil y mis proyectos en una web propia que cargue rápido, sea accesible, esté en español e inglés y se vea bien en cualquier dispositivo.",
-        en: "Showcase my profile and projects on a website of my own that loads fast, is accessible, comes in Spanish and English and looks good on any device.",
-      },
-      solution: {
-        es: "Una web estática hecha con Astro: el HTML se genera al construir, hay una página por idioma (/ y /en/) y el JavaScript solo se carga donde hace falta: menú, tema, idioma, paleta de comandos, consola y carruseles de imágenes.",
-        en: "A static website built with Astro: the HTML is generated at build time, there is one page per language (/ and /en/) and JavaScript only loads where it is needed: menu, theme, language, command palette, console and image carousels.",
-      },
-      decisions: [
-        {
-          es: "Pasé la web de React a Astro: el contenido es estático, así que no hacía falta un framework de interfaz en el navegador. Cada componente lleva su propio script, sin librerías.",
-          en: "I moved the site from React to Astro: the content is static, so a UI framework in the browser was not needed. Each component carries its own script, with no libraries.",
-        },
-        {
-          es: "Los textos y el contenido están tipados en español e inglés: cada texto tiene sus dos versiones y el compilador avisa si falta alguna.",
-          en: "Text and content are typed in Spanish and English: every text has both versions and the compiler warns if one is missing.",
-        },
-        {
-          es: "Tailwind CSS v4 con variables de diseño para el tema claro y oscuro.",
-          en: "Tailwind CSS v4 with design variables for the light and dark themes.",
-        },
-        {
-          es: "Accesibilidad desde el principio: diálogos nativos, foco gestionado, etiquetas ARIA, contraste revisado y respeto a «reducir movimiento».",
-          en: "Accessibility from the start: native dialogs, managed focus, ARIA labels, checked contrast and respect for “reduce motion”.",
-        },
-        {
-          es: "Pruebas con Vitest: la lógica (idioma, SEO, comandos de la consola, orden de la experiencia…) y el HTML de los componentes se comprueban automáticamente.",
-          en: "Tests with Vitest: the logic (language, SEO, console commands, experience ordering…) and the components' HTML are checked automatically.",
-        },
-      ],
-      results: [
-        {
-          es: "Lighthouse, medido en local sobre el build: 100 en accesibilidad, buenas prácticas y SEO, y entre 97 y 100 en rendimiento, sin desplazamiento de diseño (CLS 0).",
-          en: "Lighthouse, measured locally on the build: 100 for accessibility, best practices and SEO, and between 97 and 100 for performance, with no layout shift (CLS 0).",
-        },
-        {
-          es: "Una web bilingüe con una URL por idioma y su propia página 404.",
-          en: "A bilingual website with one URL per language and its own 404 page.",
-        },
-        {
-          es: "Más de 250 pruebas automáticas que se ejecutan en segundos.",
-          en: "More than 250 automated tests that run in seconds.",
-        },
-      ],
-    },
   },
 ];

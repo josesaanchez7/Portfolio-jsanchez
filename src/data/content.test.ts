@@ -132,14 +132,6 @@ describe("traducciones del contenido", () => {
     ...projects.flatMap((project) => [
       project.title,
       project.description,
-      ...(project.caseStudy
-        ? [
-            project.caseStudy.problem,
-            project.caseStudy.solution,
-            ...project.caseStudy.decisions,
-            ...project.caseStudy.results,
-          ]
-        : []),
     ]),
     ...experience.flatMap((item) => [
       item.title,

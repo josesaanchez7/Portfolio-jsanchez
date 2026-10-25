@@ -90,12 +90,6 @@ export interface Messages {
     closeImage: string;
     demo: string;
     code: string;
-    viewDetail: string;
-    closeDetail: string;
-    problem: string;
-    solution: string;
-    decisions: string;
-    results: string;
     moreTitle: string;
     moreDescription: string;
     moreButton: string;

@@ -4,7 +4,6 @@ import { SPOTLIGHT } from "../../lib/spotlight";
 import type { Project } from "../../types/content";
 import Button from "../ui/Button.astro";
 import ProjectCarousel from "./ProjectCarousel.astro";
-import ProjectCaseStudy from "./ProjectCaseStudy.astro";
 
 interface Props {
   project: Project;
@@ -57,7 +56,6 @@ const title = localize(project.title);
           </Button>
         )
       }
-      {project.caseStudy && <ProjectCaseStudy project={project} caseStudy={project.caseStudy} />}
     </div>
   </div>
 </article>

@@ -21,11 +21,11 @@ describe("Button", () => {
   });
 
   it("sin href renderiza un botón y pasa el resto de atributos", async () => {
-    const { getByRole } = await renderComponent(Button, { props: { "data-case-study-open": "detalle", "aria-haspopup": "dialog" }, slot: "Ver detalle" });
+    const { getByRole } = await renderComponent(Button, { props: { "data-demo-open": "detalle", "aria-haspopup": "dialog" }, slot: "Abrir detalle" });
 
-    const button = getByRole("button", { name: "Ver detalle" });
+    const button = getByRole("button", { name: "Abrir detalle" });
     expect(button).toHaveAttribute("type", "button");
-    expect(button).toHaveAttribute("data-case-study-open", "detalle");
+    expect(button).toHaveAttribute("data-demo-open", "detalle");
     expect(button).toHaveAttribute("aria-haspopup", "dialog");
   });
 

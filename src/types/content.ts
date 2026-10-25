@@ -15,13 +15,6 @@ export interface Profile {
   linkedin: HttpsUrl;
 }
 
-export interface CaseStudy {
-  problem: LocalizedText;
-  solution: LocalizedText;
-  decisions: LocalizedText[];
-  results: LocalizedText[];
-}
-
 export type ProjectStatus = "done" | "in-progress" | "todo";
 
 /** Una captura de un proyecto. */
@@ -55,8 +48,6 @@ export interface Project {
   code?: HttpsUrl;
   /** Demo. Si falta, el botón no se muestra. */
   demo?: HttpsUrl;
-  /** Si existe, la tarjeta muestra "Ver detalle" con el caso de estudio. */
-  caseStudy?: CaseStudy;
 }
 
 export type ExperienceKind = "work" | "education" | "certification";

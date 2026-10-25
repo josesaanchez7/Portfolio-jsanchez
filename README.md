@@ -79,7 +79,7 @@ src/
 ├── layouts/        Layout.astro: <html>, <head> (SEO, fuentes, script anti-parpadeo) y <body>
 ├── components/
 │   ├── layout/     Header, Footer, Section (estructura de página)
-│   ├── sections/   una por sección: Hero, Projects (+ Card y CaseStudy), Experience y Education (+ Entry), Stack (+ TechMarquee), About, Contact
+│   ├── sections/   una por sección: Hero, Projects (+ Card y Carousel), Experience y Education (+ Entry), Stack (+ TechMarquee), About, Contact
 │   ├── boot/       BootScreen: pantalla de carga con aspecto de terminal
 │   ├── palette/    CommandPalette: paleta de comandos (Ctrl/⌘ + K)
 │   ├── console/    ConsoleDialog: consola interactiva
@@ -281,8 +281,7 @@ y los `TODO` marcan la información pendiente de completar.
 - **Proyectos** ([`projects.ts`](src/data/projects.ts)): el orden del archivo es el de la web y el primero es el destacado
   (intercámbialos para destacar otro). Las capturas van en `public/img/projects/` (webp, proporción 16:10) y se indican como
   `images: [{ src: "/img/projects/nombre.webp", alt: { es, en } }, …]` (con una sola, `image: "…"` basta; con dos o más sale el
-  carrusel). Añade `images`, `video`, `code`, `demo` (URLs `https://…`)
-  y, opcionalmente, `caseStudy` (problema, solución, decisiones, resultados) para mostrar "Ver detalle".
+  carrusel). Añade `images`, `video`, `code`, `demo` (URLs `https://…`).
 - **Experiencia y educación** ([`experience.ts`](src/data/experience.ts)): cada entrada lleva `start` y, si ya
   terminó, `end` (`"AAAA-MM"`, o `"AAAA"` si no se sabe el mes). Con ellas se ordena sola, de la más reciente a
   la más antigua (lo que sigue en curso, sin `end`, va primero), así que da igual en qué punto del archivo

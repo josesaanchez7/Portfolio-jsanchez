@@ -81,12 +81,6 @@ export const en: Messages = {
     closeImage: "Close enlarged image",
     demo: "Demo",
     code: "Code",
-    viewDetail: "View details",
-    closeDetail: "Close details",
-    problem: "Problem",
-    solution: "Solution",
-    decisions: "Technical decisions",
-    results: "Results",
     moreTitle: "More projects on the way",
     moreDescription:
       "I keep adding new work over time. In the meantime, you can browse my code on GitHub.",
