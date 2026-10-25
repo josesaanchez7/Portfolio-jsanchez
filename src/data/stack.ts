@@ -9,7 +9,7 @@ const tech = (name: string): LocalizedText => ({ es: name, en: name });
 const allCategories: StackCategory[] = [
   {
     label: { es: "Frontend", en: "Frontend" },
-    items: [tech("Astro"), tech("TypeScript"), tech("HTML"), tech("CSS"), tech("Tailwind CSS")],
+    items: [tech("Astro"), tech("JavaScript"), tech("TypeScript"), tech("HTML"), tech("CSS"), tech("Tailwind CSS")],
   },
   {
     label: { es: "Backend", en: "Backend" },
@@ -18,7 +18,7 @@ const allCategories: StackCategory[] = [
   { label: { es: "Bases de datos", en: "Databases" }, items: [] },
   {
     label: { es: "Testing y calidad", en: "Testing and quality" },
-    items: [{ es: "Pruebas API", en: "API testing" }, tech("Playwright"), tech("Postman"), tech("Jira")],
+    items: [tech("Playwright"), tech("Postman"), tech("Jira")],
   },
   {
     label: { es: "Herramientas y despliegue", en: "Tools and deployment" },

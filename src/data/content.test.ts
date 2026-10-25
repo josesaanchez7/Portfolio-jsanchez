@@ -1,4 +1,7 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { galleryOf } from "../lib/gallery";
 import { LANGUAGES, type LocalizedText } from "../lib/language";
 import { aboutFacts, profile } from "./profile";
 import { byMostRecent, education, experience, workExperience } from "./experience";
@@ -36,6 +39,42 @@ describe("contenido estático", () => {
       expect(names.length).toBeGreaterThan(0);
       expect(new Set(names).size).toBe(names.length);
     }
+  });
+});
+
+describe("proyectos", () => {
+  const images = projects.flatMap((project) => galleryOf(project).map((image) => ({ project, image })));
+
+  it("cada imagen existe en public/ y es un webp", () => {
+    expect(images.length).toBeGreaterThan(0);
+    for (const { project, image } of images) {
+      expect(image.src, project.id).toMatch(/^\/img\/projects\/.+\.webp$/);
+      expect(existsSync(join(process.cwd(), "public", image.src)), `${project.id}: falta ${image.src}`).toBe(true);
+    }
+  });
+
+  it("los proyectos con varias imágenes las describen todas, en los dos idiomas", () => {
+    for (const project of projects) {
+      const gallery = galleryOf(project);
+      if (gallery.length < 2) continue;
+      for (const image of gallery) {
+        for (const language of LANGUAGES) {
+          expect(image.alt?.[language]?.trim().length ?? 0, `${project.id} ${image.src} (${language})`).toBeGreaterThan(10);
+        }
+      }
+    }
+  });
+
+  it("no se repite ninguna imagen dentro de un mismo proyecto", () => {
+    for (const project of projects) {
+      const sources = galleryOf(project).map((image) => image.src);
+      expect(new Set(sources).size, project.id).toBe(sources.length);
+    }
+  });
+
+  it("los estados son válidos y el primer proyecto es el destacado", () => {
+    for (const project of projects) expect(["done", "in-progress", "todo"]).toContain(project.status);
+    expect(projects[0]?.featured ?? true).toBe(true);
   });
 });
 
