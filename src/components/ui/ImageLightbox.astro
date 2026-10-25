@@ -1,0 +1,178 @@
+---
+import { getI18n } from "../../i18n";
+import Icon from "./Icon.astro";
+
+const { t } = getI18n(Astro.currentLocale);
+
+// Botones circulares sobre el fondo oscuro de la vista ampliada.
+const BUTTON =
+  "absolute z-10 grid size-11 cursor-pointer place-items-center rounded-full bg-white/10 text-[1.05rem] text-white backdrop-blur-sm transition-colors duration-200 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+---
+
+{
+  /*
+  Vista ampliada de las imágenes (un solo <dialog> para toda la página). Se abre desde cualquier botón con
+  data-lightbox-open dentro de un contenedor data-lightbox-group (ver ProjectCarousel.astro): muestra las imágenes
+  de ese contenedor, en orden, y permite recorrerlas. <dialog> modal aporta capa superior, foco atrapado y Escape.
+*/
+}
+<dialog
+  data-lightbox
+  aria-label={t.projects.lightboxLabel()}
+  class="m-0 size-full max-h-none max-w-none overflow-hidden bg-[rgba(4,6,12,0.96)] p-0 text-white opacity-100 backdrop-blur-xl backdrop:bg-transparent open:flex starting:open:opacity-0 transition-opacity duration-200"
+>
+  <div
+    data-lightbox-stage
+    class="flex size-full flex-col items-center justify-center gap-3 overflow-y-auto p-4 sm:p-10"
+  >
+    <img
+      data-lightbox-image
+      alt=""
+      draggable="false"
+      class="max-h-[calc(100dvh-11rem)] max-w-full touch-pan-y rounded-md object-contain shadow-[0_20px_70px_rgba(0,0,0,0.6)] select-none sm:max-h-[calc(100dvh-13rem)]"
+    />
+    {/* La descripción se ve como pie de foto; los lectores de pantalla ya la leen en el alt y en el aviso de abajo. */}
+    <p data-lightbox-caption aria-hidden="true" class="line-clamp-3 max-w-[70ch] text-center text-[0.9rem] text-white/75"></p>
+    <p data-lightbox-counter aria-hidden="true" class="font-code text-[0.8rem] text-white/60"></p>
+  </div>
+
+  <button type="button" data-lightbox-close aria-label={t.projects.closeImage} class={`top-4 right-4 ${BUTTON}`}>
+    <Icon name="times" />
+  </button>
+  <button type="button" data-lightbox-prev aria-label={t.projects.previousImage} class={`top-1/2 left-3 -translate-y-1/2 sm:left-6 ${BUTTON}`}>
+    <Icon name="arrowRight" class="rotate-180" />
+  </button>
+  <button type="button" data-lightbox-next aria-label={t.projects.nextImage} class={`top-1/2 right-3 -translate-y-1/2 sm:right-6 ${BUTTON}`}>
+    <Icon name="arrowRight" />
+  </button>
+
+  <div data-lightbox-live class="sr-only" aria-live="polite"></div>
+</dialog>
+
+<script>
+  import { messages } from "../../i18n/messages";
+  import { DEFAULT_LANGUAGE, parseLanguage } from "../../lib/language";
+
+  const SWIPE_MIN_PX = 50;
+
+  interface Item {
+    src: string;
+    alt: string;
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>("[data-lightbox]");
+  const stage = dialog?.querySelector<HTMLElement>("[data-lightbox-stage]");
+  const image = dialog?.querySelector<HTMLImageElement>("[data-lightbox-image]");
+  const caption = dialog?.querySelector<HTMLElement>("[data-lightbox-caption]");
+  const counter = dialog?.querySelector<HTMLElement>("[data-lightbox-counter]");
+  const live = dialog?.querySelector<HTMLElement>("[data-lightbox-live]");
+  const prev = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-prev]");
+  const next = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-next]");
+  const close = dialog?.querySelector<HTMLButtonElement>("[data-lightbox-close]");
+
+  if (dialog && stage && image && caption && counter && live && prev && next && close) {
+    const html = document.documentElement;
+    const text = messages[parseLanguage(html.lang) ?? DEFAULT_LANGUAGE].projects;
+
+    let items: Item[] = [];
+    let index = 0;
+    let group: HTMLElement | null = null;
+    let opener: HTMLElement | null = null;
+
+    const show = (target: number) => {
+      index = (target + items.length) % items.length;
+      const item = items[index];
+      if (!item) return;
+
+      image.src = item.src;
+      image.alt = item.alt;
+      caption.textContent = item.alt;
+      const position = text.slideLabel(index + 1, items.length);
+      counter.textContent = items.length > 1 ? position : "";
+      live.textContent = `${position}: ${item.alt}`;
+      prev.hidden = next.hidden = items.length < 2;
+
+      // Se precargan las vecinas para que cambiar de imagen sea inmediato.
+      for (const neighbour of [items[(index + 1) % items.length], items[(index - 1 + items.length) % items.length]]) {
+        if (neighbour) new Image().src = neighbour.src;
+      }
+    };
+
+    const open = (button: HTMLElement) => {
+      const container = button.closest<HTMLElement>("[data-lightbox-group]");
+      if (!container || dialog.open) return;
+
+      const buttons = [...container.querySelectorAll<HTMLElement>("[data-lightbox-open]")];
+      items = buttons.flatMap((candidate) => {
+        const picture = candidate.querySelector("img");
+        return picture ? [{ src: picture.currentSrc || picture.src, alt: picture.alt }] : [];
+      });
+      if (items.length === 0) return;
+
+      group = container;
+      opener = button;
+      dialog.setAttribute("aria-label", text.lightboxLabel(container.dataset.lightboxTitle ?? ""));
+      show(Math.max(0, buttons.indexOf(button)));
+      // Mientras está abierta, la página de detrás no hace scroll (ver global.css).
+      html.toggleAttribute("data-lightbox-active", true);
+      dialog.showModal();
+      close.focus();
+    };
+
+    dialog.addEventListener("close", () => {
+      html.removeAttribute("data-lightbox-active");
+      // El carrusel de la tarjeta se queda en la última imagen vista y el foco vuelve a su botón.
+      group?.dispatchEvent(new CustomEvent("carousel-goto", { detail: index }));
+      const buttons = group ? [...group.querySelectorAll<HTMLElement>("[data-lightbox-open]")] : [];
+      (buttons[index] ?? opener)?.focus({ preventScroll: true });
+      group = opener = null;
+      image.removeAttribute("src");
+    });
+
+    document.addEventListener("click", (event) => {
+      const button = event.target instanceof Element ? event.target.closest<HTMLElement>("[data-lightbox-open]") : null;
+      if (button) open(button);
+    });
+
+    prev.addEventListener("click", () => show(index - 1));
+    next.addEventListener("click", () => show(index + 1));
+    close.addEventListener("click", () => dialog.close());
+
+    // Clic en el fondo (no en la imagen ni en los botones) cierra la vista ampliada.
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog || event.target === stage) dialog.close();
+    });
+
+    dialog.addEventListener("keydown", (event) => {
+      if (items.length < 2) return;
+      const moves: Record<string, () => void> = {
+        ArrowLeft: () => show(index - 1),
+        ArrowRight: () => show(index + 1),
+        Home: () => show(0),
+        End: () => show(items.length - 1),
+      };
+      const move = moves[event.key];
+      if (!move) return;
+      event.preventDefault();
+      move();
+    });
+
+    // Deslizar con el dedo (o arrastrar) hacia los lados cambia de imagen.
+    let startX: number | null = null;
+    let startY = 0;
+    stage.addEventListener("pointerdown", (event) => {
+      startX = event.clientX;
+      startY = event.clientY;
+    });
+    stage.addEventListener("pointerup", (event) => {
+      if (startX === null || items.length < 2) return;
+      const dx = event.clientX - startX;
+      const dy = event.clientY - startY;
+      startX = null;
+      if (Math.abs(dx) >= SWIPE_MIN_PX && Math.abs(dx) > Math.abs(dy) * 1.5) show(index + (dx < 0 ? 1 : -1));
+    });
+    stage.addEventListener("pointercancel", () => {
+      startX = null;
+    });
+  }
+</script>

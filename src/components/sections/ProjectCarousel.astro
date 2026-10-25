@@ -1,0 +1,220 @@
+---
+import { getI18n } from "../../i18n";
+import { galleryOf } from "../../lib/gallery";
+import type { Project } from "../../types/content";
+import Icon from "../ui/Icon.astro";
+
+interface Props {
+  project: Project;
+  title: string;
+}
+
+const { project, title } = Astro.props;
+const { t, localize } = getI18n(Astro.currentLocale);
+const gallery = galleryOf(project);
+const total = gallery.length;
+const isCarousel = total > 1;
+// Texto alternativo de cada imagen: el suyo o, si falta, el genérico del proyecto.
+const slides = gallery.map((image) => ({
+  src: image.src,
+  alt: image.alt ? localize(image.alt) : t.projects.screenshotAlt(title),
+}));
+
+// Botones flotantes sobre la imagen: sobre fondo oscuro translúcido para que se lean con cualquier captura.
+const ARROW =
+  "absolute top-1/2 z-10 grid size-9 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-black/55 text-[0.95rem] text-white opacity-0 backdrop-blur-sm transition-[opacity,background-color] duration-200 group-hover/carousel:opacity-100 group-focus-within/carousel:opacity-100 hover:bg-black/75 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white [@media(hover:none)]:opacity-100";
+---
+
+{
+  /*
+  Capturas de un proyecto. Una sola imagen (o ninguna: vista previa provisional) se muestra tal cual; con dos o más es un
+  carrusel (patrón APG): una pista con scroll-snap, que ya se desliza con el dedo, la rueda o las flechas del teclado
+  sin JavaScript, más flechas y puntos que el <script> activa (están ocultos hasta entonces). No cambia sola.
+  El orden en el HTML es el de tabulación: anterior → puntos → siguiente.
+*/
+}
+<div
+  class="group/carousel relative size-full"
+  {...total > 0 && { "data-lightbox-group": "", "data-lightbox-title": title }}
+  {...isCarousel && {
+    "data-carousel": "",
+    role: "region",
+    "aria-roledescription": t.projects.carouselRole,
+    "aria-label": t.projects.carouselLabel(title),
+  }}
+>
+  {
+    total === 0 ? (
+      // Vista previa provisional: sustitúyela añadiendo `images` (o `image`) al proyecto.
+      <div
+        class="relative flex size-full flex-col items-center justify-center gap-3 bg-[linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] bg-size-[32px_32px] bg-center p-6 text-center font-code text-[0.85rem] text-fg-muted"
+        aria-hidden="true"
+      >
+        <Icon name="code" class="text-[1.75rem] text-accent" />
+        <span>{title}</span>
+        {project.video && (
+          <video
+            data-hover-video
+            class="pointer-events-none absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-300 data-playing:opacity-100"
+            src={project.video}
+            muted
+            loop
+            playsinline
+            preload="none"
+            tabindex="-1"
+          />
+        )}
+      </div>
+    ) : (
+      <div
+        data-carousel-track
+        class="flex size-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] motion-safe:scroll-smooth [&::-webkit-scrollbar]:hidden"
+        {...isCarousel && { "aria-live": "polite" }}
+      >
+        {slides.map((image, index) => (
+          <div
+            data-carousel-slide
+            class="relative size-full shrink-0 basis-full snap-center"
+            {...isCarousel && {
+              role: "group",
+              "aria-roledescription": t.projects.slideRole,
+              "aria-label": t.projects.slideLabel(index + 1, total),
+            }}
+          >
+            {/* Toda la imagen es un botón que la abre en grande (ImageLightbox.astro); el icono es decorativo. */}
+            <button
+              type="button"
+              data-lightbox-open
+              aria-haspopup="dialog"
+              aria-label={t.projects.enlargeImage(image.alt)}
+              class="group/zoom relative block size-full cursor-zoom-in focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+            >
+              <img
+                src={image.src}
+                alt={image.alt}
+                class="size-full object-cover"
+                loading="lazy"
+                decoding="async"
+                width={1600}
+                height={1000}
+              />
+              <span
+                aria-hidden="true"
+                class="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-black/55 text-[0.85rem] text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover/zoom:opacity-100 group-focus-visible/zoom:opacity-100 [@media(hover:none)]:opacity-100"
+              >
+                <Icon name="expand" />
+              </span>
+            </button>
+            {index === 0 && project.video && (
+              // Vista previa en vídeo: decorativa y sin audio; el script de ProjectCard la reproduce al pasar el ratón o
+              // enfocar la tarjeta. Va dentro de la primera diapositiva, así que solo se ve mientras esa está a la vista.
+              <video
+                data-hover-video
+                class="pointer-events-none absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-300 data-playing:opacity-100"
+                src={project.video}
+                poster={image.src}
+                muted
+                loop
+                playsinline
+                preload="none"
+                aria-hidden="true"
+                tabindex="-1"
+              />
+            )}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  {
+    isCarousel && (
+      <div data-carousel-controls hidden>
+        <button type="button" data-carousel-prev aria-label={t.projects.previousImage} class={`left-3 ${ARROW}`}>
+          <Icon name="arrowRight" class="rotate-180" />
+        </button>
+        <div class="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex justify-center">
+          <div class="pointer-events-auto flex items-center rounded-full bg-black/45 px-1.5 backdrop-blur-sm">
+            {gallery.map((_, index) => (
+              <button
+                type="button"
+                data-carousel-dot
+                aria-label={t.projects.goToImage(index + 1, total)}
+                class="group grid size-6 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-white"
+              >
+                <span class="block size-2 rounded-full bg-white/50 transition-[background-color,scale] duration-200 group-aria-[current=true]:scale-125 group-aria-[current=true]:bg-white" />
+              </button>
+            ))}
+          </div>
+        </div>
+        <button type="button" data-carousel-next aria-label={t.projects.nextImage} class={`right-3 ${ARROW}`}>
+          <Icon name="arrowRight" />
+        </button>
+      </div>
+    )
+  }
+</div>
+
+<script>
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  for (const carousel of document.querySelectorAll<HTMLElement>("[data-carousel]")) {
+    const track = carousel.querySelector<HTMLElement>("[data-carousel-track]");
+    const controls = carousel.querySelector<HTMLElement>("[data-carousel-controls]");
+    const slides = [...carousel.querySelectorAll<HTMLElement>("[data-carousel-slide]")];
+    const dots = [...carousel.querySelectorAll<HTMLElement>("[data-carousel-dot]")];
+    if (!track || !controls || slides.length < 2) continue;
+
+    let current = 0;
+
+    const markCurrent = (index: number) => {
+      current = index;
+      dots.forEach((dot, dotIndex) => {
+        if (dotIndex === index) dot.setAttribute("aria-current", "true");
+        else dot.removeAttribute("aria-current");
+      });
+      // Solo el botón de ampliar de la imagen visible entra en el orden de tabulación.
+      slides.forEach((slide, slideIndex) => {
+        slide.querySelector("[data-lightbox-open]")?.setAttribute("tabindex", slideIndex === index ? "0" : "-1");
+      });
+    };
+
+    // Cada diapositiva ocupa el ancho de la pista: ir a la n es desplazarse n anchos. Es circular.
+    const goTo = (index: number) => {
+      const target = (index + slides.length) % slides.length;
+      track.scrollTo({ left: target * track.clientWidth, behavior: reducedMotion ? "auto" : "smooth" });
+    };
+
+    // La diapositiva actual es la que se ve casi entera, sea cual sea la forma de llegar a ella (dedo, rueda, teclado, botones).
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) markCurrent(slides.indexOf(entry.target as HTMLElement));
+        }
+      },
+      { root: track, threshold: 0.6 },
+    );
+    for (const slide of slides) observer.observe(slide);
+
+    carousel.querySelector("[data-carousel-prev]")?.addEventListener("click", () => goTo(current - 1));
+    carousel.querySelector("[data-carousel-next]")?.addEventListener("click", () => goTo(current + 1));
+    dots.forEach((dot, index) => dot.addEventListener("click", () => goTo(index)));
+
+    // Flechas del teclado desde cualquier botón del carrusel (imagen, flechas o puntos).
+    carousel.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      goTo(current + (event.key === "ArrowRight" ? 1 : -1));
+    });
+
+    // Al cerrar la vista ampliada, el carrusel se queda en la última imagen vista (sin animar: no se ve).
+    carousel.addEventListener("carousel-goto", (event) => {
+      const target = (event as CustomEvent<number>).detail;
+      track.scrollTo({ left: target * track.clientWidth, behavior: "auto" });
+      markCurrent(target);
+    });
+
+    markCurrent(0);
+    controls.hidden = false;
+  }
+</script>

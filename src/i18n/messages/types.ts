@@ -55,6 +55,8 @@ export interface Messages {
     themeToDark: string;
     openMenu: string;
     closeMenu: string;
+    /** Botón de la cabecera que abre la paleta de comandos. */
+    searchLabel: string;
     /** Etiqueta accesible del selector, indexada por el idioma al que se cambia. */
     switchLanguage: Record<Language, string>;
   };
@@ -72,6 +74,20 @@ export interface Messages {
   projects: {
     techLabel: string;
     screenshotAlt: (title: string) => string;
+    /** Carrusel de capturas (solo con dos o más). */
+    carouselRole: string;
+    slideRole: string;
+    carouselLabel: (title: string) => string;
+    slideLabel: (current: number, total: number) => string;
+    previousImage: string;
+    nextImage: string;
+    goToImage: (current: number, total: number) => string;
+    /** Botón sobre cada imagen que la abre en grande; recibe el texto alternativo de la imagen. */
+    enlargeImage: (alt: string) => string;
+    /** Vista ampliada (lightbox). */
+    /** Sin título devuelve el nombre genérico del diálogo. */
+    lightboxLabel: (title?: string) => string;
+    closeImage: string;
     demo: string;
     code: string;
     viewDetail: string;
@@ -105,6 +121,8 @@ export interface Messages {
     copied: string;
     copyError: string;
     sendEmail: string;
+    /** Indicador junto al correo cuando `statusBar.available` es true. */
+    available: string;
   };
   footer: {
     label: string;
@@ -116,6 +134,20 @@ export interface Messages {
     notFoundLabel: string;
     console: string;
     consoleLabel: string;
+  };
+  /** Paleta de comandos (Ctrl/⌘ + K). Los nombres de tema, idioma, correo y CV reutilizan header, contact y hero. */
+  palette: {
+    title: string;
+    inputLabel: string;
+    placeholder: string;
+    empty: string;
+    groups: { go: string; actions: string; links: string };
+    home: string;
+    openConsole: string;
+    toggleDebug: string;
+    /** Palabras extra por las que también se encuentra cada comando (separadas por espacios). */
+    keywords: { theme: string; language: string; email: string; cv: string; console: string; debug: string; links: string };
+    hints: { navigate: string; select: string; close: string };
   };
   /** Página 404: se elige el idioma en el navegador (un 404 no sabe a qué URL iba el visitante). */
   notFound: {

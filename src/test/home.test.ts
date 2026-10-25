@@ -1,6 +1,7 @@
 // @vitest-environment node
 // Vive en src/test y no en src/pages: Astro convierte en ruta cualquier archivo de pages.
 import { describe, expect, it } from "vitest";
+import { projects } from "../data/projects";
 import { SECTIONS } from "../data/sections";
 import { messages } from "../i18n/messages";
 import { LANGUAGES } from "../lib/language";
@@ -60,6 +61,7 @@ describe.each(LANGUAGES)("página (%s)", (language) => {
     expect(getByRole("link", { name: messages[language].skipToContent })).toHaveAttribute("href", "#main");
     expect(document.getElementById("main")).not.toBeNull();
     expect(document.querySelector("dialog[data-console]")).not.toBeNull();
+    expect(document.querySelector("dialog[data-lightbox]")).not.toBeNull();
     expect(document.querySelector("[data-boot-screen]")).toHaveAttribute("aria-label", messages[language].boot.label);
   });
 
@@ -71,13 +73,20 @@ describe.each(LANGUAGES)("página (%s)", (language) => {
     for (const step of steps) expect(step).toHaveAttribute("data-pending");
   });
 
-  it("solo muestra botones de proyecto cuando existe el enlace", async () => {
-    const { getByRole, queryByRole } = await render();
-    const card = getByRole("article");
+  it("cada proyecto muestra sus botones de demo y código solo si existe el enlace", async () => {
+    const { getAllByRole } = await render();
+    const cards = getAllByRole("article");
 
-    // El proyecto actual no define demo ni código: no debe haber botones vacíos.
-    expect(card.querySelector('a[href=""], a:not([href])')).toBeNull();
-    expect(queryByRole("link", { name: messages[language].projects.demo })).toBeNull();
-    expect(queryByRole("link", { name: messages[language].projects.code })).toBeNull();
+    expect(cards).toHaveLength(projects.length);
+    for (const [index, project] of projects.entries()) {
+      const card = cards[index] as HTMLElement;
+      const links = [...card.querySelectorAll("a")];
+      const byText = (text: string) => links.find((link) => link.textContent?.trim() === text);
+
+      // Sin enlace no hay botón (y nunca hay botones vacíos).
+      expect(card.querySelector('a[href=""], a:not([href])')).toBeNull();
+      expect(byText(messages[language].projects.demo)?.getAttribute("href")).toBe(project.demo);
+      expect(byText(messages[language].projects.code)?.getAttribute("href")).toBe(project.code);
+    }
   });
 });

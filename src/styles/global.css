@@ -43,13 +43,21 @@
    * Puntos de corte. Tailwind aplica `max-*` con "width < valor", así que cada uno vale N+1:
    * `max-nav:` equivale a "ancho ≤ 820px".
    */
-  --breakpoint-menu: 901px; /* menú móvil de la cabecera (con 6 secciones no cabe antes) */
+  --breakpoint-menu: 961px; /* menú móvil de la cabecera (la cápsula con 6 secciones necesita ~930px) */
   --breakpoint-nav: 821px; /* diseños a una columna */
   --breakpoint-tablet: 769px; /* secciones con menos margen */
   --breakpoint-tight: 641px; /* línea de tiempo */
   --breakpoint-phone: 601px; /* pantalla de carga */
   --breakpoint-mini: 421px; /* oculta el nombre junto al logo */
   --animate-blink: blink 1s steps(1) infinite;
+  --animate-marquee: marquee 40s linear infinite;
+
+  /* La pista lleva cuatro copias iguales: desplazar la mitad vuelve al punto de partida sin saltos. */
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
 
   @keyframes blink {
     50% {
@@ -90,7 +98,7 @@
   --font-display: "Space Grotesk Variable", "Space Grotesk", "Inter Variable", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
 
-  --header-height: 64px;
+  --header-height: 88px; /* cápsula (56px) + hueco superior + aire: margen de scroll de las anclas */
 }
 
 :root[data-theme="light"] {
@@ -148,14 +156,20 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    /* Sin esperas: p. ej. el escalonado del menú móvil. */
+    transition-delay: 0s !important;
   }
 }
 
 /*
- * Sin scroll de fondo mientras se ve la pantalla de carga (<html data-boot>) o la consola
- * (<html data-console-open>). Fuera de @layer a propósito: debe ganar a las utilidades del <body>.
+ * Sin scroll de fondo mientras se ve la pantalla de carga (<html data-boot>), la consola
+ * (<html data-console-active>), la paleta de comandos (<html data-palette-active>), la imagen ampliada (<html data-lightbox-active>) o el menú móvil
+ * (<html data-menu-active>). Fuera de @layer a propósito: debe ganar a las utilidades del <body>.
  */
 html[data-boot] body,
-html[data-console-open] body {
+html[data-console-active] body,
+html[data-palette-active] body,
+html[data-lightbox-active] body,
+html[data-menu-active] body {
   overflow: hidden;
 }

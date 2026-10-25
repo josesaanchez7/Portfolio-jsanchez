@@ -1,51 +1,36 @@
 ---
 import { getI18n } from "../../i18n";
+import { SPOTLIGHT } from "../../lib/spotlight";
 import type { Project } from "../../types/content";
 import Button from "../ui/Button.astro";
-import Icon from "../ui/Icon.astro";
+import ProjectCarousel from "./ProjectCarousel.astro";
 import ProjectCaseStudy from "./ProjectCaseStudy.astro";
 
 interface Props {
   project: Project;
+  /** Tarjeta grande del bento: ocupa más columnas y lleva el título y el texto más grandes. */
+  featured?: boolean;
 }
 
-const { project } = Astro.props;
+const { project, featured = false } = Astro.props;
 const { t, localize } = getI18n(Astro.currentLocale);
 const titleId = `project-${project.id}-title`;
 const title = localize(project.title);
 ---
 
 <article
-  class="flex flex-col overflow-hidden rounded-lg border border-border bg-surface transition-[border-color,translate] duration-250 ease-[ease] hover:-translate-y-[3px] hover:border-accent"
+  class={`flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface transition-[border-color,translate] duration-250 ease-[ease] hover:-translate-y-[3px] hover:border-border-strong ${SPOTLIGHT}`}
   aria-labelledby={titleId}
+  data-spotlight
+  data-project-card
 >
-  <div class="aspect-[16/10] border-b border-border bg-page">
-    {
-      project.image ? (
-        <img
-          src={project.image}
-          alt={t.projects.screenshotAlt(title)}
-          class="h-full w-full object-cover"
-          loading="lazy"
-          width={640}
-          height={400}
-        />
-      ) : (
-        // Vista previa provisional: sustitúyela añadiendo `image` al proyecto.
-        <div
-          class="flex h-full w-full flex-col items-center justify-center gap-3 bg-[linear-gradient(var(--border)_1px,transparent_1px),linear-gradient(90deg,var(--border)_1px,transparent_1px)] bg-size-[32px_32px] bg-center p-6 text-center font-code text-[0.85rem] text-fg-muted"
-          aria-hidden="true"
-        >
-          <Icon name="code" class="text-[1.75rem] text-accent" />
-          <span>{title}</span>
-        </div>
-      )
-    }
+  <div class="relative aspect-[16/10] border-b border-border bg-page">
+    <ProjectCarousel project={project} title={title} />
   </div>
 
-  <div class="flex flex-1 flex-col gap-4 p-6">
-    <h3 id={titleId} class="text-[1.3rem]">{title}</h3>
-    <p class="text-fg-muted">{localize(project.description)}</p>
+  <div class={`flex flex-1 flex-col gap-4 p-6 ${featured ? "lg:p-8" : ""}`}>
+    <h3 id={titleId} class={featured ? "text-[1.3rem] lg:text-[1.7rem]" : "text-[1.3rem]"}>{title}</h3>
+    <p class={`text-fg-muted ${featured ? "lg:text-[1.05rem]" : ""}`}>{localize(project.description)}</p>
 
     <ul class="flex flex-wrap gap-2" aria-label={t.projects.techLabel}>
       {
@@ -76,3 +61,41 @@ const title = localize(project.title);
     </div>
   </div>
 </article>
+
+<script>
+  import { initSpotlight } from "../../scripts/spotlight";
+
+  initSpotlight();
+
+  // Vista previa en vídeo: se reproduce al pasar el ratón o al entrar con el teclado en la tarjeta, y se
+  // detiene (y vuelve al principio) al salir. No se hace con «reducir movimiento» ni con ahorro de datos.
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+
+  if (!reducedMotion && !saveData) {
+    for (const video of document.querySelectorAll<HTMLVideoElement>("[data-hover-video]")) {
+      const card = video.closest<HTMLElement>("[data-project-card]");
+      if (!card) continue;
+
+      const play = () => {
+        // play() rechaza si el navegador bloquea la reproducción o el archivo no carga: entonces se queda la imagen.
+        video.play().then(
+          () => video.toggleAttribute("data-playing", true),
+          () => undefined,
+        );
+      };
+      const stop = () => {
+        video.pause();
+        video.currentTime = 0;
+        video.removeAttribute("data-playing");
+      };
+
+      card.addEventListener("pointerenter", play);
+      card.addEventListener("pointerleave", stop);
+      card.addEventListener("focusin", play);
+      card.addEventListener("focusout", (event) => {
+        if (!(event.relatedTarget instanceof Node) || !card.contains(event.relatedTarget)) stop();
+      });
+    }
+  }
+</script>

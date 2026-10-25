@@ -8,26 +8,60 @@ import Icon from "../ui/Icon.astro";
 
 const { language, t, localize } = getI18n(Astro.currentLocale);
 
-// El menú móvil se activa en ≤ 900px (max-menu:). Sin ancho ni display: cada botón añade los suyos.
+// Botones circulares de la cabecera. Sin ancho ni display: cada botón añade los suyos.
 const ICON_BUTTON =
-  "h-[38px] place-items-center rounded-sm bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
+  "h-[38px] place-items-center rounded-full bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
+
+// Enlaces sociales: en escritorio van en la cápsula y en móvil dentro del menú (el CSS muestra uno u otro).
+const SOCIAL_LINKS = [
+  { href: profile.github, label: t.header.github, icon: "github", name: "GitHub" },
+  { href: profile.linkedin, label: t.header.linkedin, icon: "linkedin", name: "LinkedIn" },
+] as const;
 
 // El selector muestra y activa el idioma al que se cambiaría.
 const otherLanguage = language === "es" ? "en" : "es";
+
+// Entrada escalonada de los enlaces del menú móvil: cada elemento espera un poco más que el anterior.
+const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[opacity,translate] max-menu:duration-500 max-menu:group-data-menu-open:translate-y-0 max-menu:group-data-menu-open:opacity-100 max-menu:group-data-menu-open:delay-[calc(var(--i)*60ms+120ms)]";
 ---
 
+{
+  /*
+  Navbar «isla»: una cápsula flotante y centrada, siempre a la vista en escritorio. La cabecera es sticky con alto 0 (no ocupa sitio en la página);
+  la cápsula se ajusta a su contenido. El <script> de abajo pone estos atributos en <header>:
+    data-scrolled   la cápsula se encoge y gana opacidad
+    data-hidden     solo en móvil: se oculta al bajar y reaparece al subir
+    data-menu-open  menú móvil a pantalla completa abierto
+  y la variable --progress (0–1) que dibuja la barra de lectura. En móvil el <nav> pasa a ser el menú a pantalla
+  completa; los hijos «relative z-10» quedan por encima de él para que el botón ✕ siga a la vista.
+*/
+}
 <header
-  class="sticky top-0 z-[1000] h-(--header-height) border-b border-border bg-[color-mix(in_srgb,var(--bg)_85%,transparent)] backdrop-blur-md"
   data-header
+  style="--progress:0"
+  class="group pointer-events-none sticky top-0 z-[1000] flex h-0 justify-center transition-[translate] duration-300 ease-out data-hidden:-translate-y-24"
 >
-  <div class="mx-auto flex h-full max-w-site items-center gap-6 px-6 max-menu:gap-3 max-menu:px-5">
+  <div
+    class="pointer-events-auto relative isolate mx-3 mt-[max(0.75rem,env(safe-area-inset-top))] flex h-14 w-fit max-w-[calc(100%-1.5rem)] items-center gap-4 pr-3 pl-4 transition-[height,margin,gap] duration-300 ease-out group-data-scrolled:mt-[max(0.5rem,env(safe-area-inset-top))] group-data-scrolled:h-12 group-data-scrolled:gap-3 max-menu:w-full max-menu:justify-between"
+  >
+    {/* Fondo de la cápsula: va aparte para que el desenfoque no afecte al menú móvil (backdrop-filter crea un bloque contenedor). */}
+    <span
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-full border border-border bg-[color-mix(in_srgb,var(--bg)_62%,transparent)] shadow-card backdrop-blur-xl transition-[background-color,box-shadow] duration-300 group-data-scrolled:bg-[color-mix(in_srgb,var(--bg)_90%,transparent)] group-data-scrolled:shadow-[0_8px_30px_rgba(0,0,0,0.28)]"
+    >
+      {/* Progreso de lectura: 2px en el borde inferior; el recorte redondeado de la cápsula lo curva. */}
+      <span
+        data-progress
+        class="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-(--progress) bg-accent"></span>
+    </span>
+
     <a
       href={`#${HERO_ID}`}
-      class="inline-flex items-center gap-[0.65rem] font-heading font-bold tracking-[-0.01em] text-fg"
+      class="relative z-10 inline-flex items-center gap-[0.65rem] font-heading font-bold tracking-[-0.01em] text-fg"
       aria-label={t.header.homeLabel(profile.name)}
     >
       <span
-        class="grid h-8 w-8 place-items-center rounded-sm border border-border bg-surface text-[0.8rem] text-accent"
+        class="grid h-8 w-8 place-items-center rounded-full border border-border bg-surface text-[0.8rem] text-accent"
         aria-hidden="true"
       >
         JS
@@ -39,17 +73,46 @@ const otherLanguage = language === "es" ? "en" : "es";
       id="main-nav"
       aria-label={t.header.navLabel}
       data-nav
-      class="ml-auto max-menu:absolute max-menu:top-(--header-height) max-menu:right-0 max-menu:left-0 max-menu:m-0 max-menu:hidden max-menu:border-b max-menu:border-border max-menu:bg-page max-menu:px-5 max-menu:pt-3 max-menu:pb-5 max-menu:shadow-card max-menu:data-open:block"
+      class="max-menu:invisible max-menu:fixed max-menu:inset-0 max-menu:z-0 max-menu:flex max-menu:flex-col max-menu:justify-center max-menu:gap-10 max-menu:bg-[color-mix(in_srgb,var(--bg)_94%,transparent)] max-menu:px-8 max-menu:pt-24 max-menu:pb-10 max-menu:opacity-0 max-menu:backdrop-blur-xl max-menu:transition-[opacity,visibility] max-menu:duration-300 max-menu:group-data-menu-open:visible max-menu:group-data-menu-open:opacity-100"
     >
-      <ul class="flex gap-1 max-menu:flex-col">
+      <div class="relative" data-nav-track>
+        {/* Indicador deslizante: una píldora que se mueve bajo el enlace al que apunta el ratón o, si no, bajo el de la sección activa. */}
+        <span
+          data-indicator
+          aria-hidden="true"
+          class="pointer-events-none absolute top-0 left-0 h-full w-0 rounded-full bg-accent-soft opacity-0 max-menu:hidden"
+        ></span>
+        <ul class="flex gap-0.5 max-menu:flex-col max-menu:gap-1">
+          {
+            SECTIONS.map(({ id, navLabel }, index) => (
+              <li class={STAGGER} style={`--i:${index}`}>
+                <a
+                  href={`#${id}`}
+                  data-nav-link
+                  class="relative z-10 block rounded-full px-3 py-1.5 text-[0.92rem] font-medium text-fg-muted transition-colors duration-200 ease-[ease] hover:text-fg aria-[current=true]:text-fg max-menu:px-0 max-menu:py-3 max-menu:font-heading max-menu:text-[1.9rem] max-menu:font-bold max-menu:tracking-[-0.02em] max-menu:aria-[current=true]:text-accent"
+                >
+                  {localize(navLabel)}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      {/* Solo en el menú móvil: los enlaces sociales de la cápsula no caben en pantallas pequeñas. */}
+      <ul class={`hidden gap-3 max-menu:flex ${STAGGER}`} style={`--i:${SECTIONS.length}`}>
         {
-          SECTIONS.map(({ id, navLabel }) => (
+          SOCIAL_LINKS.map(({ href, label, icon, name }) => (
             <li>
               <a
-                href={`#${id}`}
-                class="relative block rounded-sm px-3 py-[0.45rem] text-[0.92rem] font-medium text-fg-muted transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-fg aria-[current=true]:text-fg aria-[current=true]:after:absolute aria-[current=true]:after:right-3 aria-[current=true]:after:bottom-[0.1rem] aria-[current=true]:after:left-3 aria-[current=true]:after:h-0.5 aria-[current=true]:after:rounded-[2px] aria-[current=true]:after:bg-accent aria-[current=true]:after:content-[''] max-menu:px-2 max-menu:py-[0.8rem] max-menu:text-[1rem] max-menu:aria-[current=true]:after:right-auto max-menu:aria-[current=true]:after:left-2 max-menu:aria-[current=true]:after:w-6"
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 rounded-full border border-border-strong px-4 py-2 text-fg-muted transition-colors hover:border-accent hover:text-accent"
+                aria-label={label}
               >
-                {localize(navLabel)}
+                <Icon name={icon} />
+                {name}
               </a>
             </li>
           ))
@@ -58,26 +121,37 @@ const otherLanguage = language === "es" ? "en" : "es";
     </nav>
 
     <div
-      class="flex items-center gap-1 border-l border-border pl-3 max-menu:ml-auto max-menu:border-l-0 max-menu:pl-0"
+      class="relative z-10 flex items-center gap-1 border-l border-border pl-3 max-menu:ml-auto max-menu:border-l-0 max-menu:pl-0"
     >
-      <a
-        href={profile.github}
-        target="_blank"
-        rel="noopener noreferrer"
-        class={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
-        aria-label={t.header.github}
+      {
+        SOCIAL_LINKS.map(({ href, label, icon }) => (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class={`inline-grid w-[38px] text-[1.1rem] max-menu:hidden ${ICON_BUTTON}`}
+            aria-label={label}
+          >
+            <Icon name={icon} />
+          </a>
+        ))
+      }
+      {/* Paleta de comandos (Ctrl/⌘ + K): ver components/palette/CommandPalette.astro */}
+      <button
+        type="button"
+        data-palette-open
+        aria-label={t.header.searchLabel}
+        aria-keyshortcuts="Control+K Meta+K"
+        class={`inline-flex items-center gap-2 px-[0.65rem] text-[1.05rem] ${ICON_BUTTON}`}
       >
-        <Icon name="github" />
-      </a>
-      <a
-        href={profile.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        class={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
-        aria-label={t.header.linkedin}
-      >
-        <Icon name="linkedin" />
-      </a>
+        <Icon name="search" />
+        <kbd
+          data-palette-kbd
+          aria-hidden="true"
+          class="hidden rounded-[6px] border border-border-strong px-1.5 py-0.5 font-code text-[0.7rem] leading-none text-fg-muted lg:inline"
+          >Ctrl K</kbd
+        >
+      </button>
       {/* El tema real lo fija el script del <head> antes del primer pintado: el icono sigue a <html data-theme>. */}
       <button
         type="button"
@@ -122,44 +196,88 @@ const otherLanguage = language === "es" ? "en" : "es";
   import { parseLanguage, storeLanguage } from "../../lib/language";
   import { parseTheme, readStoredTheme, storeTheme, type Theme } from "../../lib/theme";
 
+  const html = document.documentElement;
   const header = document.querySelector<HTMLElement>("[data-header]");
   const nav = header?.querySelector<HTMLElement>("[data-nav]");
+  const track = header?.querySelector<HTMLElement>("[data-nav-track]");
+  const indicator = header?.querySelector<HTMLElement>("[data-indicator]");
   const menuToggle = header?.querySelector<HTMLButtonElement>("[data-menu-toggle]");
   const themeToggle = header?.querySelector<HTMLButtonElement>("[data-theme-toggle]");
   const languageSwitch = header?.querySelector<HTMLAnchorElement>("[data-language-switch]");
+  const links = [...(nav?.querySelectorAll<HTMLAnchorElement>("[data-nav-link]") ?? [])];
 
-  // --- Menú móvil ---------------------------------------------------------------------------
-  if (header && nav && menuToggle) {
-    const isOpen = () => menuToggle.getAttribute("aria-expanded") === "true";
-    const setOpen = (open: boolean) => {
-      nav.toggleAttribute("data-open", open);
-      menuToggle.setAttribute("aria-expanded", String(open));
-      menuToggle.setAttribute(
-        "aria-label",
-        (open ? menuToggle.dataset.labelClose : menuToggle.dataset.labelOpen) ?? "",
-      );
-    };
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    menuToggle.addEventListener("click", () => setOpen(!isOpen()));
-    // Al elegir una sección el menú se cierra.
-    nav.addEventListener("click", (event) => {
-      if (event.target instanceof Element && event.target.closest("a")) setOpen(false);
-    });
-    // Escape cierra el menú y devuelve el foco al botón; un clic fuera del header también lo cierra.
-    document.addEventListener("keydown", (event) => {
-      if (event.key !== "Escape" || !isOpen()) return;
-      setOpen(false);
-      menuToggle.focus();
-    });
-    document.addEventListener("pointerdown", (event) => {
-      if (isOpen() && event.target instanceof Node && !header.contains(event.target)) setOpen(false);
-    });
+  // ¿Modo móvil? Lo es mientras el botón de menú se ve (el CSS decide el punto de corte). Se sabe por un
+  // ResizeObserver, que avisa con el diseño ya calculado: leer getComputedStyle al arrancar forzaría un reflow.
+  let mobile = false;
+  if (header && menuToggle) {
+    new ResizeObserver(([entry]) => {
+      mobile = (entry?.contentRect.width ?? 0) > 0;
+      // Al pasar a escritorio: la barra siempre a la vista y el menú abierto se cierra solo.
+      if (!mobile) {
+        header.removeAttribute("data-hidden");
+        if (header.hasAttribute("data-menu-open")) menuToggle.click();
+      }
+    }).observe(menuToggle);
   }
 
-  // --- Sección activa -----------------------------------------------------------------------
+  // --- Indicador deslizante ----------------------------------------------------------------------
+  // Se coloca bajo el enlace señalado (ratón o teclado) y, si no hay ninguno, bajo el de la sección activa.
+  let pointed: HTMLElement | null = null;
+  const activeLink = () => links.find((link) => link.getAttribute("aria-current") === "true");
+
+  const placeIndicator = () => {
+    if (!indicator) return;
+    const target = pointed ?? activeLink();
+    if (!target || target.offsetWidth === 0) {
+      indicator.style.opacity = "0";
+      return;
+    }
+    indicator.style.width = `${target.offsetWidth}px`;
+    indicator.style.translate = `${target.offsetLeft}px 0`;
+    indicator.style.opacity = "1";
+    // La primera colocación es instantánea: las siguientes se animan.
+    if (!prefersReducedMotion && !indicator.dataset.ready) {
+      requestAnimationFrame(() => {
+        indicator.dataset.ready = "";
+        indicator.style.transition = "translate 300ms ease-out, width 300ms ease-out, opacity 200ms ease-out";
+      });
+    }
+  };
+
+  if (track && indicator) {
+    const linkOf = (event: Event) =>
+      event.target instanceof Element ? event.target.closest<HTMLElement>("[data-nav-link]") : null;
+
+    track.addEventListener("pointerover", (event) => {
+      const link = linkOf(event);
+      if (link) {
+        pointed = link;
+        placeIndicator();
+      }
+    });
+    track.addEventListener("pointerleave", () => {
+      pointed = null;
+      placeIndicator();
+    });
+    track.addEventListener("focusin", (event) => {
+      pointed = linkOf(event);
+      placeIndicator();
+    });
+    track.addEventListener("focusout", () => {
+      pointed = null;
+      placeIndicator();
+    });
+
+    // Los anchos cambian al cargar las fuentes o redimensionar: se recoloca.
+    new ResizeObserver(placeIndicator).observe(track);
+    void document.fonts?.ready.then(placeIndicator);
+  }
+
+  // --- Sección activa (scroll-spy) --------------------------------------------------------------
   // Marca el enlace de la sección que cruza la franja central del viewport.
   if (nav) {
-    const links = [...nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries.find((entry) => entry.isIntersecting);
@@ -168,6 +286,7 @@ const otherLanguage = language === "es" ? "en" : "es";
           if (link.hash === `#${visible.target.id}`) link.setAttribute("aria-current", "true");
           else link.removeAttribute("aria-current");
         }
+        placeIndicator();
       },
       { rootMargin: "-45% 0px -50% 0px" },
     );
@@ -179,10 +298,109 @@ const otherLanguage = language === "es" ? "en" : "es";
     }
   }
 
-  // --- Tema claro / oscuro ------------------------------------------------------------------
+  // --- Menú móvil (pantalla completa) -----------------------------------------------------------
+  if (header && nav && menuToggle) {
+    const isOpen = () => header.hasAttribute("data-menu-open");
+    // Con el menú abierto, el resto de la página no recibe foco ni clics.
+    const behindMenu = () => document.querySelectorAll<HTMLElement>("#main, footer");
+
+    const setOpen = (open: boolean, returnFocus = false) => {
+      header.toggleAttribute("data-menu-open", open);
+      // Bloquea el scroll de fondo (ver global.css).
+      html.toggleAttribute("data-menu-active", open);
+      for (const element of behindMenu()) element.toggleAttribute("inert", open);
+      menuToggle.setAttribute("aria-expanded", String(open));
+      menuToggle.setAttribute(
+        "aria-label",
+        (open ? menuToggle.dataset.labelClose : menuToggle.dataset.labelOpen) ?? "",
+      );
+      if (open) {
+        header.removeAttribute("data-hidden");
+        // El menú empieza la transición en visibility:hidden y un elemento oculto no admite foco: se espera
+        // un instante a que sea visible.
+        window.setTimeout(() => {
+          if (isOpen()) links[0]?.focus();
+        }, 60);
+      } else if (returnFocus) {
+        menuToggle.focus();
+      }
+    };
+
+    menuToggle.addEventListener("click", () => setOpen(!isOpen()));
+    // Todo el menú es enlaces y fondo: elegir una sección o tocar cualquier hueco lo cierra.
+    nav.addEventListener("click", () => setOpen(false));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && isOpen()) setOpen(false, true);
+    });
+  }
+
+  // --- Scroll: encoger, progreso de lectura y ocultar al bajar -----------------------------------
+  if (header) {
+    const SCROLLED_AFTER = 16;
+    const HIDE_AFTER = 120;
+    const MIN_DELTA = 6;
+    // Posición en la última comprobación. Se lee en la primera actualización y no al arrancar: window.scrollY
+    // con el diseño sin calcular fuerza un reflow.
+    let lastY: number | null = null;
+    let frame = 0;
+    // Recorrido total del scroll. Se mide en un ResizeObserver (con el diseño ya calculado) y no en cada
+    // fotograma: leer scrollHeight con el diseño sin calcular obliga al navegador a hacerlo de golpe.
+    let maxScroll = 0;
+
+    // En escritorio la barra está siempre a la vista; ocultarla al bajar solo se hace en móvil, para ganar pantalla.
+
+    const update = () => {
+      frame = 0;
+      const y = Math.max(0, window.scrollY);
+
+      header.style.setProperty("--progress", String(maxScroll > 0 ? Math.min(1, y / maxScroll) : 0));
+      header.toggleAttribute("data-scrolled", y > SCROLLED_AFTER);
+
+      if (!mobile || lastY === null) {
+        header.removeAttribute("data-hidden");
+        lastY = y;
+        return;
+      }
+
+      const delta = y - lastY;
+      if (Math.abs(delta) < MIN_DELTA) return;
+      lastY = y;
+
+      // No se oculta con el menú o un diálogo abiertos, ni mientras se navega con teclado por la cabecera,
+      // ni si el usuario pidió menos movimiento.
+      const keepVisible =
+        prefersReducedMotion ||
+        header.hasAttribute("data-menu-open") ||
+        document.querySelector("dialog[open]") !== null ||
+        header.querySelector(":focus-visible") !== null;
+      header.toggleAttribute("data-hidden", delta > 0 && y > HIDE_AFTER && !keepVisible);
+    };
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!frame) frame = requestAnimationFrame(update);
+      },
+      { passive: true },
+    );
+    const measure = () => {
+      maxScroll = html.scrollHeight - window.innerHeight;
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    // El alto de la página cambia al cargar fuentes e imágenes; la ventana, al redimensionarla.
+    // El observador también avisa al empezar a observar: esa es la primera medición.
+    new ResizeObserver(measure).observe(document.body);
+    window.addEventListener("resize", measure);
+    // Si se llega con el teclado a la cabecera mientras está oculta, reaparece.
+    header.addEventListener("focusin", () => {
+      if (header.querySelector(":focus-visible")) header.removeAttribute("data-hidden");
+    });
+  }
+
+  // --- Tema claro / oscuro ----------------------------------------------------------------------
   // El script del <head> ya aplicó el tema guardado; aquí solo se sincroniza la etiqueta y se alterna.
   if (themeToggle) {
-    const currentTheme = (): Theme => parseTheme(document.documentElement.dataset.theme) ?? readStoredTheme();
+    const currentTheme = (): Theme => parseTheme(html.dataset.theme) ?? readStoredTheme();
     const syncLabel = () => {
       const { labelToLight, labelToDark } = themeToggle.dataset;
       themeToggle.setAttribute("aria-label", (currentTheme() === "dark" ? labelToLight : labelToDark) ?? "");
@@ -191,13 +409,13 @@ const otherLanguage = language === "es" ? "en" : "es";
     syncLabel();
     themeToggle.addEventListener("click", () => {
       const next: Theme = currentTheme() === "dark" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
+      html.dataset.theme = next;
       storeTheme(next);
       syncLabel();
     });
   }
 
-  // --- Cambio de idioma ---------------------------------------------------------------------
+  // --- Cambio de idioma -------------------------------------------------------------------------
   // Es un enlace normal (funciona sin JavaScript); antes de navegar se recuerda la elección, se
   // conservan la búsqueda y el ancla, y se mantiene el scroll (la pantalla de carga no se repite: solo sale una vez por sesión).
   const SCROLL_KEY = "scroll-restore";

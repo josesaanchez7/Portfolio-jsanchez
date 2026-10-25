@@ -1,5 +1,6 @@
 ---
 import { profile } from "../../data/profile";
+import { statusBar } from "../../data/statusBar";
 import { getI18n } from "../../i18n";
 import Section from "../layout/Section.astro";
 import Button from "../ui/Button.astro";
@@ -13,7 +14,21 @@ const { t } = getI18n(Astro.currentLocale);
     class="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] items-start gap-[clamp(2rem,5vw,4rem)] max-nav:grid-cols-1"
     data-contact
   >
-    <p class="max-w-[44ch] text-[1.1rem] text-fg-muted">{t.contact.intro}</p>
+    <div class="flex flex-col items-start gap-6">
+      <p class="max-w-[44ch] text-[1.1rem] text-fg-muted">{t.contact.intro}</p>
+      {
+        statusBar.available && (
+          <p class="inline-flex items-center gap-3 rounded-full border border-border bg-surface px-4 py-2 text-[0.92rem] font-medium">
+            {/* Punto verde que late; con «reducir movimiento» queda fijo. */}
+            <span class="relative flex size-2.5" aria-hidden="true">
+              <span class="absolute inline-flex size-full animate-ping rounded-full bg-boot-ok opacity-60" />
+              <span class="relative inline-flex size-2.5 rounded-full bg-boot-ok" />
+            </span>
+            {t.contact.available}
+          </p>
+        )
+      }
+    </div>
 
     <div class="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6">
       <div class="flex items-stretch overflow-hidden rounded-sm border border-border-strong bg-page">
@@ -35,13 +50,6 @@ const { t } = getI18n(Astro.currentLocale);
           <Icon name="check" class="hidden group-data-copied:block" />
         </button>
       </div>
-      <p
-        class="-mt-[0.4rem] min-h-[1.4em] text-[0.88rem] text-accent"
-        role="status"
-        aria-live="polite"
-        data-copy-status
-      >
-      </p>
 
       <div class="flex flex-wrap gap-3">
         <Button href={`mailto:${profile.email}`} icon="envelope">{t.contact.sendEmail}</Button>
@@ -55,13 +63,13 @@ const { t } = getI18n(Astro.currentLocale);
 </Section>
 
 <script>
-  const RESET_DELAY_MS = 2500;
+  import { showToast } from "../../scripts/toast";
 
-  const root = document.querySelector<HTMLElement>("[data-contact]");
-  const button = root?.querySelector<HTMLButtonElement>("[data-copy-email]");
-  const status = root?.querySelector<HTMLElement>("[data-copy-status]");
+  const ICON_RESET_MS = 2500;
 
-  if (button && status) {
+  const button = document.querySelector<HTMLButtonElement>("[data-contact] [data-copy-email]");
+
+  if (button) {
     let resetTimer: number | undefined;
 
     button.addEventListener("click", async () => {
@@ -73,14 +81,11 @@ const { t } = getI18n(Astro.currentLocale);
         // También cubre contextos sin Clipboard API (p. ej. http sin TLS).
       }
 
+      // El aviso (región role="status") lo anuncia a los lectores de pantalla; el botón muestra un ✓ un rato.
+      showToast((copied ? button.dataset.copiedMessage : button.dataset.errorMessage) ?? "", copied ? "ok" : "error");
       button.toggleAttribute("data-copied", copied);
-      status.textContent = (copied ? button.dataset.copiedMessage : button.dataset.errorMessage) ?? "";
-
       window.clearTimeout(resetTimer);
-      resetTimer = window.setTimeout(() => {
-        button.removeAttribute("data-copied");
-        status.textContent = "";
-      }, RESET_DELAY_MS);
+      resetTimer = window.setTimeout(() => button.removeAttribute("data-copied"), ICON_RESET_MS);
     });
   }
 </script>

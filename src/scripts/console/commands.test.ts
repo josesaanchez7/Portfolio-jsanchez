@@ -123,8 +123,10 @@ describe("proyectos", () => {
 
     expect(lines).toHaveLength(projects.length);
     const [first] = lines;
-    expect(first?.[0]).toMatchObject({ text: projects[0]?.id, tone: "dim" });
-    expect(plain(first ?? [])).toContain("Portfolio personal");
+    // La clave se rellena con espacios hasta la longitud de la más larga.
+    const width = Math.max(...projects.map((project) => project.id.length));
+    expect(first?.[0]).toMatchObject({ text: projects[0]?.id.padEnd(width), tone: "dim" });
+    expect(plain(first ?? [])).toContain(projects[0]?.title.es ?? "");
   });
 
   it("colorea el estado: Hecho en verde, En curso en azul, Por hacer en gris", () => {

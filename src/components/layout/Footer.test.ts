@@ -75,16 +75,16 @@ describe("Footer: botones y enlaces", () => {
 
   it("el botón de la consola está activo y el script lo reconoce", async () => {
     const { getByRole } = await renderComponent(Footer);
-    const consoleButton = getByRole("button", { name: "Abrir la consola interactiva (Ctrl+K)" });
+    const consoleButton = getByRole("button", { name: "Abrir la consola interactiva (tecla `)" });
 
     expect(consoleButton).not.toHaveAttribute("aria-disabled");
     expect(consoleButton).toHaveAttribute("data-console-open");
   });
 
-  it("sus nombres accesibles contienen el texto visible (404 y Ctrl+K)", async () => {
+  it("sus nombres accesibles contienen el texto visible (404 y Consola)", async () => {
     const { getByRole } = await renderComponent(Footer);
 
     expect(getByRole("link", { name: /404/ })).toHaveTextContent("404");
-    expect(getByRole("button", { name: /Ctrl\+K/ })).toHaveTextContent("Ctrl+K");
+    expect(getByRole("button", { name: /consola/i })).toHaveTextContent("Consola");
   });
 });

@@ -20,7 +20,36 @@ describe("Header", () => {
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     expect(toggle).toHaveAttribute("aria-controls", "main-nav");
     expect(document.getElementById("main-nav")).not.toBeNull();
-    expect(document.getElementById("main-nav")).not.toHaveAttribute("data-open");
+    expect(document.querySelector("[data-header]")).not.toHaveAttribute("data-menu-open");
+  });
+
+  it("es una cápsula flotante con indicador deslizante y barra de progreso, ambos decorativos", async () => {
+    const { document } = await renderComponent(Header);
+
+    const header = document.querySelector("[data-header]");
+    expect(header).toHaveAttribute("style", expect.stringContaining("--progress:0"));
+    for (const selector of ["[data-indicator]", "[data-progress]"]) {
+      const element = document.querySelector(selector);
+      expect(element, selector).not.toBeNull();
+      expect((element as HTMLElement).closest('[aria-hidden="true"]'), selector).not.toBeNull();
+    }
+  });
+
+  it("los enlaces del menú móvil entran escalonados (un retardo más por enlace)", async () => {
+    const { document } = await renderComponent(Header);
+
+    const steps = [...document.querySelectorAll<HTMLElement>("[data-nav-link]")].map((link) =>
+      link.closest("li")?.getAttribute("style"),
+    );
+    expect(steps).toEqual(SECTIONS.map((_, index) => `--i:${index}`));
+  });
+
+  it("tiene un botón para abrir la paleta de comandos con su atajo anunciado", async () => {
+    const { getByRole } = await renderComponent(Header);
+
+    const palette = getByRole("button", { name: "Abrir la paleta de comandos" });
+    expect(palette).toHaveAttribute("data-palette-open");
+    expect(palette).toHaveAttribute("aria-keyshortcuts", "Control+K Meta+K");
   });
 
   it("el botón de tema lleva las dos etiquetas para que el script alterne", async () => {

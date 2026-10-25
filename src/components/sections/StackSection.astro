@@ -1,16 +1,23 @@
 ---
 import { stack } from "../../data/stack";
 import { getI18n } from "../../i18n";
+import { SPOTLIGHT } from "../../lib/spotlight";
 import Section from "../layout/Section.astro";
+import TechMarquee from "./TechMarquee.astro";
 
 const { localize } = getI18n(Astro.currentLocale);
 ---
 
 <Section id="Stack">
+  <TechMarquee />
+
   <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] gap-6">
     {
       stack.map((category) => (
-        <div class="flex flex-col gap-4 rounded-md border border-border bg-surface p-6">
+        <div
+          class={`flex flex-col gap-4 rounded-md border border-border bg-surface p-6 ${SPOTLIGHT}`}
+          data-spotlight
+        >
           <h3 class="font-code text-[0.8rem] font-medium tracking-[0.04em] text-accent uppercase">
             {localize(category.label)}
           </h3>
@@ -26,3 +33,9 @@ const { localize } = getI18n(Astro.currentLocale);
     }
   </div>
 </Section>
+
+<script>
+  import { initSpotlight } from "../../scripts/spotlight";
+
+  initSpotlight();
+</script>

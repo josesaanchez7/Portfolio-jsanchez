@@ -14,7 +14,7 @@ const { credential } = item;
 
 {/* Una entrada de la línea de tiempo: trabajo, estudios o certificación (con su credencial). */}
 <li
-  class="relative grid grid-cols-[minmax(130px,220px)_1fr] gap-6 pb-10 pl-8 last:pb-0 before:absolute before:top-[0.45rem] before:-left-[0.3rem] before:h-[0.6rem] before:w-[0.6rem] before:rounded-full before:bg-accent before:shadow-[0_0_0_4px_var(--bg)] before:content-[''] max-tight:grid-cols-1 max-tight:gap-2 max-tight:pl-6"
+  class="relative z-[1] grid grid-cols-[minmax(130px,220px)_1fr] gap-6 pb-10 pl-8 last:pb-0 before:absolute before:top-[0.45rem] before:-left-[0.3rem] before:h-[0.6rem] before:w-[0.6rem] before:rounded-full before:bg-accent before:shadow-[0_0_0_4px_var(--bg)] before:transition-[background-color,box-shadow] before:duration-500 before:content-[''] group-data-ready:before:bg-border-strong group-data-ready:data-lit:before:bg-accent group-data-ready:data-lit:before:shadow-[0_0_0_4px_var(--bg),0_0_14px_var(--accent)] max-tight:grid-cols-1 max-tight:gap-2 max-tight:pl-6"
 >
   <div
     class="flex flex-col gap-[0.2rem] pt-[0.2rem] font-code text-[0.82rem] max-tight:flex-row max-tight:gap-3"

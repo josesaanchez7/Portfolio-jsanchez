@@ -2,22 +2,45 @@
 import { profile } from "../../data/profile";
 import { projects } from "../../data/projects";
 import { getI18n } from "../../i18n";
+import { moreTileSpan } from "../../lib/bento";
+import { SPOTLIGHT } from "../../lib/spotlight";
 import Section from "../layout/Section.astro";
 import Button from "../ui/Button.astro";
 import ProjectCard from "./ProjectCard.astro";
 
 const { t } = getI18n(Astro.currentLocale);
+
+// La tarjeta «más proyectos» rellena el hueco de la última fila (ver lib/bento.ts).
+const span = moreTileSpan(projects.map((project, index) => project.featured ?? index === 0));
+// Clases completas y estáticas: Tailwind no detecta las que se construyen con texto.
+const MORE_SPAN: Record<number, string> = { 2: "lg:col-span-2", 4: "lg:col-span-4", 6: "lg:col-span-6" };
+const moreSpan = MORE_SPAN[span] ?? "lg:col-span-2";
+// Con espacio de sobra, el texto y el botón van en horizontal.
+const moreLayout = span === 2 ? "" : "lg:flex-row lg:items-center lg:justify-between lg:gap-10";
 ---
 
 <Section id="Proyectos">
-  <div class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,420px),1fr))] gap-6">
-    {projects.map((project) => <ProjectCard project={project} />)}
+  {/* Bento: en pantallas anchas el proyecto destacado ocupa 4 de 6 columnas y el resto 2; en las demás, una columna. */}
+  <div class="grid gap-6 lg:grid-cols-6">
+    {
+      projects.map((project, index) => {
+        const featured = project.featured ?? index === 0;
+        return (
+          <div class={featured ? "lg:col-span-4" : "lg:col-span-2"}>
+            <ProjectCard project={project} featured={featured} />
+          </div>
+        );
+      })
+    }
 
     <aside
-      class="flex flex-col items-start justify-center gap-4 rounded-lg border border-dashed border-border-strong p-6"
+      class={`flex flex-col items-start justify-center gap-4 rounded-lg border border-dashed border-border-strong p-6 ${moreSpan} ${moreLayout} ${SPOTLIGHT}`}
+      data-spotlight
     >
-      <h3 class="text-[1.2rem]">{t.projects.moreTitle}</h3>
-      <p class="text-fg-muted">{t.projects.moreDescription}</p>
+      <div class="flex flex-col gap-4">
+        <h3 class="text-[1.2rem]">{t.projects.moreTitle}</h3>
+        <p class="text-fg-muted">{t.projects.moreDescription}</p>
+      </div>
       <Button href={profile.github} external variant="secondary" icon="github">
         {t.projects.moreButton}
       </Button>

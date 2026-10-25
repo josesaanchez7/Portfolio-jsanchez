@@ -1,4 +1,4 @@
-/** Iconos de Font Awesome 5 Free (CC BY 4.0, https://fontawesome.com/license/free) como datos SVG: viewBox + trazado. */
+/** Iconos como datos SVG (viewBox + trazado): los de Font Awesome 5 Free (CC BY 4.0, https://fontawesome.com/license/free) y `search` y `expand`, propios. */
 export interface IconData {
   viewBox: string;
   path: string;
@@ -48,6 +48,14 @@ export const ICONS = {
   moon: {
     viewBox: "0 0 512 512",
     path: "M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-238.262-71.576-238.262-196.954 0-72.222 38.662-138.635 101.498-174.394 9.686-5.512 7.25-20.197-3.756-22.23A258.156 258.156 0 0 0 283.211 0c-141.309 0-256 114.511-256 256 0 141.309 114.511 256 256 256z",
+  },
+  expand: {
+    viewBox: "0 0 24 24",
+    path: "M4 9V4h5v2H6v3H4zm10-5h5v5h-2V6h-3V4zM6 15v3h3v2H4v-5h2zm12 0h2v5h-5v-2h3v-3z",
+  },
+  search: {
+    viewBox: "0 0 24 24",
+    path: "M10 2a8 8 0 1 0 4.9 14.3l4.8 4.8a1 1 0 0 0 1.4-1.4l-4.8-4.8A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z",
   },
   sun: {
     viewBox: "0 0 512 512",

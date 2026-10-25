@@ -1,0 +1,59 @@
+---
+---
+
+{
+  /*
+  Línea de tiempo vertical (<ol>) para ExperienceEntry. La línea gris es el carril y la de acento se «dibuja» según
+  el scroll (--fill, de 0 a 1); cada hito (<li>) se enciende (data-lit) cuando la franja de lectura llega a él.
+  Sin JavaScript o con «reducir movimiento», todo se ve ya dibujado y encendido: el script solo añade data-ready.
+*/
+}
+<ol
+  data-timeline
+  style="--fill:1"
+  class="group relative ml-[0.4rem] flex flex-col before:absolute before:inset-y-0 before:left-0 before:w-px before:bg-border-strong before:content-[''] after:absolute after:inset-y-0 after:left-0 after:w-px after:origin-top after:scale-y-(--fill) after:bg-accent after:transition-transform after:duration-150 after:ease-out after:content-['']"
+>
+  <slot />
+</ol>
+
+<script>
+  const READING_LINE = 0.65;
+
+  const lists = [...document.querySelectorAll<HTMLElement>("[data-timeline]")];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (!reducedMotion) {
+    for (const list of lists) {
+      const items = [...list.children] as HTMLElement[];
+      let visible = false;
+      let frame = 0;
+
+      // La franja de lectura está a un 65 % de la altura de la ventana: el hito se enciende al cruzarla.
+      const update = () => {
+        frame = 0;
+        const mark = window.innerHeight * READING_LINE;
+        const rect = list.getBoundingClientRect();
+        const fill = Math.min(1, Math.max(0, (mark - rect.top) / rect.height));
+        list.style.setProperty("--fill", String(fill));
+        for (const item of items) item.toggleAttribute("data-lit", item.getBoundingClientRect().top <= mark);
+      };
+      const schedule = () => {
+        if (visible && !frame) frame = requestAnimationFrame(update);
+      };
+
+      list.dataset.ready = "";
+      list.style.setProperty("--fill", "0");
+
+      // Solo se escucha el scroll mientras la lista está cerca de la pantalla; el observador avisa con el diseño ya calculado.
+      new IntersectionObserver(
+        ([entry]) => {
+          visible = entry?.isIntersecting ?? false;
+          if (visible) update();
+        },
+        { rootMargin: "25% 0px" },
+      ).observe(list);
+      window.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule);
+    }
+  }
+</script>

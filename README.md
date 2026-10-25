@@ -42,7 +42,7 @@ que importa [`Layout.astro`](src/layouts/Layout.astro):
   `font-heading` (Space Grotesk), `font-code` (JetBrains Mono) y `font-boot` (Geist Mono, pantalla de carga).
   Las tres de la primera pantalla se precargan desde `Layout.astro`.
 - **Radios y ancho:** `rounded-sm|md|lg` (8/12/16 px) y `max-w-site` (1040 px).
-- **Puntos de corte con nombre:** `max-menu:` (≤ 900 px, menú móvil), `max-nav:` (≤ 820 px, diseños a una columna), `max-tablet:` (≤ 768), `max-tight:` (≤ 640),
+- **Puntos de corte con nombre:** `max-menu:` (≤ 960 px, menú móvil a pantalla completa), `max-nav:` (≤ 820 px, diseños a una columna), `max-tablet:` (≤ 768), `max-tight:` (≤ 640),
   `max-phone:` (≤ 600) y `max-mini:` (≤ 420). Tailwind aplica `max-*` con «ancho < valor», por eso en
   `@theme` cada uno vale N + 1.
 - **Base:** los estilos de elementos (tipografía de los títulos, foco visible, `scroll-behavior`) están en
@@ -79,13 +79,14 @@ src/
 ├── layouts/        Layout.astro: <html>, <head> (SEO, fuentes, script anti-parpadeo) y <body>
 ├── components/
 │   ├── layout/     Header, Footer, Section (estructura de página)
-│   ├── sections/   una por sección: Hero, Projects (+ Card y CaseStudy), Experience (+ Entry), Stack, About, Contact
+│   ├── sections/   una por sección: Hero, Projects (+ Card y CaseStudy), Experience y Education (+ Entry), Stack (+ TechMarquee), About, Contact
 │   ├── boot/       BootScreen: pantalla de carga con aspecto de terminal
+│   ├── palette/    CommandPalette: paleta de comandos (Ctrl/⌘ + K)
 │   ├── console/    ConsoleDialog: consola interactiva
-│   └── ui/         piezas reutilizables: Button, Icon (+ icons.ts), RichText
-├── scripts/        lógica de navegador sin marcado: guion y tiempos de la carga, comandos y sesión de la consola, debug
+│   └── ui/         piezas reutilizables: Button, Icon (+ icons.ts), RichText, Timeline, Toast
+├── scripts/        lógica de navegador sin marcado: guion y tiempos de la carga, comandos y sesión de la consola, búsqueda de la paleta, debug
 ├── i18n/           getI18n (idioma de la página), parseTags y diccionarios de interfaz (messages/)
-├── data/           contenido estático tipado (perfil, proyectos, experiencia, stack, secciones)
+├── data/           contenido estático tipado (perfil, proyectos, experiencia, stack, métricas, secciones)
 ├── types/          modelos de dominio del contenido
 ├── lib/            funciones puras (tema, idioma, formato, SEO) y utilidades de estilo
 ├── styles/         global.css: Tailwind, tokens de diseño y base
@@ -102,7 +103,7 @@ se publica), por eso los tests de las páginas viven en `src/test`.
 No hay islas ni hidratación: cada componente con comportamiento lleva su `<script>` (TypeScript) al final del
 archivo `.astro`, que Astro empaqueta y carga como módulo. Los scripts enlazan con el marcado mediante
 atributos `data-*` (`data-header`, `data-theme-toggle`, `data-console-open`…) y comparten estado a través del
-DOM (`<html data-theme | data-debug | data-boot | data-console-open>`).
+DOM (`<html data-theme | data-debug | data-boot | data-console-active | data-palette-active | data-menu-active>`).
 
 - **Tema:** el script inline del `<head>` aplica el tema guardado antes del primer pintado; el botón de la cabecera
   lo alterna (los dos iconos están en el HTML y los muestra el CSS según `data-theme`).
@@ -137,6 +138,71 @@ que eligió con el selector y, si nunca eligió, el del navegador. Lleva `noinde
 (`<Layout home>` solo la activa en la home) y muestra la ruta pedida con aspecto de terminal. Los textos
 están en `notFound` de `src/i18n/messages`.
 
+## Navbar
+
+[`components/layout/Header.astro`](src/components/layout/Header.astro): una cápsula flotante y centrada («isla»), con fondo
+translúcido y `backdrop-blur`. La cabecera es `sticky` con alto 0 (no ocupa sitio) y la cápsula se ajusta a su contenido.
+El `<script>` del componente pone atributos en `<header>` que el CSS (variantes `group-data-*:`) convierte en estilo:
+
+- **`data-scrolled`** (al bajar de 16 px): la cápsula se encoge (56 → 48 px) y gana opacidad.
+- **Indicador deslizante:** una píldora que se mueve bajo el enlace señalado (ratón o teclado) y, si no hay ninguno, bajo
+  el de la sección activa (scroll-spy con `IntersectionObserver`). Es decorativo (`aria-hidden`).
+- **Barra de progreso de lectura:** 2 px en el borde inferior, con el color de acento. El script escribe `--progress`
+  (0–1) en `<header>`; el recorrido total se mide en un `ResizeObserver`, no en cada fotograma.
+- **Siempre a la vista en escritorio.** En móvil, `data-hidden` la oculta al bajar y la muestra al subir (no ocurre con
+  el menú o un diálogo abiertos, al navegar con teclado ni con `prefers-reduced-motion`).
+- **Móvil (≤ 960 px, `max-menu:`):** el `<nav>` pasa a ser un menú a pantalla completa con los enlaces entrando
+  escalonados (`--i` por elemento); dentro van GitHub y LinkedIn. Mientras está abierto, el resto de la página es
+  `inert` y no hace scroll; se cierra con Escape, tocando cualquier hueco o al elegir una sección.
+- Los atributos de estado de `<html>` (`data-menu-active`, `data-palette-active`, `data-console-active`) bloquean el
+  scroll de fondo (regla al final de `global.css`); no se llaman como los botones que abren cada cosa para que los
+  selectores no se confundan.
+
+## Paleta de comandos
+
+[`components/palette/CommandPalette.astro`](src/components/palette/CommandPalette.astro). **`Ctrl + K` / `⌘ + K`** (también el
+botón de la lupa de la cabecera) abre un buscador para ir a una sección o ejecutar una acción: tema, idioma, copiar el correo
+(con un aviso), descargar el CV, abrir la consola, activar el modo debug y abrir GitHub o LinkedIn.
+
+- **Teclado:** escribe para filtrar (sin tildes ni mayúsculas, por palabras sueltas y por palabras clave), `↑`/`↓` mueven la
+  selección, `Enter` ejecuta, `Esc` o `Ctrl/⌘ + K` cierran. También se puede usar el ratón.
+- **Accesibilidad:** patrón combobox + listbox; el foco se queda en el campo y `aria-activedescendant` apunta a la opción.
+  Al cerrar, el foco vuelve a donde estaba. No se abre durante la pantalla de carga ni encima de otro diálogo.
+- **Cómo funciona:** todas las opciones ya vienen en el HTML (con su texto de búsqueda normalizado); el script solo filtra con
+  [`scripts/palette.ts`](src/scripts/palette.ts) y ejecuta la elegida reutilizando los controles que existen (botón de tema,
+  enlace de idioma, botón de la consola…), así que cada uno conserva su estado.
+- **Añadir un comando:** un elemento en `commands` del frontmatter (y su función en `commands` del `<script>` si es una
+  acción nueva). Los textos van en `palette` de `src/i18n/messages`.
+
+## Secciones: efectos
+
+- **Proyectos (bento):** en pantallas anchas la tarjeta destacada ocupa 4 de 6 columnas (título y texto más grandes) y
+  el resto 2; en las demás, una columna. Lo es la primera o la que lleve `featured: true`. Las capturas de cada proyecto se ven como un **carrusel**
+  ([`ProjectCarousel.astro`](src/components/sections/ProjectCarousel.astro)) cuando hay dos o más: una pista con `scroll-snap`
+  que ya se desliza con el dedo, la rueda o las flechas del teclado sin JavaScript, más flechas (siempre visibles en pantallas
+  táctiles; en las demás, al pasar el ratón o enfocar) y puntos que activa el script. Es circular, no avanza solo, cada imagen
+  lleva su texto alternativo y sigue el patrón de carrusel de ARIA (región «carrusel», diapositivas «n de N»). Al pulsar una imagen (o Enter/Espacio en ella) se abre **en grande**
+  ([`ui/ImageLightbox.astro`](src/components/ui/ImageLightbox.astro), un único `<dialog>` modal para toda la web): recorre las imágenes
+  del proyecto con las flechas, el teclado (←, →, Inicio, Fin) o deslizando, muestra la descripción como pie de foto y se cierra
+  con Esc, el botón ✕ o un clic en el fondo. Al cerrar, el carrusel se queda en la última imagen vista y el foco vuelve a su botón.
+  También se amplía un proyecto con una sola imagen. Las tarjetas
+  tienen **spotlight**:
+  el borde y un brillo suave siguen al ratón ([`lib/spotlight.ts`](src/lib/spotlight.ts) + [`scripts/spotlight.ts`](src/scripts/spotlight.ts),
+  también en las tarjetas del Stack). Con `video` (mp4/webm, sin audio, en `public/`) la tarjeta reproduce una vista previa al
+  pasar el ratón o entrar con el teclado (la `image` hace de póster); no se reproduce con «reducir movimiento» ni con ahorro de
+  datos, y si el vídeo falla se queda la imagen. `demo` y `code` muestran sus botones solo si existen.
+- **Experiencia y Educación:** una línea de tiempo ([`ui/Timeline.astro`](src/components/ui/Timeline.astro)). La línea de acento se
+  «dibuja» según el scroll (`--fill`) y cada hito se enciende (`data-lit`) al cruzar la franja de lectura (65 % de la altura de la
+  ventana). Sin JavaScript o con «reducir movimiento» se ve ya todo dibujado y encendido.
+- **Stack:** encima de las tarjetas hay dos filas de tecnologías que se desplazan en sentidos opuestos y se pausan con el ratón
+  ([`TechMarquee.astro`](src/components/sections/TechMarquee.astro)). Es decorativo (`aria-hidden`: las tarjetas ya listan lo mismo)
+  y con «reducir movimiento» queda una sola copia en varias líneas.
+- **Sobre mí:** contadores animados que cuentan al entrar en pantalla. El HTML trae el valor final (y un `sr-only` para los lectores
+  de pantalla); el script solo anima. Ver «Dónde editar el contenido» para las cifras.
+- **Contacto:** indicador «Disponible para nuevas oportunidades» con un punto verde que late (sale si `statusBar.available` es
+  true) y un aviso animado («✓ Correo copiado») al copiar el correo. El aviso es [`ui/Toast.astro`](src/components/ui/Toast.astro) +
+  `showToast()` de [`scripts/toast.ts`](src/scripts/toast.ts), compartido con la paleta de comandos.
+
 ## Pantalla de carga (consola)
 
 [`components/boot/BootScreen.astro`](src/components/boot/BootScreen.astro). Al abrir la web se muestra una
@@ -159,10 +225,10 @@ terminal simulada que se desvanece y deja ver el portfolio, que ya está montado
 
 [`components/console/ConsoleDialog.astro`](src/components/console/ConsoleDialog.astro). Una terminal simulada para conocerme escribiendo comandos.
 
-- **Abrir:** `Ctrl + K` / `Cmd + K` (también la cierra), la tecla `` ` `` (no si se está escribiendo en un
-  campo; en el teclado español es la tecla muerta a la derecha de la P) y el botón `>_ Ctrl+K` del footer.
-  No se abre durante la pantalla de carga.
-- **Cerrar:** `Esc`, el botón ×, un clic fuera, `Ctrl + K` otra vez o el comando `exit`. Al cerrar, el foco
+- **Abrir:** la tecla `` ` `` (no si se está escribiendo en un campo; en el teclado español es la tecla muerta a la
+  derecha de la P), el botón `>_ Consola` del footer o el comando «Abrir consola» de la paleta (`Ctrl/⌘ + K`, que ya no
+  abre la consola directamente). No se abre durante la pantalla de carga ni encima de otro diálogo.
+- **Cerrar:** `Esc`, el botón ×, un clic fuera o el comando `exit`. Al cerrar, el foco
   vuelve al elemento que la abrió.
 - **Comandos:** `help`, `whoami`, `skills`, `proyectos` / `projects`, `run tests` (también `npm test` y
   `npx playwright test`), `contacto` / `contact`, `cv`, `debug`, `404`, `clear`, `exit` y el oculto
@@ -209,7 +275,13 @@ Vitest, con dos tipos de prueba:
 El contenido vive en [`src/data/`](src/data). Los campos opcionales que quedan vacíos no se muestran
 y los `TODO` marcan la información pendiente de completar.
 
-- **Proyectos** ([`projects.ts`](src/data/projects.ts)): añade `image`, `code`, `demo` (URLs `https://…`)
+- **Métricas** ([`metrics.ts`](src/data/metrics.ts)): las dos primeras se calculan solas (años desde tu primer puesto, que sube
+  cada año al construir, y número de tecnologías del stack). Para añadir las tuyas (bugs reportados, tests automatizados, años
+  programando…) rellena `personal` con cifras reales, aunque sean aproximadas: `{ value: 150, prefix: "+", label: { es, en } }`.
+- **Proyectos** ([`projects.ts`](src/data/projects.ts)): el orden del archivo es el de la web y el primero es el destacado
+  (intercámbialos para destacar otro). Las capturas van en `public/img/projects/` (webp, proporción 16:10) y se indican como
+  `images: [{ src: "/img/projects/nombre.webp", alt: { es, en } }, …]` (con una sola, `image: "…"` basta; con dos o más sale el
+  carrusel). Añade `images`, `video`, `code`, `demo` (URLs `https://…`)
   y, opcionalmente, `caseStudy` (problema, solución, decisiones, resultados) para mostrar "Ver detalle".
 - **Experiencia y educación** ([`experience.ts`](src/data/experience.ts)): cada entrada lleva `start` y, si ya
   terminó, `end` (`"AAAA-MM"`, o `"AAAA"` si no se sabe el mes). Con ellas se ordena sola, de la más reciente a

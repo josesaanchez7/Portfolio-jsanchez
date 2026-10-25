@@ -24,6 +24,14 @@ export interface CaseStudy {
 
 export type ProjectStatus = "done" | "in-progress" | "todo";
 
+/** Una captura de un proyecto. */
+export interface ProjectImage {
+  /** Ruta dentro de public/ (p. ej. "/img/projects/captura.webp"). Proporción recomendada: 16:10. */
+  src: string;
+  /** Texto alternativo. Si falta, se usa «Captura del proyecto …». */
+  alt?: LocalizedText;
+}
+
 export interface Project {
   id: string;
   title: LocalizedText;
@@ -32,8 +40,17 @@ export interface Project {
   tags: string[];
   /** Estado del proyecto (se muestra en la consola). */
   status: ProjectStatus;
-  /** Captura del proyecto. Si falta, se muestra una vista previa provisional. */
+  /** Capturas del proyecto: con dos o más se ven como un carrusel. Si no hay ninguna, se muestra una vista previa provisional. */
+  images?: ProjectImage[];
+  /** Una sola captura (equivale a `images` con una imagen). Si hay `images`, se ignora. */
   image?: string;
+  /**
+   * Vídeo corto de vista previa (mp4 o webm, sin audio): se reproduce al pasar el ratón o enfocar la tarjeta.
+   * La primera captura hace de póster. Ruta dentro de public/ (p. ej. "/videos/portfolio.mp4") o URL https.
+   */
+  video?: string;
+  /** Tarjeta destacada del bento (más ancha y en horizontal). Por defecto lo es la primera. */
+  featured?: boolean;
   /** Repositorio. Si falta, el botón no se muestra. */
   code?: HttpsUrl;
   /** Demo. Si falta, el botón no se muestra. */
@@ -82,4 +99,14 @@ export interface StackCategory {
 export interface AboutFact {
   label: LocalizedText;
   value: LocalizedText;
+}
+
+/** Cifra destacada de «Sobre mí»: se muestra con un contador animado. */
+export interface Metric {
+  value: number;
+  /** Delante del número (p. ej. "+"). */
+  prefix?: string;
+  /** Detrás del número (p. ej. "%"). */
+  suffix?: string;
+  label: LocalizedText;
 }

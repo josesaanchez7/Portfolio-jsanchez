@@ -18,16 +18,7 @@ const allCategories: StackCategory[] = [
   { label: { es: "Bases de datos", en: "Databases" }, items: [] },
   {
     label: { es: "Testing y calidad", en: "Testing and quality" },
-    items: [
-      { es: "Pruebas manuales", en: "Manual testing" },
-      { es: "Pruebas exploratorias", en: "Exploratory testing" },
-      { es: "Pruebas API", en: "API testing" },
-      { es: "Planificación de pruebas", en: "Test planning" },
-      tech("Playwright"),
-      tech("Postman"),
-      tech("Jira"),
-      { es: "Metodologías ágiles", en: "Agile methodologies" },
-    ],
+    items: [{ es: "Pruebas API", en: "API testing" }, tech("Playwright"), tech("Postman"), tech("Jira")],
   },
   {
     label: { es: "Herramientas y despliegue", en: "Tools and deployment" },

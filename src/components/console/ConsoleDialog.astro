@@ -174,15 +174,15 @@ const DIALOG =
       if (dialog.open || isBooting()) return;
       returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       // Mientras está abierta, la página de detrás no hace scroll (ver global.css).
-      document.documentElement.toggleAttribute("data-console-open", true);
+      document.documentElement.toggleAttribute("data-console-active", true);
       dialog.showModal();
       log.scrollTop = log.scrollHeight;
       input.focus();
     };
 
-    // Cualquier cierre (Esc, ×, clic fuera, Ctrl+K, exit…) acaba aquí: devuelve el foco a quien abrió.
+    // Cualquier cierre (Esc, ×, clic fuera, exit…) acaba aquí: devuelve el foco a quien abrió.
     dialog.addEventListener("close", () => {
-      document.documentElement.removeAttribute("data-console-open");
+      document.documentElement.removeAttribute("data-console-active");
       returnFocus?.focus();
       returnFocus = null;
     });
@@ -195,7 +195,8 @@ const DIALOG =
       trigger.addEventListener("click", open);
     }
 
-    // --- Atajos globales: Ctrl/Cmd + K abre y cierra; ` abre si no se está escribiendo ----------
+    // --- Atajo global: la tecla ` abre si no se está escribiendo -------------------------------
+    // (Ctrl/⌘ + K abre la paleta de comandos, que tiene el comando «Abrir consola».)
     const isTypingTarget = (target: EventTarget | null): boolean =>
       target instanceof HTMLElement &&
       (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
@@ -208,19 +209,14 @@ const DIALOG =
     document.addEventListener("keydown", (event) => {
       if (isBooting() || event.repeat) return;
 
-      if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        if (dialog.open) dialog.close();
-        else open();
-        return;
-      }
-
       if (
         isGraveKey(event) &&
         !event.ctrlKey &&
         !event.metaKey &&
         !event.altKey &&
-        !isTypingTarget(event.target)
+        !isTypingTarget(event.target) &&
+        // Ni encima de otro diálogo (la paleta o un caso de estudio).
+        !document.querySelector("dialog[open]")
       ) {
         event.preventDefault();
         open();

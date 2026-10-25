@@ -21,7 +21,7 @@ const TITLE_TAGS: Record<string, TagSpec> = { h: { as: "span", class: "text-acce
   id={HERO_ID}
   data-section={HERO_ID}
   aria-labelledby="hero-title"
-  class={`relative isolate scroll-mt-(--header-height) px-6 pt-[clamp(3.5rem,9vw,7rem)] pb-[clamp(4rem,9vw,7rem)] before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:bg-[radial-gradient(color-mix(in_srgb,var(--text-muted)_25%,transparent)_1px,transparent_1px)] before:bg-size-[28px_28px] before:mask-[linear-gradient(to_bottom,#000_0%,transparent_85%)] before:content-[''] ${DEBUG_SECTION}`}
+  class={`relative isolate scroll-mt-(--header-height) px-6 pt-[calc(var(--header-height)+clamp(2rem,7vw,5.5rem))] pb-[clamp(4rem,9vw,7rem)] before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:bg-[radial-gradient(color-mix(in_srgb,var(--text-muted)_25%,transparent)_1px,transparent_1px)] before:bg-size-[28px_28px] before:mask-[linear-gradient(to_bottom,#000_0%,transparent_85%)] before:content-[''] ${DEBUG_SECTION}`}
 >
   <div
     class="mx-auto grid max-w-site grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-[clamp(2rem,6vw,5rem)] max-nav:grid-cols-1"
