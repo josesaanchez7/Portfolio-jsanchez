@@ -1,48 +1,48 @@
 ---
 import { stack } from "../../data/stack";
 import { getI18n } from "../../i18n";
+import TechLogo from "../ui/TechLogo.astro";
 
 const { localize } = getI18n(Astro.currentLocale);
 
-// Todas las tecnologías, sin repetir, repartidas en dos filas.
+// Todas las tecnologías, sin repetir, en una sola línea.
 const names = [...new Set(stack.flatMap((category) => category.items.map(localize)))];
-const middle = Math.ceil(names.length / 2);
-const rows = [
-  { items: names.slice(0, middle), reverse: false },
-  { items: names.slice(middle), reverse: true },
-];
 
-// Cada fila se repite 4 veces y se desplaza un 50 %: el bucle es continuo aunque la fila sea más estrecha que la pantalla.
+// La fila se repite 4 veces y se desplaza un 50 %: el bucle es continuo aunque la fila sea más estrecha que la pantalla.
 const COPIES = 4;
-// Segundos por tecnología: la velocidad es la misma en las dos filas aunque tengan distinta longitud.
+// Segundos por tecnología: la velocidad no depende de cuántas haya.
 const SECONDS_PER_ITEM = 4;
 ---
 
 {
   /*
-  Decorativo (aria-hidden): las mismas tecnologías están, agrupadas, en las tarjetas de debajo.
-  Con «reducir movimiento» no hay desplazamiento: queda una sola copia, en varias líneas.
+  Una sola línea por la que van pasando las tecnologías. Cada una es una baldosa con su logo oficial (en un solo tono neutro; con
+  hover o foco, en su color de marca) y su nombre debajo. La primera copia es la «real» (logo con role="img" y aria-label, más
+  el texto visible); las copias que repiten la fila para el bucle van con aria-hidden. Con «reducir movimiento» no hay
+  desplazamiento: queda una sola copia, en varias líneas.
 */
 }
-<div class="flex flex-col gap-3" aria-hidden="true">
-  {
-    rows.map((row) => (
-      <div class="overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
-        <div
-          class={`flex w-max animate-marquee hover:[animation-play-state:paused] motion-reduce:w-full ${row.reverse ? "[animation-direction:reverse]" : ""}`}
-          style={`animation-duration:${row.items.length * SECONDS_PER_ITEM}s`}
+<div class="overflow-hidden [mask-image:linear-gradient(to_right,transparent,#000_8%,#000_92%,transparent)]">
+  <div
+    class="flex w-max animate-marquee hover:[animation-play-state:paused] motion-reduce:w-full"
+    style={`animation-duration:${names.length * SECONDS_PER_ITEM}s`}
+  >
+    {
+      Array.from({ length: COPIES }, (_, copy) => (
+        <ul
+          class={`flex shrink-0 gap-3 pr-3 motion-reduce:flex-wrap ${copy > 0 ? "motion-reduce:hidden" : ""}`}
+          aria-hidden={copy > 0 ? "true" : undefined}
         >
-          {Array.from({ length: COPIES }, (_, copy) => (
-            <ul class={`flex shrink-0 gap-3 pr-3 motion-reduce:flex-wrap ${copy > 0 ? "motion-reduce:hidden" : ""}`}>
-              {row.items.map((name) => (
-                <li class="rounded-full border border-border-strong bg-surface px-4 py-2 font-code text-[0.85rem] whitespace-nowrap text-fg-muted">
-                  {name}
-                </li>
-              ))}
-            </ul>
+          {names.map((name) => (
+            <li class="group/tile flex w-[7.5rem] shrink-0 flex-col items-center gap-2 rounded-lg border border-border-strong bg-surface px-3 py-3">
+              <span class="grid h-[3.25rem] w-full place-items-center">
+                <TechLogo name={name} decorative={copy > 0} />
+              </span>
+              <span class="font-code text-[0.75rem] whitespace-nowrap text-fg-muted">{name}</span>
+            </li>
           ))}
-        </div>
-      </div>
-    ))
-  }
+        </ul>
+      ))
+    }
+  </div>
 </div>

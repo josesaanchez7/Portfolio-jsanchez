@@ -13,6 +13,16 @@ describe("Header", () => {
     }
   });
 
+  it("la navegación no lleva enlaces sociales (ni GitHub ni LinkedIn), ni en la cápsula ni en el menú móvil", async () => {
+    const { document } = await renderComponent(Header);
+
+    expect(document.querySelectorAll("a[target='_blank']")).toHaveLength(0);
+    expect(document.querySelector("a[href*='github.com'], a[href*='linkedin.com']")).toBeNull();
+    expect(document.body.innerHTML).not.toMatch(/GitHub|LinkedIn/i);
+    // Quedan los enlaces de sección, el buscador, el tema y el idioma.
+    expect(document.querySelectorAll("nav a[href^='#']")).toHaveLength(SECTIONS.length);
+  });
+
   it("el menú móvil parte cerrado y expone su estado y destino", async () => {
     const { getByRole, document } = await renderComponent(Header);
 
@@ -44,12 +54,14 @@ describe("Header", () => {
     expect(steps).toEqual(SECTIONS.map((_, index) => `--i:${index}`));
   });
 
-  it("tiene un botón para abrir la paleta de comandos con su atajo anunciado", async () => {
-    const { getByRole } = await renderComponent(Header);
+  it("tiene un botón para abrir la consola con su atajo (Ctrl K) anunciado, y ya no hay paleta de comandos", async () => {
+    const { getByRole, document } = await renderComponent(Header);
 
-    const palette = getByRole("button", { name: "Abrir la paleta de comandos" });
-    expect(palette).toHaveAttribute("data-palette-open");
-    expect(palette).toHaveAttribute("aria-keyshortcuts", "Control+K Meta+K");
+    const consoleButton = getByRole("button", { name: "Abrir la consola (Ctrl K)" });
+    expect(consoleButton).toHaveAttribute("data-console-open");
+    expect(consoleButton).toHaveAttribute("aria-keyshortcuts", "Control+K Meta+K");
+    expect(consoleButton.querySelector("[data-console-kbd]")).toHaveTextContent("Ctrl K");
+    expect(document.querySelector("[data-palette-open], [data-palette-kbd]")).toBeNull();
   });
 
   it("el botón de tema lleva las dos etiquetas para que el script alterne", async () => {

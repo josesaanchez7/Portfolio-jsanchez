@@ -1,7 +1,6 @@
 ---
 import BootScreen from "../../components/boot/BootScreen.astro";
 import ConsoleDialog from "../../components/console/ConsoleDialog.astro";
-import CommandPalette from "../../components/palette/CommandPalette.astro";
 import Footer from "../../components/layout/Footer.astro";
 import Header from "../../components/layout/Header.astro";
 import AboutSection from "../../components/sections/AboutSection.astro";
@@ -10,7 +9,6 @@ import EducationSection from "../../components/sections/EducationSection.astro";
 import ExperienceSection from "../../components/sections/ExperienceSection.astro";
 import HeroSection from "../../components/sections/HeroSection.astro";
 import ProjectsSection from "../../components/sections/ProjectsSection.astro";
-import StackSection from "../../components/sections/StackSection.astro";
 import ImageLightbox from "../../components/ui/ImageLightbox.astro";
 import Toast from "../../components/ui/Toast.astro";
 import { getI18n } from "../../i18n";
@@ -43,14 +41,12 @@ const { t } = getI18n(Astro.currentLocale);
       <ProjectsSection />
       <ExperienceSection />
       <EducationSection />
-      <StackSection />
       <AboutSection />
       <ContactSection />
     </main>
     <Footer />
   </div>
   <ConsoleDialog />
-  <CommandPalette />
   <ImageLightbox />
   <Toast />
 </Layout>

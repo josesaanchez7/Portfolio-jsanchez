@@ -51,11 +51,42 @@
   --breakpoint-mini: 421px; /* oculta el nombre junto al logo */
   --animate-blink: blink 1s steps(1) infinite;
   --animate-marquee: marquee 40s linear infinite;
+  --animate-pulse-ring: pulse-ring 1.1s ease-out 1;
+  --animate-panel-in: panel-in 0.25s ease-out;
+  --animate-digit-in: digit-in 0.35s ease-out;
 
   /* La pista lleva cuatro copias iguales: desplazar la mitad vuelve al punto de partida sin saltos. */
   @keyframes marquee {
     to {
       transform: translateX(-50%);
+    }
+  }
+
+  /* Un dígito del reloj que cambia entra deslizándose desde abajo. */
+  @keyframes digit-in {
+    from {
+      opacity: 0;
+      translate: 0 0.45em;
+    }
+  }
+
+  /* Aparición de un panel de detalles al abrirlo. */
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      translate: 0 -0.4rem;
+    }
+  }
+
+  /* Onda que sale del hito de la línea de tiempo al encenderse. */
+  @keyframes pulse-ring {
+    from {
+      opacity: 0.7;
+      scale: 1;
+    }
+    to {
+      opacity: 0;
+      scale: 3.2;
     }
   }
 
@@ -163,12 +194,11 @@
 
 /*
  * Sin scroll de fondo mientras se ve la pantalla de carga (<html data-boot>), la consola
- * (<html data-console-active>), la paleta de comandos (<html data-palette-active>), la imagen ampliada (<html data-lightbox-active>) o el menú móvil
+ * (<html data-console-active>), la imagen ampliada (<html data-lightbox-active>) o el menú móvil
  * (<html data-menu-active>). Fuera de @layer a propósito: debe ganar a las utilidades del <body>.
  */
 html[data-boot] body,
 html[data-console-active] body,
-html[data-palette-active] body,
 html[data-lightbox-active] body,
 html[data-menu-active] body {
   overflow: hidden;

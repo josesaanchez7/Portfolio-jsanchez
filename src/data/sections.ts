@@ -21,13 +21,8 @@ export const SECTIONS = [
   },
   {
     id: "Education",
-    navLabel: { es: "Educación", en: "Education" },
-    title: { es: "Educación y certificaciones", en: "Education and certifications" },
-  },
-  {
-    id: "Stack",
-    navLabel: { es: "Stack", en: "Stack" },
-    title: { es: "Stack tecnológico", en: "Tech stack" },
+    navLabel: { es: "Formación", en: "Education" },
+    title: { es: "Formación", en: "Education" },
   },
   {
     id: "SobreMi",

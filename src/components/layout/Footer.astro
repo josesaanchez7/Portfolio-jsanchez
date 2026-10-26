@@ -13,7 +13,7 @@ const ITEM = "inline-flex items-center gap-1.5 px-2.5 py-1 whitespace-nowrap";
 const BUTTON = [
   ITEM,
   "cursor-pointer border-0 bg-transparent font-[inherit] text-inherit",
-  "hover:bg-black/20 aria-pressed:bg-black/30",
+  "hover:bg-black/20",
   "focus-visible:rounded-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-contrast",
 ].join(" ");
 
@@ -71,11 +71,6 @@ const SECONDARY = "max-sm:hidden";
         )
       }
       <li>
-        <button type="button" class={BUTTON} aria-pressed="false" data-debug-toggle>
-          {t.footer.debug}
-        </button>
-      </li>
-      <li>
         {/* Una ruta que no existe a propósito: la responde la página 404 real. */}
         <a href={notFoundPath(language)} class={BUTTON} aria-label={t.footer.notFoundLabel}>
           {t.footer.notFound}
@@ -90,20 +85,3 @@ const SECONDARY = "max-sm:hidden";
     </ul>
   </div>
 </footer>
-
-<script>
-  import { isDebugEnabled, onDebugChange, toggleDebug } from "../../scripts/debug";
-
-  const syncPressed = () => {
-    for (const button of document.querySelectorAll<HTMLButtonElement>("[data-debug-toggle]")) {
-      button.setAttribute("aria-pressed", String(isDebugEnabled()));
-    }
-  };
-
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-debug-toggle]")) {
-    button.addEventListener("click", toggleDebug);
-  }
-  // El comando `debug` de la consola cambia el mismo estado: el botón se mantiene en sincronía.
-  onDebugChange(syncPressed);
-  syncPressed();
-</script>

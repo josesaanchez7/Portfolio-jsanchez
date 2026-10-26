@@ -12,12 +12,6 @@ const { language, t, localize } = getI18n(Astro.currentLocale);
 const ICON_BUTTON =
   "h-[38px] place-items-center rounded-full bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
 
-// Enlaces sociales: en escritorio van en la cápsula y en móvil dentro del menú (el CSS muestra uno u otro).
-const SOCIAL_LINKS = [
-  { href: profile.github, label: t.header.github, icon: "github", name: "GitHub" },
-  { href: profile.linkedin, label: t.header.linkedin, icon: "linkedin", name: "LinkedIn" },
-] as const;
-
 // El selector muestra y activa el idioma al que se cambiaría.
 const otherLanguage = language === "es" ? "en" : "es";
 
@@ -98,55 +92,22 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
           }
         </ul>
       </div>
-
-      {/* Solo en el menú móvil: los enlaces sociales de la cápsula no caben en pantallas pequeñas. */}
-      <ul class={`hidden gap-3 max-menu:flex ${STAGGER}`} style={`--i:${SECTIONS.length}`}>
-        {
-          SOCIAL_LINKS.map(({ href, label, icon, name }) => (
-            <li>
-              <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-2 rounded-full border border-border-strong px-4 py-2 text-fg-muted transition-colors hover:border-accent hover:text-accent"
-                aria-label={label}
-              >
-                <Icon name={icon} />
-                {name}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
     </nav>
 
     <div
       class="relative z-10 flex items-center gap-1 border-l border-border pl-3 max-menu:ml-auto max-menu:border-l-0 max-menu:pl-0"
     >
-      {
-        SOCIAL_LINKS.map(({ href, label, icon }) => (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class={`inline-grid w-[38px] text-[1.1rem] max-menu:hidden ${ICON_BUTTON}`}
-            aria-label={label}
-          >
-            <Icon name={icon} />
-          </a>
-        ))
-      }
-      {/* Paleta de comandos (Ctrl/⌘ + K): ver components/palette/CommandPalette.astro */}
+      {/* Consola (Ctrl/⌘ + K): el atajo está en components/console/ConsoleDialog.astro */}
       <button
         type="button"
-        data-palette-open
-        aria-label={t.header.searchLabel}
+        data-console-open
+        aria-label={t.header.consoleLabel}
         aria-keyshortcuts="Control+K Meta+K"
         class={`inline-flex items-center gap-2 px-[0.65rem] text-[1.05rem] ${ICON_BUTTON}`}
       >
-        <Icon name="search" />
+        <span class="font-code text-[0.95rem] font-medium" aria-hidden="true">&gt;_</span>
         <kbd
-          data-palette-kbd
+          data-console-kbd
           aria-hidden="true"
           class="hidden rounded-[6px] border border-border-strong px-1.5 py-0.5 font-code text-[0.7rem] leading-none text-fg-muted lg:inline"
           >Ctrl K</kbd

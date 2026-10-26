@@ -1,7 +1,8 @@
 ---
 import { getI18n } from "../../i18n";
 import type { ExperienceItem } from "../../types/content";
-import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
+import LiveTenure from "../ui/LiveTenure.astro";
 
 interface Props {
   item: ExperienceItem;
@@ -9,42 +10,134 @@ interface Props {
 
 const { item } = Astro.props;
 const { t, localize } = getI18n(Astro.currentLocale);
-const { credential } = item;
+
+const ongoing = item.end === undefined;
+const criteria = item.highlights?.length ?? 0;
+
+// Las clases se escriben enteras (no se componen) para que Tailwind las detecte.
+const REVEAL =
+  "transition-[opacity,translate] duration-700 ease-out group-data-ready:opacity-0 group-data-ready:data-seen:opacity-100 group-data-ready:data-seen:translate-x-0 group-data-ready:data-seen:translate-y-0";
+// Escalonado: --i multiplica el retardo de cada criterio, chip y subtarea.
+const STAGGER = "[transition-delay:calc(var(--i)*90ms+250ms)]";
+const CHIP =
+  "rounded-full bg-accent-soft px-[0.65rem] py-[0.2rem] font-code text-[0.78rem] text-accent";
 ---
 
-{/* Una entrada de la línea de tiempo: trabajo, estudios o certificación (con su credencial). */}
+{/* Un puesto: tarjeta tipo ticket de JIRA (ID, estado, criterios de aceptación y subtareas) con su fecha a la izquierda del eje. */}
 <li
-  class="relative z-[1] grid grid-cols-[minmax(130px,220px)_1fr] gap-6 pb-10 pl-8 last:pb-0 before:absolute before:top-[0.45rem] before:-left-[0.3rem] before:h-[0.6rem] before:w-[0.6rem] before:rounded-full before:bg-accent before:shadow-[0_0_0_4px_var(--bg)] before:transition-[background-color,box-shadow] before:duration-500 before:content-[''] group-data-ready:before:bg-border-strong group-data-ready:data-lit:before:bg-accent group-data-ready:data-lit:before:shadow-[0_0_0_4px_var(--bg),0_0_14px_var(--accent)] max-tight:grid-cols-1 max-tight:gap-2 max-tight:pl-6"
+  data-node
+  class="relative grid grid-cols-[var(--rail)_1fr] gap-y-3 nav:grid-cols-[var(--date)_var(--rail)_1fr]"
 >
+  <span
+    data-track
+    aria-hidden="true"
+    class="absolute top-[1.35rem] left-[calc(var(--rail)/2)] z-[1] size-3 -translate-x-1/2 rounded-full bg-accent shadow-[0_0_0_4px_var(--bg)] transition-[background-color,box-shadow] duration-500 group-data-ready:bg-border-strong group-data-ready:data-lit:bg-accent group-data-ready:data-lit:shadow-[0_0_0_4px_var(--bg),0_0_14px_var(--accent)] nav:left-[calc(var(--date)+var(--rail)/2)]"
+  ></span>
+  <span
+    data-track
+    aria-hidden="true"
+    class="pointer-events-none absolute top-[1.35rem] left-[calc(var(--rail)/2)] z-[1] size-3 -translate-x-1/2 rounded-full bg-accent opacity-0 group-data-ready:data-lit:animate-pulse-ring nav:left-[calc(var(--date)+var(--rail)/2)]"
+  ></span>
+
   <div
-    class="flex flex-col gap-[0.2rem] pt-[0.2rem] font-code text-[0.82rem] max-tight:flex-row max-tight:gap-3"
+    data-reveal
+    class={`col-start-2 row-start-1 flex flex-col gap-[0.35rem] pt-[0.9rem] pl-4 font-code text-[0.82rem] nav:col-start-1 nav:items-end nav:pr-2 nav:pl-0 nav:text-right group-data-ready:-translate-x-6 ${REVEAL}`}
   >
-    <span class="text-accent">{t.experience[item.kind]}</span>
-    {item.period && <span class="text-fg-muted">{localize(item.period)}</span>}
+    {item.period && <span class="whitespace-nowrap text-accent">{localize(item.period)}</span>}
+    <span class="inline-flex items-center gap-2 text-fg-muted">
+      {
+        ongoing && (
+          <span class="relative flex size-2.5" aria-hidden="true">
+            <span class="absolute inline-flex size-full animate-ping rounded-full bg-boot-ok opacity-60" />
+            <span class="relative inline-flex size-2.5 rounded-full bg-boot-ok" />
+          </span>
+        )
+      }
+      {ongoing && <span class="sr-only">{t.experience.ongoing}: </span>}
+      <LiveTenure start={item.start} end={item.end} />
+    </span>
   </div>
-  <div class="flex flex-col gap-[0.35rem]">
-    <h3 class="text-[1.25rem]">{localize(item.title)}</h3>
-    {item.organization && <p class="font-medium">{localize(item.organization)}</p>}
+
+  <article
+    data-reveal
+    class={`col-start-2 row-start-2 flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-surface p-4 nav:col-start-3 nav:p-5 nav:row-start-1 nav:ml-6 ml-4 group-data-ready:translate-x-8 ${REVEAL}`}
+  >
+    <header class="flex flex-wrap items-center justify-between gap-2 font-code text-[0.78rem]">
+      {item.ticket && <span class="font-medium text-accent">{item.ticket}</span>}
+      <span
+        class={`inline-flex items-center gap-[0.4rem] rounded-full border px-[0.65rem] py-[0.15rem] ${ongoing ? "border-accent bg-accent-soft text-accent" : "border-boot-ok/50 bg-boot-ok/15 text-fg"}`}
+      >
+        <Icon name={ongoing ? "arrowRight" : "check"} class="size-[0.7rem]" />
+        {ongoing ? t.experience.statusInProgress : t.experience.statusDone}
+      </span>
+    </header>
+
+    <h4 class="text-[1.25rem]">{localize(item.title)}</h4>
+
     {
-      item.description && (
-        <p class="mt-[0.4rem] max-w-[60ch] text-fg-muted">{localize(item.description)}</p>
-      )
-    }
-    {
-      credential && (credential.id || credential.url) && (
-        <div class="mt-[0.4rem] flex flex-col items-start gap-3">
-          {credential.id && (
-            <p class="font-code text-[0.82rem] text-fg-muted">
-              {t.experience.credentialId}: {credential.id}
-            </p>
-          )}
-          {credential.url && (
-            <Button href={credential.url} external variant="secondary" icon="externalLink">
-              {t.experience.showCredential}
-            </Button>
-          )}
+      item.highlights && item.highlights.length > 0 && (
+        <div class="flex flex-col gap-2">
+          <p class="font-code text-[0.75rem] tracking-wide text-fg-muted uppercase">
+            {t.experience.acceptanceCriteria}
+          </p>
+          <ul class="flex flex-col gap-[0.45rem]">
+            {item.highlights.map((highlight, i) => (
+              <li
+                data-reveal
+                style={`--i:${i}`}
+                class={`flex gap-[0.6rem] text-fg-muted group-data-ready:translate-y-2 ${REVEAL} ${STAGGER}`}
+              >
+                <Icon name="check" class="mt-[0.35rem] size-[0.8rem] shrink-0 text-boot-ok" />
+                <span>{localize(highlight)}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )
     }
-  </div>
+
+    {
+      item.tech && item.tech.length > 0 && (
+        <ul class="flex flex-wrap gap-2" aria-label={t.projects.techLabel}>
+          {item.tech.map((tech, i) => (
+            <li data-reveal style={`--i:${i + criteria}`} class={`${CHIP} group-data-ready:translate-y-2 ${REVEAL} ${STAGGER}`}>
+              {tech}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {
+      item.subtasks?.map((subtask, i) => (
+        <div
+          role="group"
+          aria-label={t.experience.subtask(localize(subtask.title))}
+          data-reveal
+          style={`--i:${criteria + (item.tech?.length ?? 0) + i}`}
+          class={`relative ml-3 pl-6 group-data-ready:translate-y-2 before:absolute before:-top-5 before:left-0 before:h-[calc(1.25rem+1.1rem)] before:w-4 before:rounded-bl-lg before:border-b-2 before:border-l-2 before:border-border-strong before:content-[''] ${REVEAL} ${STAGGER}`}
+        >
+          <div class="flex flex-col gap-2 rounded-md border border-border bg-page p-3">
+            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-code text-[0.78rem]">
+              <span class="font-medium text-accent">{subtask.ticket}</span>
+              <span class="flex flex-wrap gap-x-3 text-fg-muted">
+                <span class="whitespace-nowrap">{localize(subtask.period)}</span>
+                <span class="whitespace-nowrap">
+                  <LiveTenure start={subtask.start} end={subtask.end} />
+                </span>
+              </span>
+            </div>
+            <p class="font-semibold">{localize(subtask.title)}</p>
+            {subtask.tech && subtask.tech.length > 0 && (
+              <ul class="flex flex-wrap gap-2" aria-label={t.projects.techLabel}>
+                {subtask.tech.map((tech) => (
+                  <li class={CHIP}>{tech}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ))
+    }
+  </article>
 </li>

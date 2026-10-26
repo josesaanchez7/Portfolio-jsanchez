@@ -162,15 +162,6 @@ export const COMMANDS: readonly CommandDefinition[] = [
     run: ({ t }) => ({ lines: [text(t.console.openingCv)], effects: ["openCv", "close"] }),
   },
   {
-    aliases: ["debug"],
-    displayName: same("debug"),
-    helpKey: "debug",
-    run: ({ t, debugEnabled }) => ({
-      lines: [text(debugEnabled ? t.console.debugOff : t.console.debugOn)],
-      effects: ["toggleDebug"],
-    }),
-  },
-  {
     aliases: ["404"],
     displayName: same("404"),
     helpKey: "notFound",

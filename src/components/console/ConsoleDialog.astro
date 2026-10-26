@@ -75,7 +75,6 @@ const DIALOG =
     ConsoleTone,
   } from "../../scripts/console/consoleTypes";
   import { createConsoleSession } from "../../scripts/console/session";
-  import { isDebugEnabled, toggleDebug } from "../../scripts/debug";
 
   const TONE_CLASS: Record<ConsoleTone, string> = {
     ok: "text-boot-ok",
@@ -99,7 +98,6 @@ const DIALOG =
       localize: (text) => text[language],
       profile,
       projects,
-      debugEnabled: isDebugEnabled(),
     });
 
     /** Una línea de resultados. Todo el texto se pinta como texto plano: nunca se interpreta como HTML. */
@@ -141,9 +139,6 @@ const DIALOG =
           break;
         case "openCv":
           window.open(cvUrl, "_blank", "noopener,noreferrer");
-          break;
-        case "toggleDebug":
-          toggleDebug();
           break;
         case "show404":
           // Una ruta que no existe a propósito: la responde la página 404 real.
@@ -195,8 +190,15 @@ const DIALOG =
       trigger.addEventListener("click", open);
     }
 
-    // --- Atajo global: la tecla ` abre si no se está escribiendo -------------------------------
-    // (Ctrl/⌘ + K abre la paleta de comandos, que tiene el comando «Abrir consola».)
+    // --- Atajos globales -------------------------------------------------------------------------
+    // Ctrl/⌘ + K abre la consola (y la cierra si ya está abierta), también al escribir. La tecla ` la abre solo si no se
+    // está escribiendo. ⌘K en Mac, Ctrl K en el resto: el HTML de la cabecera trae «Ctrl K» y aquí se adapta.
+    if (/mac|iphone|ipad/i.test(navigator.platform)) {
+      for (const hint of document.querySelectorAll("[data-console-kbd]")) hint.textContent = "⌘K";
+    }
+    const isShortcutK = (event: KeyboardEvent): boolean =>
+      (event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === "k";
+
     const isTypingTarget = (target: EventTarget | null): boolean =>
       target instanceof HTMLElement &&
       (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
@@ -209,13 +211,22 @@ const DIALOG =
     document.addEventListener("keydown", (event) => {
       if (isBooting() || event.repeat) return;
 
+      if (isShortcutK(event)) {
+        // Evita el atajo del navegador (en algunos, Ctrl K enfoca la búsqueda).
+        event.preventDefault();
+        if (dialog.open) dialog.close();
+        // Ni encima de otro diálogo (un caso de estudio o la imagen ampliada).
+        else if (!document.querySelector("dialog[open]")) open();
+        return;
+      }
+
       if (
         isGraveKey(event) &&
         !event.ctrlKey &&
         !event.metaKey &&
         !event.altKey &&
         !isTypingTarget(event.target) &&
-        // Ni encima de otro diálogo (la paleta o un caso de estudio).
+        // Ni encima de otro diálogo (un caso de estudio o la imagen ampliada).
         !document.querySelector("dialog[open]")
       ) {
         event.preventDefault();

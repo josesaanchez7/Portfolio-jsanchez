@@ -1,78 +1,208 @@
 ---
-import { aboutFacts, profile } from "../../data/profile";
 import { metrics } from "../../data/metrics";
+import { languages, location, profile } from "../../data/profile";
 import { getI18n } from "../../i18n";
 import { formatInteger } from "../../lib/format";
+import { SPOTLIGHT } from "../../lib/spotlight";
 import Section from "../layout/Section.astro";
-import RichText from "../ui/RichText.astro";
+import RichText, { type TagSpec } from "../ui/RichText.astro";
+import TechMarquee from "./TechMarquee.astro";
 
 const { language, t, localize } = getI18n(Astro.currentLocale);
 
+/** Segmentos de la barra de nivel de un idioma. */
+const SEGMENTS = 5;
+
 /** Texto de una cifra: prefijo + número con separador de miles + sufijo. */
 const display = (value: number, prefix = "", suffix = "") => `${prefix}${formatInteger(value, language)}${suffix}`;
+
+// Las palabras clave de la presentación (<k>…</k>) van en el color de acento.
+const KEYWORD: Record<string, TagSpec> = { k: { as: "strong", class: "font-semibold text-accent" } };
+
+// Las clases se escriben enteras (no se componen) para que Tailwind las detecte.
+// Tarjeta: mismo borde y fondo que el resto del sitio, elevación sutil y «spotlight» que sigue al cursor.
+// Con «reducir movimiento» no hay elevación ni spotlight.
+const CARD = `flex h-full flex-col gap-4 rounded-lg border border-border bg-surface transition-[translate,border-color] duration-200 ease-[ease] hover:-translate-y-[3px] hover:border-border-strong motion-reduce:hover:translate-y-0 motion-reduce:before:hidden motion-reduce:after:hidden ${SPOTLIGHT}`;
+// Entrada: fundido + 16 px hacia arriba, una sola vez. El retardo escalonado (70 ms) lo pone el script.
+const REVEAL =
+  "transition-[opacity,translate] duration-500 ease-out group-data-ready:translate-y-4 group-data-ready:opacity-0 group-data-ready:data-seen:translate-y-0 group-data-ready:data-seen:opacity-100";
+const LABEL = "font-code text-[0.78rem] font-medium tracking-[0.04em] text-accent uppercase";
 ---
 
+{
+  /*
+  «Sobre mí» como bento grid: 4 columnas en escritorio, 2 en tablet y 1 en móvil. Cada tarjeta va dentro de un envoltorio
+  [data-reveal] que hace la entrada (para que su retardo no afecte al hover de la tarjeta). Sin JavaScript todo se ve, con
+  las cifras ya en su valor final y el reloj oculto (se rellena al cargar). El carrusel de tecnologías es el de siempre.
+*/
+}
 <Section id="SobreMi">
-  <div
-    class="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] items-start gap-[clamp(2rem,5vw,4rem)] max-nav:grid-cols-1"
-  >
-    <div class="flex max-w-[60ch] flex-col gap-5">
-      <p class="text-[clamp(1.15rem,2.2vw,1.35rem)] leading-[1.5] text-fg">
-        {t.about.intro({ fullName: profile.fullName })}
-      </p>
-      <p class="text-[1.05rem] text-fg-muted [&_strong]:font-semibold [&_strong]:text-fg">
-        <RichText
-          text={t.about.path({ job: localize(profile.currentJob), employer: profile.employer })}
-        />
-      </p>
-      <p class="border-l-2 border-accent pl-4 text-[1.05rem] text-fg">{t.about.edge}</p>
-
-      {/* Cifras con contador animado: el HTML ya trae el valor final y el script lo cuenta al verse. */}
-      <ul class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3" data-metrics>
-        {
-          metrics.map((metric) => (
-            <li class="rounded-md border border-border bg-surface px-5 py-4">
-              <p class="font-heading text-[clamp(1.8rem,4vw,2.4rem)] leading-none font-bold tracking-[-0.02em] text-accent">
-                <span class="sr-only">{display(metric.value, metric.prefix, metric.suffix)}</span>
-                <span
-                  aria-hidden="true"
-                  data-count={metric.value}
-                  data-prefix={metric.prefix ?? ""}
-                  data-suffix={metric.suffix ?? ""}
-                >
-                  {display(metric.value, metric.prefix, metric.suffix)}
-                </span>
-              </p>
-              <p class="mt-2 text-[0.88rem] leading-snug text-fg-muted">{localize(metric.label)}</p>
-            </li>
-          ))
-        }
-      </ul>
+  <div data-bento class="group grid grid-cols-1 gap-4 tight:grid-cols-2 nav:grid-cols-4">
+    {/* 1 · Presentación (2×2) */}
+    <div data-reveal class={`${REVEAL} tight:col-span-2 nav:row-span-2`}>
+      <article aria-labelledby="about-intro" data-spotlight class={`${CARD} justify-center p-8 nav:p-10`}>
+        <h3 id="about-intro" class="sr-only">{t.about.introLabel}</h3>
+        <p class="text-[clamp(1.3rem,2.6vw,1.85rem)] leading-[1.4] font-medium text-fg">
+          <RichText
+            text={t.about.intro({ name: profile.name, job: localize(profile.currentJob) })}
+            tags={KEYWORD}
+          />
+        </p>
+      </article>
     </div>
 
-    <dl class="m-0 flex flex-col rounded-md border border-border bg-surface">
-      {
-        aboutFacts.map((fact) => (
-          <div class="flex flex-col gap-[0.15rem] px-5 py-4 not-first:border-t not-first:border-border">
-            <dt class="font-code text-[0.78rem] text-accent">{localize(fact.label)}</dt>
-            <dd class="m-0 font-medium">{localize(fact.value)}</dd>
-          </div>
-        ))
-      }
-    </dl>
+    {/* 2 · Ubicación y hora local */}
+    <div data-reveal class={REVEAL}>
+      <article aria-labelledby="about-location" data-spotlight class={`${CARD} overflow-hidden p-6`}>
+        <span
+          aria-hidden="true"
+          class="pointer-events-none absolute inset-0 [background-image:radial-gradient(var(--border-strong)_1px,transparent_1.5px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_at_100%_0%,#000,transparent_72%)]"
+        ></span>
+        <h3 id="about-location" class={`${LABEL} relative`}>{t.about.locationLabel}</h3>
+        <p class="relative flex items-center gap-3 font-heading text-[1.3rem] leading-tight font-bold">
+          {/* Pin con pulso suave en bucle. */}
+          <span class="relative flex size-3 shrink-0" aria-hidden="true">
+            <span class="absolute inline-flex size-full animate-ping rounded-full bg-accent opacity-60"></span>
+            <span class="relative inline-flex size-3 rounded-full bg-accent"></span>
+          </span>
+          {localize(location.name)}
+        </p>
+        {/* Hora local en vivo: oculta hasta que el script la rellena; aria-live="off" para no leer cada minuto. */}
+        <p
+          data-clock
+          data-timezone={location.timeZone}
+          data-language={language}
+          class="invisible relative mt-auto flex flex-col"
+        >
+          <span class="font-code text-[0.78rem] text-fg-muted">{t.about.localTime}</span>
+          <time
+            data-clock-time
+            aria-live="off"
+            class="font-code text-[1.7rem] leading-tight font-medium tabular-nums"
+          ></time>
+        </p>
+      </article>
+    </div>
+
+    {/* 3 · Idiomas */}
+    <div data-reveal class={REVEAL}>
+      <article aria-labelledby="about-languages" data-spotlight class={`${CARD} p-6`}>
+        <h3 id="about-languages" class={LABEL}>{t.about.languagesLabel}</h3>
+        <ul class="flex flex-col gap-4">
+          {
+            languages.map((entry) => (
+              <li class="flex flex-col gap-[0.45rem]">
+                <p class="flex items-baseline justify-between gap-3">
+                  <span class="font-medium">{localize(entry.name)}</span>
+                  <span class="font-code text-[0.8rem] text-fg-muted">{localize(entry.level)}</span>
+                </p>
+                <span class="flex gap-1" aria-hidden="true">
+                  {Array.from({ length: SEGMENTS }, (_, index) => (
+                    <span
+                      class={`h-[0.45rem] flex-1 rounded-full ${index < entry.segments ? "bg-accent" : "bg-border-strong/50"}`}
+                    />
+                  ))}
+                </span>
+                <span class="sr-only">{t.about.levelOf(entry.segments, SEGMENTS)}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </article>
+    </div>
+
+    {/* 4 · Cifras con contador animado: el HTML ya trae el valor final y el script lo cuenta al verse. */}
+    <div data-reveal class={`${REVEAL} tight:col-span-2`}>
+      <article aria-labelledby="about-numbers" data-spotlight class={`${CARD} p-6`}>
+        <h3 id="about-numbers" class={LABEL}>{t.about.numbersLabel}</h3>
+        <ul class="grid grid-cols-2 gap-4" data-metrics>
+          {
+            metrics.map((metric) => (
+              <li class="flex flex-col gap-2">
+                <p class="font-heading text-[clamp(2.1rem,5vw,3rem)] leading-none font-bold tracking-[-0.02em] text-accent">
+                  <span class="sr-only">{display(metric.value, metric.prefix, metric.suffix)}</span>
+                  <span
+                    aria-hidden="true"
+                    data-count={metric.value}
+                    data-prefix={metric.prefix ?? ""}
+                    data-suffix={metric.suffix ?? ""}
+                  >
+                    {display(metric.value, metric.prefix, metric.suffix)}
+                  </span>
+                </p>
+                <p class="text-[0.9rem] leading-snug text-fg-muted">{localize(metric.label)}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </article>
+    </div>
+
+    {/* 5 · Stack (ancho completo): el carrusel de logos de siempre, sin cambios. */}
+    <div data-reveal class={`${REVEAL} tight:col-span-2 nav:col-span-4`}>
+      <article aria-labelledby="about-stack" data-spotlight class={`${CARD} gap-5 py-6`}>
+        <h3 id="about-stack" class="px-6 font-code text-[0.85rem] font-medium text-accent">{t.about.stackLabel}</h3>
+        <TechMarquee />
+      </article>
+    </div>
   </div>
 </Section>
 
 <script>
   import { formatInteger } from "../../lib/format";
   import { DEFAULT_LANGUAGE, parseLanguage } from "../../lib/language";
+  import { initSpotlight } from "../../scripts/spotlight";
 
   const DURATION_MS = 1400;
-
-  const counters = [...document.querySelectorAll<HTMLElement>("[data-metrics] [data-count]")];
+  const STAGGER_MS = 70;
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Con «reducir movimiento» (o sin contadores) se queda el valor final del HTML.
+  // --- Hora local en vivo (Europe/Madrid): se actualiza cada minuto y los dígitos que cambian entran con una transición.
+  for (const clock of document.querySelectorAll<HTMLElement>("[data-clock]")) {
+    const target = clock.querySelector<HTMLElement>("[data-clock-time]");
+    const timeZone = clock.dataset.timezone;
+    if (!target || !timeZone) continue;
+    const language = parseLanguage(clock.dataset.language) ?? DEFAULT_LANGUAGE;
+    // Español: 24 h; inglés: 12 h con AM/PM.
+    const format = new Intl.DateTimeFormat(language === "es" ? "es-ES" : "en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: language !== "es",
+      timeZone,
+    });
+
+    const render = (animate: boolean) => {
+      const text = format.format(new Date());
+      const digits = [...text];
+      if (digits.length !== target.children.length) {
+        target.replaceChildren(
+          ...digits.map(() => Object.assign(document.createElement("span"), { className: "inline-block whitespace-pre" })),
+        );
+      }
+      digits.forEach((char, index) => {
+        const digit = target.children[index] as HTMLElement;
+        if (digit.textContent === char) return;
+        const changed = digit.textContent !== "";
+        digit.textContent = char;
+        if (animate && changed) {
+          digit.classList.remove("animate-digit-in");
+          void digit.offsetWidth; // reinicia la animación
+          digit.classList.add("animate-digit-in");
+        }
+      });
+    };
+
+    render(false);
+    clock.classList.remove("invisible");
+    const tick = () => {
+      render(!reducedMotion);
+      setTimeout(tick, 60_000 - (Date.now() % 60_000) + 50);
+    };
+    setTimeout(tick, 60_000 - (Date.now() % 60_000) + 50);
+  }
+
+  // --- Cifras con contador. Con «reducir movimiento» se queda el valor final del HTML.
+  const counters = [...document.querySelectorAll<HTMLElement>("[data-metrics] [data-count]")];
   if (counters.length > 0 && !reducedMotion) {
     const language = parseLanguage(document.documentElement.lang) ?? DEFAULT_LANGUAGE;
 
@@ -81,15 +211,15 @@ const display = (value: number, prefix = "", suffix = "") => `${prefix}${formatI
     };
 
     const count = (counter: HTMLElement) => {
-      const target = Number(counter.dataset.count);
+      const goal = Number(counter.dataset.count);
       const start = performance.now();
-      const tick = (now: number) => {
+      const step = (now: number) => {
         const progress = Math.min(1, (now - start) / DURATION_MS);
         // Frena al final (ease-out cúbico).
-        show(counter, Math.round(target * (1 - (1 - progress) ** 3)));
-        if (progress < 1) requestAnimationFrame(tick);
+        show(counter, Math.round(goal * (1 - (1 - progress) ** 3)));
+        if (progress < 1) requestAnimationFrame(step);
       };
-      requestAnimationFrame(tick);
+      requestAnimationFrame(step);
     };
 
     const observer = new IntersectionObserver(
@@ -102,10 +232,36 @@ const display = (value: number, prefix = "", suffix = "") => `${prefix}${formatI
       },
       { threshold: 0.6 },
     );
-
     for (const counter of counters) {
       show(counter, 0);
       observer.observe(counter);
+    }
+  }
+
+  // --- Entrada en cascada (una sola vez) y spotlight: ninguno de los dos con «reducir movimiento».
+  if (!reducedMotion) {
+    initSpotlight();
+
+    for (const grid of document.querySelectorAll<HTMLElement>("[data-bento]")) {
+      const cards = [...grid.querySelectorAll<HTMLElement>("[data-reveal]")];
+      grid.dataset.ready = "";
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          // Las tarjetas que entran a la vez aparecen una tras otra, en el orden de la cuadrícula.
+          const entering = entries
+            .filter((entry) => entry.isIntersecting)
+            .map((entry) => entry.target as HTMLElement)
+            .sort((a, b) => cards.indexOf(a) - cards.indexOf(b));
+          entering.forEach((card, index) => {
+            observer.unobserve(card);
+            card.style.transitionDelay = `${index * STAGGER_MS}ms`;
+            card.setAttribute("data-seen", "");
+          });
+        },
+        { threshold: 0.12 },
+      );
+      for (const card of cards) observer.observe(card);
     }
   }
 </script>

@@ -1,0 +1,38 @@
+---
+import { getI18n } from "../../i18n";
+import type { SortableDate } from "../../types/content";
+import { formatTenure, monthsBetween } from "../../lib/tenure";
+
+interface Props {
+  start: SortableDate;
+  /** Si falta, el periodo sigue en curso y el texto se recalcula en el navegador. */
+  end?: SortableDate | undefined;
+}
+
+const { start, end } = Astro.props;
+const { language } = getI18n(Astro.currentLocale);
+const text = formatTenure(monthsBetween(start, end, new Date()), language);
+const live = end === undefined;
+---
+
+{/* Duración de un periodo. Si sigue en curso se calcula al construir y el script lo actualiza al cargar la página. */}
+<span {...(live && { "data-tenure": "", "data-start": start, "data-language": language })}>{text}</span>
+
+<script>
+  import { formatTenure, monthsBetween } from "../../lib/tenure";
+  import { parseLanguage } from "../../lib/language";
+
+  const REFRESH_MS = 60 * 60 * 1000;
+
+  const refresh = () => {
+    for (const element of document.querySelectorAll<HTMLElement>("[data-tenure]")) {
+      const { start, language } = element.dataset;
+      const parsed = parseLanguage(language);
+      if (!start || !parsed) continue;
+      element.textContent = formatTenure(monthsBetween(start, undefined, new Date()), parsed);
+    }
+  };
+
+  refresh();
+  setInterval(refresh, REFRESH_MS);
+</script>

@@ -16,7 +16,7 @@ export interface ConsoleSegment {
 export type ConsoleLine = readonly ConsoleSegment[];
 
 /** Acciones que un comando pide a la interfaz (los comandos no tocan la página directamente). */
-export type ConsoleEffect = "close" | "openCv" | "toggleDebug" | "show404";
+export type ConsoleEffect = "close" | "openCv" | "show404";
 
 export interface CommandResult {
   lines: readonly ConsoleLine[];
@@ -34,5 +34,4 @@ export interface CommandContext {
   localize: (text: LocalizedText) => string;
   profile: Profile;
   projects: readonly Project[];
-  debugEnabled: boolean;
 }

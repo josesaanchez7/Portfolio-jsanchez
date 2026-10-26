@@ -1,0 +1,86 @@
+---
+import { education, upcomingCertifications } from "../../data/experience";
+import { getI18n } from "../../i18n";
+import CertBadge from "./CertBadge.astro";
+import StudyCard from "./StudyCard.astro";
+import UpcomingCard from "./UpcomingCard.astro";
+
+const { t } = getI18n(Astro.currentLocale);
+
+const certifications = education.filter((item) => item.kind === "certification");
+// La titulación más reciente es la principal; el resto van a su lado, más pequeñas y con la altura justa de su contenido.
+const [mainStudy, ...otherStudies] = education.filter((item) => item.kind === "education");
+const hasCertifications = certifications.length > 0 || upcomingCertifications.length > 0;
+
+// Entrada con escala + fundido en cascada, distinta a la de Experiencia (laterales): las tarjetas con 80 ms entre sí
+// y las insignias con 40 ms. --i escalona cada una.
+const DEAL =
+  "transition-[opacity,scale] duration-500 ease-out group-data-ready:scale-[0.96] group-data-ready:opacity-0 group-data-ready:data-seen:scale-100 group-data-ready:data-seen:opacity-100";
+const DEAL_CARD = `${DEAL} [transition-delay:calc(var(--i)*80ms)]`;
+const DEAL_BADGE = `${DEAL} [transition-delay:calc(var(--i)*40ms)]`;
+---
+
+{/* Versión «tarjetas»: primero la titulación, que es lo que más pesa; debajo, las certificaciones en formato compacto. */}
+<div data-showcase class="group flex flex-col gap-10">
+  {
+    mainStudy && (
+      <div class="grid gap-5 nav:grid-cols-[3fr_2fr]">
+        <div data-deal style="--i:0" class={DEAL_CARD}>
+          <StudyCard item={mainStudy} featured />
+        </div>
+        {otherStudies.length > 0 && (
+          <div class="flex flex-col gap-5 nav:self-start">
+            {otherStudies.map((item, i) => (
+              <div data-deal style={`--i:${i + 1}`} class={DEAL_CARD}>
+                <StudyCard item={item} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    )
+  }
+  {
+    hasCertifications && (
+      <div class="flex flex-col gap-4">
+        <h3 class="font-code text-[0.9rem] font-medium text-fg-muted">{t.experience.certifications}</h3>
+        <ul class="flex flex-wrap gap-3">
+          {certifications.map((item, i) => (
+            <li data-deal style={`--i:${i}`} class={`max-w-full ${DEAL_BADGE}`}>
+              <CertBadge item={item} />
+            </li>
+          ))}
+          {upcomingCertifications.map((upcoming, i) => (
+            <li data-deal style={`--i:${certifications.length + i}`} class={`max-w-full ${DEAL_BADGE}`}>
+              <UpcomingCard upcoming={upcoming} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+</div>
+
+<script>
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Con «reducir movimiento» no se prepara nada: todo se ve desde el principio, sin animación.
+  if (!reducedMotion) {
+    for (const showcase of document.querySelectorAll<HTMLElement>("[data-showcase]")) {
+      showcase.dataset.ready = "";
+
+      // Cada tarjeta se «reparte» una sola vez, al entrar en pantalla.
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            observer.unobserve(entry.target);
+            entry.target.setAttribute("data-seen", "");
+          }
+        },
+        { threshold: 0.15 },
+      );
+      for (const card of showcase.querySelectorAll("[data-deal]")) observer.observe(card);
+    }
+  }
+</script>

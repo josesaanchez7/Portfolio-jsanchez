@@ -15,7 +15,6 @@ export type ConsoleHelpKey =
   | "tests"
   | "contact"
   | "cv"
-  | "debug"
   | "notFound"
   | "clear"
   | "exit";
@@ -38,8 +37,6 @@ export interface Messages {
     skillsDevelopment: string;
     projectStatus: Record<ProjectStatus, string>;
     openingCv: string;
-    debugOn: string;
-    debugOff: string;
     /** Recibe la ruta a la que se navega. */
     navigatingToNotFound: (path: string) => string;
     sudoGranted: (email: string) => string;
@@ -49,14 +46,12 @@ export interface Messages {
   header: {
     homeLabel: (name: string) => string;
     navLabel: string;
-    github: string;
-    linkedin: string;
     themeToLight: string;
     themeToDark: string;
     openMenu: string;
     closeMenu: string;
-    /** Botón de la cabecera que abre la paleta de comandos. */
-    searchLabel: string;
+    /** Botón de la cabecera que abre la consola (Ctrl/⌘ + K). */
+    consoleLabel: string;
     /** Etiqueta accesible del selector, indexada por el idioma al que se cambia. */
     switchLanguage: Record<Language, string>;
   };
@@ -98,16 +93,66 @@ export interface Messages {
     work: string;
     education: string;
     certification: string;
-    credentialId: string;
+    /** Etiqueta accesible del enlace a la credencial de una certificación. */
+    credentialLabel: (title: string, issuer: string | undefined) => string;
+    /** Encabezado de la fila de certificaciones (en plural). */
+    certifications: string;
+    /** Etiqueta accesible de la trayectoria dentro de la empresa. */
+    careerPath: string;
+    /** Estado de la tarjeta de un puesto, como en JIRA. */
+    statusInProgress: string;
+    statusDone: string;
+    acceptanceCriteria: string;
+    /** Prefijo accesible de la duración del puesto actual («En curso: 1 año y 0 meses»). */
+    ongoing: string;
+    nextCertification: string;
+    /** Nodo superior del eje. */
+    today: string;
+    /** Nodo final del eje. */
+    journeyStart: string;
+    /** Etiqueta del tramo entre dos empresas cuando hubo un hueco: recibe la duración («3 meses»). */
+    gap: (duration: string) => string;
+    /** Píldora sobre la línea entre dos puestos. */
+    promotion: string;
+    /** Etiqueta accesible de una subtarea dentro de un puesto. */
+    subtask: (title: string) => string;
+  };
+  /** Sección «Formación»: textos del pipeline. */
+  education: {
+    /** Nombre del «workflow» de la cabecera del pipeline. */
+    workflowFile: string;
+    /** Etiqueta accesible del estado del workflow. */
+    workflowStatus: string;
+    passing: string;
+    running: string;
+    stagesLabel: string;
+    /** Texto de estado de cada etapa (para lectores de pantalla). */
+    statusDone: string;
+    statusRunning: string;
+    statusUpcoming: string;
+    /** En la cápsula de una etapa que aún no está completada. */
+    comingSoon: string;
+    detailsFor: (title: string) => string;
+    center: string;
+    issuer: string;
+    dates: string;
+    date: string;
+    status: string;
     showCredential: string;
   };
   about: {
-    /** Presentación y origen: cómo empezó. */
-    intro: (values: { fullName: string }) => string;
-    /** Recorrido hasta hoy. Admite <b>…</b>. */
-    path: (values: { job: string; employer: string }) => string;
-    /** Qué aporta combinar desarrollo y pruebas. */
-    edge: string;
+    /** Título accesible (oculto) de la tarjeta de presentación. */
+    introLabel: string;
+    /** Presentación breve. Las palabras clave van entre <k>…</k> (se pintan en el color de acento). */
+    intro: (values: { name: string; job: string }) => string;
+    locationLabel: string;
+    localTime: string;
+    languagesLabel: string;
+    /** Texto accesible de la barra de nivel de un idioma («nivel 3 de 5»). */
+    levelOf: (level: number, total: number) => string;
+    numbersLabel: string;
+    /** Etiqueta mono sobre el carrusel de tecnologías. */
+    stackLabel: string;
   };
   contact: {
     intro: string;
@@ -123,27 +168,11 @@ export interface Messages {
     errors: (count: number) => string;
     testedTimes: (count: string) => string;
     available: string;
-    debug: string;
     notFound: string;
     notFoundLabel: string;
     console: string;
     consoleLabel: string;
   };
-  /** Paleta de comandos (Ctrl/⌘ + K). Los nombres de tema, idioma, correo y CV reutilizan header, contact y hero. */
-  palette: {
-    title: string;
-    inputLabel: string;
-    placeholder: string;
-    empty: string;
-    groups: { go: string; actions: string; links: string };
-    home: string;
-    openConsole: string;
-    toggleDebug: string;
-    /** Palabras extra por las que también se encuentra cada comando (separadas por espacios). */
-    keywords: { theme: string; language: string; email: string; cv: string; console: string; debug: string; links: string };
-    hints: { navigate: string; select: string; close: string };
-  };
-  /** Página 404: se elige el idioma en el navegador (un 404 no sabe a qué URL iba el visitante). */
   notFound: {
     title: string;
     heading: string;

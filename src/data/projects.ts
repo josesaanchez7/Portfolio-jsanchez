@@ -42,8 +42,8 @@ export const projects: Project[] = [
     id: "portfolio",
     title: { es: "Portfolio personal", en: "Personal portfolio" },
     description: {
-      es: "Esta misma web: mi portfolio, generado con Astro como HTML estático. Está en español e inglés, con tema claro y oscuro, navegación accesible, paleta de comandos (Ctrl+K), una consola interactiva y una pantalla de carga con aspecto de terminal.",
-      en: "This very website: my portfolio, generated with Astro as static HTML. It comes in Spanish and English, with light and dark themes, accessible navigation, a command palette (Ctrl+K), an interactive console and a terminal-style loading screen.",
+      es: "Esta misma web: mi portfolio, generado con Astro como HTML estático. Está en español e inglés, con tema claro y oscuro, navegación accesible, una consola interactiva (Ctrl+K) y una pantalla de carga con aspecto de terminal.",
+      en: "This very website: my portfolio, generated with Astro as static HTML. It comes in Spanish and English, with light and dark themes, accessible navigation, an interactive console (Ctrl+K) and a terminal-style loading screen.",
     },
     tags: ["Astro", "TypeScript", "Tailwind CSS", "Vitest"],
     // TODO: confirma el estado ("done" | "in-progress" | "todo"). Aparece en el comando `proyectos` de la consola.
@@ -62,13 +62,6 @@ export const projects: Project[] = [
         alt: {
           es: "Sección Stack en tema claro: dos filas de tecnologías en movimiento y tarjetas por categoría.",
           en: "Tech stack section in light theme: two moving rows of technologies and a card for each category.",
-        },
-      },
-      {
-        src: "/img/projects/portfolio-paleta.webp",
-        alt: {
-          es: "Paleta de comandos abierta con Ctrl+K: lista de secciones y acciones para buscar y ejecutar.",
-          en: "Command palette opened with Ctrl+K: a list of sections and actions to search and run.",
         },
       },
       {

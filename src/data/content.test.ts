@@ -3,8 +3,9 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { galleryOf } from "../lib/gallery";
 import { LANGUAGES, type LocalizedText } from "../lib/language";
-import { aboutFacts, profile } from "./profile";
-import { byMostRecent, education, experience, workExperience } from "./experience";
+import { languages, profile } from "./profile";
+import { allEducationStages } from "./education";
+import { byMostRecent, education, experience, upcomingCertifications, workExperience } from "./experience";
 import type { ExperienceItem } from "../types/content";
 import { projects } from "./projects";
 import { getSection, SECTIONS } from "./sections";
@@ -106,6 +107,43 @@ describe("experiencia y educación", () => {
     expect(education[0]?.kind).toBe("certification");
   });
 
+  it("los puestos llevan un ID de ticket único y al menos un logro; solo el último sigue en curso", () => {
+    const tickets = workExperience.map((item) => item.ticket);
+    expect(tickets.every((ticket) => ticket && /^[A-Z]+-\d+$/.test(ticket))).toBe(true);
+    expect(new Set(tickets).size).toBe(tickets.length);
+    for (const item of workExperience) expect(item.highlights?.length, item.title.es).toBeGreaterThan(0);
+    expect(workExperience.filter((item) => item.end === undefined)).toHaveLength(1);
+  });
+
+  it("los puestos son consecutivos: cada uno empieza el mes siguiente a que termine el anterior", () => {
+    const chronological = [...workExperience].reverse();
+    for (const [i, item] of chronological.entries()) {
+      const previous = chronological[i - 1];
+      if (!previous?.end) continue;
+      const [year, month] = previous.end.split("-").map(Number) as [number, number];
+      const next = month === 12 ? `${year + 1}-01` : `${year}-${String(month + 1).padStart(2, "0")}`;
+      expect(item.start, item.title.es).toBe(next);
+    }
+  });
+
+  it("las subtareas caen dentro del periodo de su puesto y su ID cuelga del ticket del puesto", () => {
+    const subtasks = workExperience.flatMap((item) => (item.subtasks ?? []).map((subtask) => ({ item, subtask })));
+    expect(subtasks.length).toBeGreaterThan(0);
+    for (const { item, subtask } of subtasks) {
+      expect(subtask.ticket, subtask.title.es).toMatch(new RegExp(`^${item.ticket}-\\d+$`));
+      expect(subtask.start >= item.start, `${subtask.title.es}: empieza antes que el puesto`).toBe(true);
+      if (item.end !== undefined) {
+        expect(subtask.end, `${subtask.title.es}: debe acabar con el puesto`).toBeDefined();
+        expect((subtask.end ?? "") <= item.end, `${subtask.title.es}: acaba después que el puesto`).toBe(true);
+      }
+      if (subtask.end !== undefined) expect(subtask.end >= subtask.start).toBe(true);
+    }
+  });
+
+  it("solo el puesto más reciente se marca como promoción interna", () => {
+    expect(workExperience.filter((item) => item.promotion)).toEqual([workExperience[0]]);
+  });
+
   it("ninguna de las dos secciones queda vacía", () => {
     expect(workExperience.length).toBeGreaterThan(0);
     expect(education.length).toBeGreaterThan(0);
@@ -118,6 +156,12 @@ describe("secciones", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
+  it("«Stack» ya no es una sección: «Sobre mí» pasa a 04 y «Contacto» a 05", () => {
+    expect(SECTIONS.map((section) => section.id)).toEqual(["Proyectos", "Experience", "Education", "SobreMi", "Contacto"]);
+    expect(getSection("SobreMi").number).toBe("04");
+    expect(getSection("Contacto").number).toBe("05");
+  });
+
   it("numera las secciones según su orden", () => {
     expect(getSection("Proyectos").number).toBe("01");
     expect(getSection("Contacto").number).toBe(String(SECTIONS.length).padStart(2, "0"));
@@ -128,7 +172,7 @@ describe("traducciones del contenido", () => {
   const localizedTexts: LocalizedText[] = [
     profile.role,
     profile.currentJob,
-    ...aboutFacts.flatMap((fact) => [fact.label, fact.value]),
+    ...languages.flatMap((entry) => [entry.name, entry.level]),
     ...projects.flatMap((project) => [
       project.title,
       project.description,
@@ -138,7 +182,18 @@ describe("traducciones del contenido", () => {
       ...(item.organization ? [item.organization] : []),
       ...(item.period ? [item.period] : []),
       ...(item.description ? [item.description] : []),
+      ...(item.highlights ?? []),
+      ...(item.shortTitle ? [item.shortTitle] : []),
+      ...(item.subtasks ?? []).flatMap((subtask) => [subtask.title, subtask.period]),
     ]),
+    ...allEducationStages.flatMap((stage) => [
+      stage.title,
+      stage.period,
+      ...(stage.shortTitle ? [stage.shortTitle] : []),
+      ...(stage.organization ? [stage.organization] : []),
+      ...(stage.description ? [stage.description] : []),
+    ]),
+    ...upcomingCertifications.flatMap(({ title, status }) => [title, ...(status ? [status] : [])]),
     ...SECTIONS.flatMap((section) => [section.navLabel, section.title]),
     ...stack.flatMap((category) => [category.label, ...category.items]),
   ];

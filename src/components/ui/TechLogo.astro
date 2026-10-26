@@ -1,0 +1,48 @@
+---
+import { getTechLogo, hoverCss } from "../../data/techLogos";
+
+interface Props {
+  /** Nombre de la tecnología, como en `stack.ts`. */
+  name: string;
+  /** Copia duplicada del carrusel: oculta a lectores de pantalla (sin role ni aria-label). */
+  decorative?: boolean;
+}
+
+const { name, decorative = false } = Astro.props;
+const logo = getTechLogo(name);
+---
+
+{
+  /*
+  Logo oficial en un solo tono neutro (currentColor al 70 %) para que toda la fila se vea uniforme en ambos temas. Cuando la
+  baldosa (el <li class="group/tile"> que lo contiene) recibe hover o foco, pasa a su color de marca; si ese color no contrasta
+  con el tema actual, al acento del sitio (--hover se define abajo por tema). El viewBox original se respeta.
+*/
+}
+{
+  logo && (
+    <svg
+      viewBox={logo.viewBox}
+      width={logo.width}
+      height={logo.height}
+      fill="currentColor"
+      focusable="false"
+      {...(decorative ? { "aria-hidden": "true" } : { role: "img", "aria-label": name })}
+      style={`--hover-dark:${hoverCss(logo, "dark")};--hover-light:${hoverCss(logo, "light")}`}
+      class="tech-logo shrink-0 text-fg opacity-70 transition-[color,opacity] duration-200 group-hover/tile:text-(--hover) group-hover/tile:opacity-100 group-focus-within/tile:text-(--hover) group-focus-within/tile:opacity-100"
+    >
+      {logo.paths.map((d) => (
+        <path d={d} />
+      ))}
+    </svg>
+  )
+}
+
+<style>
+  .tech-logo {
+    --hover: var(--hover-dark);
+  }
+  :global(:root[data-theme="light"]) .tech-logo {
+    --hover: var(--hover-light);
+  }
+</style>

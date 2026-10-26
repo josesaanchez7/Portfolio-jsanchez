@@ -13,7 +13,6 @@ const buildContext = (language: Language = "es", overrides: Partial<CommandConte
   localize: (text) => text[language],
   profile,
   projects,
-  debugEnabled: false,
   ...overrides,
 });
 
@@ -85,27 +84,6 @@ describe("sesión de la consola: uso", () => {
     session.submit("cv");
 
     expect(effects).toEqual(["openCv", "close"]);
-  });
-
-  it("debug pide alternar el modo debug", () => {
-    const { session, effects, lines } = setup();
-
-    session.submit("debug");
-
-    expect(effects).toEqual(["toggleDebug"]);
-    expect(lines()[1]).toBe(messages.es.console.debugOn);
-  });
-
-  it("consulta el contexto en cada comando: el estado de debug actual decide el mensaje", () => {
-    let debugEnabled = false;
-    const { session, lines } = setup(() => buildContext("es", { debugEnabled }));
-
-    session.submit("debug");
-    debugEnabled = true;
-    session.submit("debug");
-
-    expect(lines()[1]).toBe(messages.es.console.debugOn);
-    expect(lines()[3]).toBe(messages.es.console.debugOff);
   });
 
   it("404 pide navegar a la página de error y cerrar la consola", () => {

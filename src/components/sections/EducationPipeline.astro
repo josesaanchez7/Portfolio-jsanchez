@@ -1,0 +1,226 @@
+---
+import { educationStages, stageName, stageRange, type EducationStage } from "../../data/education";
+import { getI18n } from "../../i18n";
+import Button from "../ui/Button.astro";
+import EducationIcon from "../ui/EducationIcon.astro";
+import Icon from "../ui/Icon.astro";
+
+interface Props {
+  /** Etapas a mostrar, de la más antigua a la más reciente. Por defecto, las activas de `data/education.ts`. */
+  stages?: EducationStage[];
+}
+
+const { stages = educationStages } = Astro.props;
+const { t, localize } = getI18n(Astro.currentLocale);
+
+const initial = stages.find((stage) => stage.openByDefault) ?? stages[0];
+const finished = stages.every((stage) => stage.status === "done");
+
+// Estado final de cada job. Es el que se ve sin JavaScript; el script solo lo recorre en secuencia al entrar en pantalla.
+const finalState = (stage: EducationStage) =>
+  stage.status === "done" ? "done" : stage.status === "in-progress" ? "running" : "pending";
+const statusText = (stage: EducationStage) =>
+  stage.status === "done"
+    ? t.education.statusDone
+    : stage.status === "in-progress"
+      ? t.education.statusRunning
+      : t.education.statusUpcoming;
+const buttonId = (stage: EducationStage) => `edu-job-${stage.id}`;
+const panelId = (stage: EducationStage) => `edu-panel-${stage.id}`;
+---
+
+{
+  /*
+  Versión «pipeline de CI»: cada etapa es un job conectado al siguiente por una línea. Sin JavaScript se ve todo en su
+  estado final y todos los paneles de detalles están abiertos; con JavaScript solo hay uno abierto a la vez y, al entrar
+  en pantalla, los jobs se ejecutan en secuencia (gris → spinner → check). El texto de estado (sr-only) no depende de la
+  animación. Con «reducir movimiento» no se prepara nada de esto.
+*/
+}
+<div data-pipeline data-open={initial?.id} class="group flex flex-col gap-6">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-2 font-code text-[0.85rem]">
+    <p class="flex items-center gap-2">
+      <span class="text-fg-muted">workflow:</span>
+      <span class="font-medium">{t.education.workflowFile}</span>
+    </p>
+    <span
+      data-badge
+      class={`inline-flex items-center gap-2 rounded-full border px-3 py-[0.2rem] text-[0.8rem] transition-[opacity,scale] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-data-ready:scale-75 group-data-ready:opacity-0 group-data-ready:data-passed:scale-100 group-data-ready:data-passed:opacity-100 ${finished ? "border-boot-ok/50 bg-boot-ok/15" : "border-boot-warn/60 bg-boot-warn/15"}`}
+    >
+      <span aria-hidden="true" class={`size-2 rounded-full ${finished ? "bg-boot-ok" : "bg-boot-warn"}`}></span>
+      <span class="sr-only">{t.education.workflowStatus}: </span>
+      {finished ? t.education.passing : t.education.running}
+    </span>
+  </div>
+
+  <ol
+    aria-label={t.education.stagesLabel}
+    style={`--n:${stages.length}`}
+    class="grid gap-6 nav:[grid-template-columns:repeat(var(--n),minmax(0,1fr))]"
+  >
+    {
+      stages.map((stage, index) => {
+        const name = localize(stageName(stage));
+        // En la cápsula, el nombre corto del centro (si lo hay); el panel de detalles lleva el completo.
+        const shortOrganization = stage.shortOrganization ?? stage.organization;
+        const organization = shortOrganization ? localize(shortOrganization) : undefined;
+        // Una etapa sin completar es discreta: borde discontinuo, algo más tenue y «Próximamente» en lugar de los años.
+        const pending = stage.status !== "done";
+        return (
+          <li data-job data-state={finalState(stage)} data-final={finalState(stage)} class="group/job relative">
+            <button
+              type="button"
+              id={buttonId(stage)}
+              data-target={stage.id}
+              aria-expanded={stage.id === initial?.id ? "true" : "false"}
+              aria-controls={panelId(stage)}
+              class={`flex h-full min-h-[7.5rem] w-full cursor-pointer items-center gap-3 rounded-lg border bg-surface p-4 text-left ${pending ? "border-dashed border-border-strong" : "border-border"} transition-[border-color,background-color,box-shadow,translate] duration-200 ease-[ease] hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_0_0_1px_var(--accent),0_10px_24px_-12px_var(--accent)] focus-visible:-translate-y-0.5 focus-visible:border-accent focus-visible:shadow-[0_0_0_1px_var(--accent),0_10px_24px_-12px_var(--accent)] aria-expanded:border-accent aria-expanded:bg-accent-soft`}
+            >
+              <span class="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-[1.35rem] text-accent" aria-hidden="true">
+                <EducationIcon name={stage.kind === "certification" ? "certificate" : "cap"} />
+              </span>
+              <span class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
+                <span class="font-heading text-[1rem] leading-tight font-bold">{name}</span>
+                {organization && <span class="text-[0.85rem] text-fg-muted">{organization}</span>}
+                <span class="font-code text-[0.75rem] text-fg-muted">{pending ? t.education.comingSoon : stageRange(stage)}</span>
+              </span>
+              <span class="sr-only">{statusText(stage)}</span>
+              {/* Indicador de estado (no depende solo del color: el texto sr-only lo dice). */}
+              <span class="relative grid size-7 shrink-0 place-items-center" aria-hidden="true">
+                <span class="hidden size-6 rounded-full border-2 border-border-strong group-data-[state=pending]/job:block" />
+                <span class="hidden size-6 animate-spin rounded-full border-[3px] border-accent border-t-transparent group-data-[state=running]/job:block" />
+                <span class="hidden size-6 place-items-center rounded-full bg-boot-ok text-boot-bg group-data-[state=done]/job:grid">
+                  <Icon name="check" class="size-3" />
+                </span>
+              </span>
+            </button>
+            {index < stages.length - 1 && (
+              <span
+                aria-hidden="true"
+                class="absolute top-full left-[2.25rem] h-6 w-[3px] -translate-x-1/2 overflow-hidden rounded-full bg-border nav:top-1/2 nav:left-full nav:h-[3px] nav:w-6 nav:translate-x-0 nav:-translate-y-1/2"
+              >
+                <span class="absolute inset-0 origin-top scale-y-0 bg-boot-ok transition-[scale] duration-500 ease-out group-data-[state=done]/job:scale-y-100 nav:origin-left nav:scale-x-0 nav:scale-y-100 nav:group-data-[state=done]/job:scale-x-100" />
+              </span>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+
+  <div class="flex flex-col gap-4">
+    {
+      stages.map((stage) => {
+        const title = localize(stage.title);
+        const organization = stage.organization ? localize(stage.organization) : undefined;
+        const url = stage.credential?.url;
+        return (
+          <div id={panelId(stage)} role="region" aria-labelledby={buttonId(stage)} data-panel={stage.id}>
+            <div class="flex flex-col gap-2.5 rounded-lg border border-border bg-surface px-5 py-4">
+              <h3 class="text-[1.15rem]">{title}</h3>
+              {/* Centro y fechas en una sola línea (en dos si no caben). */}
+              <dl class="flex flex-wrap gap-x-6 gap-y-1 text-[0.95rem]">
+                {organization && (
+                  <div class="flex gap-2">
+                    <dt class="font-code text-[0.82rem] text-fg-muted">
+                      {stage.kind === "certification" ? t.education.issuer : t.education.center}
+                    </dt>
+                    <dd>{organization}</dd>
+                  </div>
+                )}
+                <div class="flex gap-2">
+                  <dt class="font-code text-[0.82rem] text-fg-muted">
+                    {stage.kind === "certification" ? t.education.date : t.education.dates}
+                  </dt>
+                  <dd class="font-code text-[0.88rem]">{localize(stage.period)}</dd>
+                </div>
+              </dl>
+              {stage.description && <p class="text-fg-muted">{localize(stage.description)}</p>}
+              {/* El estado y el botón de la credencial comparten fila cuando hay sitio. */}
+              <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
+                <p class="flex gap-2 text-[0.95rem]">
+                  <span class="font-code text-[0.82rem] text-fg-muted">{t.education.status}</span>
+                  <span>{statusText(stage)}</span>
+                </p>
+                {url && (
+                  <Button
+                    href={url}
+                    external
+                    variant="secondary"
+                    icon="externalLink"
+                    aria-label={t.experience.credentialLabel(title, organization)}
+                  >
+                    {t.education.showCredential}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+  </div>
+</div>
+
+<script>
+  const RUN_MS = 400; // cuánto dura el spinner de cada job
+  const CONNECT_MS = 500; // lo que tarda en rellenarse la línea hasta el siguiente
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-pipeline]")) {
+    const jobs = [...root.querySelectorAll<HTMLElement>("[data-job]")];
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-target]")];
+    const panels = [...root.querySelectorAll<HTMLElement>("[data-panel]")];
+    const badge = root.querySelector<HTMLElement>("[data-badge]");
+
+    // Un solo panel abierto a la vez (sin JavaScript están todos abiertos).
+    const open = (id: string | undefined, animate: boolean) => {
+      for (const button of buttons) button.setAttribute("aria-expanded", String(button.dataset.target === id));
+      for (const panel of panels) {
+        const show = panel.dataset.panel === id;
+        panel.hidden = !show;
+        if (show && animate) {
+          panel.classList.remove("animate-panel-in");
+          void panel.offsetWidth; // reinicia la animación
+          panel.classList.add("animate-panel-in");
+        }
+      }
+    };
+    open(root.dataset.open, false);
+    for (const button of buttons) button.addEventListener("click", () => open(button.dataset.target, true));
+
+    if (reducedMotion) continue;
+
+    // Secuencia al entrar en pantalla (una sola vez): todos los jobs vuelven a gris y se ejecutan uno tras otro.
+    root.dataset.ready = "";
+    for (const job of jobs) job.dataset.state = "pending";
+
+    const run = async () => {
+      for (const job of jobs) {
+        const final = job.dataset.final ?? "done";
+        if (final === "pending") continue;
+        job.dataset.state = "running";
+        if (final === "done") {
+          await sleep(RUN_MS);
+          job.dataset.state = "done";
+          await sleep(CONNECT_MS);
+        } else {
+          // Un job «en curso» se queda con su spinner: la secuencia termina aquí.
+          break;
+        }
+      }
+      if (badge) badge.dataset.passed = "";
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        observer.disconnect();
+        void run();
+      },
+      { threshold: 0.4 },
+    );
+    observer.observe(root);
+  }
+</script>

@@ -1,12 +1,114 @@
 ---
 import { workExperience } from "../../data/experience";
+import { getI18n } from "../../i18n";
+import { formatTenure } from "../../lib/tenure";
+import { monthsBetweenJobs } from "../../lib/timeline";
+import type { ExperienceItem } from "../../types/content";
 import Section from "../layout/Section.astro";
 import Timeline from "../ui/Timeline.astro";
+import CareerPath from "./CareerPath.astro";
 import ExperienceEntry from "./ExperienceEntry.astro";
+
+interface Props {
+  /** Puestos de trabajo, del más reciente al más antiguo. Por defecto, los de `data/experience.ts`. */
+  items?: ExperienceItem[];
+}
+
+const { items = workExperience } = Astro.props;
+const { t, language, localize } = getI18n(Astro.currentLocale);
+
+// Una empresa por grupo, de la más reciente a la más antigua (los puestos ya vienen ordenados).
+const byCompany = new Map<string, ExperienceItem[]>();
+for (const item of items) {
+  const name = item.organization ? localize(item.organization) : localize(item.title);
+  byCompany.set(name, [...(byCompany.get(name) ?? []), item]);
+}
+const companies = [...byCompany.entries()].map(([name, roles]) => ({ name, roles }));
+
+/** Meses sin trabajo entre una empresa y la anterior en el tiempo (0 si se encadenan); `undefined` si no hay anterior. */
+const gapBefore = (index: number) => {
+  const newer = companies[index]?.roles.at(-1);
+  const older = companies[index + 1]?.roles[0];
+  if (!newer || !older) return undefined;
+  return { months: monthsBetweenJobs(older, newer) };
+};
+
+const COLUMNS = "grid-cols-[var(--rail)_1fr] nav:grid-cols-[var(--date)_var(--rail)_1fr]";
+const AXIS_X = "left-[calc(var(--rail)/2)] nav:left-[calc(var(--date)+var(--rail)/2)]";
 ---
 
+{
+  /*
+  Un único eje para toda la sección, de «Hoy» (arriba, lo más reciente) a «Inicio». Cada empresa es un nodo sobre el eje y sus
+  puestos cuelgan debajo, agrupados por un degradado muy suave (sin bordes). Entre empresas el eje no se
+  corta: sigue con un tramo discontinuo, con una etiqueta si hubo un hueco. --rail y --date fijan las columnas (fechas · eje ·
+  tickets) que comparten todos los nodos.
+*/
+}
 <Section id="Experience">
-  <Timeline>
-    {workExperience.map((item) => <ExperienceEntry item={item} />)}
-  </Timeline>
+  {/* overflow-x-clip: los tickets aún sin revelar parten desplazados a la derecha y, sin esto, ensancharían la página en móvil. */}
+  <div class="overflow-x-clip [--rail:2.5rem] nav:[--date:12.5rem] nav:[--rail:3rem]">
+    <Timeline>
+      <li class={`relative mb-6 grid h-[1.8rem] items-center ${COLUMNS}`}>
+        <span class={`absolute top-[0.525rem] z-[1] size-3 -translate-x-1/2 ${AXIS_X}`} aria-hidden="true">
+          <span class="absolute inline-flex size-full animate-ping rounded-full bg-boot-ok opacity-60" />
+          <span class="relative inline-flex size-3 rounded-full bg-boot-ok shadow-[0_0_0_4px_var(--bg)]" />
+        </span>
+        <span class="col-start-2 pl-4 font-code text-[0.82rem] font-medium nav:col-start-3 nav:pl-6">{t.experience.today}</span>
+      </li>
+
+      {
+        companies.map(({ name, roles }, index) => {
+          const gap = gapBefore(index - 1);
+          return (
+            <>
+              {gap && (
+                <li data-gap class={`relative grid items-center ${COLUMNS} ${gap.months > 0 ? "min-h-16" : "min-h-12"}`}>
+                  {/* Tramo tenue: las franjas del color de la página «rompen» el eje y lo dejan discontinuo. */}
+                  <span
+                    aria-hidden="true"
+                    class={`pointer-events-none absolute inset-y-0 z-[1] w-[7px] -translate-x-1/2 [background:repeating-linear-gradient(to_bottom,transparent_0_5px,var(--bg)_5px_11px)] ${AXIS_X}`}
+                  />
+                  {gap.months > 0 && (
+                    <span class="relative z-[1] col-start-2 ml-2 w-max justify-self-start rounded-full border border-dashed border-border-strong bg-page px-3 py-1 font-code text-[0.75rem] text-fg-muted nav:ml-0 nav:justify-self-center">
+                      {t.experience.gap(formatTenure(gap.months, language))}
+                    </span>
+                  )}
+                </li>
+              )}
+              <li data-company={name}>
+                <CareerPath items={roles} />
+                <ol class="relative flex flex-col gap-10 before:absolute before:-inset-y-4 before:right-0 before:left-[var(--rail)] before:rounded-r-lg before:bg-linear-to-r before:from-accent/[0.07] before:to-transparent before:content-[''] nav:before:left-[calc(var(--date)+var(--rail))]">
+                  {roles.map((item, roleIndex) => (
+                    <>
+                      <ExperienceEntry item={item} />
+                      {item.promotion && roleIndex < roles.length - 1 && (
+                        <li class={`relative z-[1] -my-4 grid ${COLUMNS}`}>
+                          <span
+                            data-promotion
+                            class="col-start-2 ml-2 inline-flex w-max items-center gap-[0.35rem] justify-self-start rounded-full border border-border-strong bg-page px-3 py-1 font-code text-[0.75rem] text-fg-muted nav:ml-0 nav:justify-self-center"
+                          >
+                            <span aria-hidden="true">↑</span>
+                            {t.experience.promotion}
+                          </span>
+                        </li>
+                      )}
+                    </>
+                  ))}
+                </ol>
+              </li>
+            </>
+          );
+        })
+      }
+
+      <li class={`relative mt-10 grid h-[1.8rem] items-center ${COLUMNS}`}>
+        <span
+          class={`absolute top-[0.525rem] z-[1] size-3 -translate-x-1/2 rounded-full bg-border-strong shadow-[0_0_0_4px_var(--bg)] ${AXIS_X}`}
+          aria-hidden="true"
+        />
+        <span class="col-start-2 pl-4 font-code text-[0.82rem] text-fg-muted nav:col-start-3 nav:pl-6">{t.experience.journeyStart}</span>
+      </li>
+    </Timeline>
+  </div>
 </Section>

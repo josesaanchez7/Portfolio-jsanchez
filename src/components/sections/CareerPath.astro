@@ -1,0 +1,80 @@
+---
+import { getI18n } from "../../i18n";
+import type { ExperienceItem } from "../../types/content";
+import Icon from "../ui/Icon.astro";
+import LiveTenure from "../ui/LiveTenure.astro";
+
+interface Props {
+  /** Puestos de una misma empresa, del más reciente al más antiguo. */
+  items: ExperienceItem[];
+}
+
+const { items } = Astro.props;
+const { t, localize } = getI18n(Astro.currentLocale);
+
+// De la más antigua a la actual. Todos los puestos son de la misma empresa: se muestra una sola vez.
+const chronological = [...items].reverse();
+const oldest = chronological[0];
+const newest = chronological.at(-1);
+const organization = oldest?.organization ? localize(oldest.organization) : undefined;
+
+// Ruta de roles: cada puesto y, tras él, sus subtareas como «+ PHP».
+const stages = chronological.flatMap((item) => [
+  { label: localize(item.title), current: item.end === undefined, subtask: false },
+  ...(item.subtasks ?? []).map((subtask) => ({ label: `+ ${subtask.label}`, current: false, subtask: true })),
+]);
+---
+
+{
+  /*
+  Nodo de empresa sobre el eje: la inicial hace de logo (centrada en el eje) y a su lado van el nombre, la duración total
+  y la ruta de roles. No lleva fechas: cada puesto muestra las suyas una sola vez.
+*/
+}
+{
+  oldest && organization && (
+    <div
+      data-node
+      class="relative grid grid-cols-[var(--rail)_1fr] nav:grid-cols-[var(--date)_var(--rail)_1fr]"
+    >
+      <div class="col-start-1 flex justify-center nav:col-start-2">
+        <span
+          data-track
+          aria-hidden="true"
+          class="relative z-[1] grid size-10 place-items-center rounded-md bg-accent font-heading text-[1.2rem] font-bold text-accent-contrast shadow-[0_0_0_6px_var(--bg)] transition-[background-color,color,box-shadow] duration-500 group-data-ready:bg-border group-data-ready:text-fg-muted group-data-ready:data-lit:bg-accent group-data-ready:data-lit:text-accent-contrast group-data-ready:data-lit:shadow-[0_0_0_6px_var(--bg),0_0_18px_var(--accent)] nav:size-12 nav:text-[1.4rem]"
+        >
+          {organization.charAt(0)}
+        </span>
+      </div>
+
+      <div class="col-start-2 flex min-w-0 flex-col gap-3 pb-8 pl-4 nav:col-start-3 nav:pl-6">
+        <div class="flex min-h-10 flex-wrap items-center gap-x-4 nav:min-h-12">
+          <h3 class="text-[1.2rem] nav:text-[1.35rem]">{organization}</h3>
+          <p class="font-code text-[0.82rem] text-fg-muted">
+            <LiveTenure start={oldest.start} end={newest?.end} />
+          </p>
+        </div>
+        {/* Con una sola etapa no hay trayectoria que contar. */}
+        {stages.length > 1 && (
+          <ol class="flex flex-wrap items-center gap-x-3 gap-y-2" aria-label={t.experience.careerPath}>
+            {stages.map((stage, i) => (
+              <>
+                {i > 0 && (
+                  <li aria-hidden="true" class="text-fg-muted">
+                    <Icon name="arrowRight" />
+                  </li>
+                )}
+                <li
+                  class={`rounded-full border px-[0.8rem] py-[0.3rem] text-[0.9rem] font-medium ${stage.current ? "border-accent bg-accent-soft text-accent" : stage.subtask ? "border-dashed border-border-strong text-fg-muted" : "border-border-strong text-fg"}`}
+                  aria-current={stage.current ? "step" : undefined}
+                >
+                  {stage.label}
+                </li>
+              </>
+            ))}
+          </ol>
+        )}
+      </div>
+    </div>
+  )
+}

@@ -1,12 +1,12 @@
 ---
-import { education } from "../../data/experience";
 import Section from "../layout/Section.astro";
-import Timeline from "../ui/Timeline.astro";
-import ExperienceEntry from "./ExperienceEntry.astro";
+// ▼ PARA CAMBIAR LA VERSIÓN DE FORMACIÓN basta con cambiar este import (el resto no se toca):
+//   ./EducationPipeline.astro  → pipeline estilo CI (la elegida)
+//   ./EducationCards.astro     → tarjetas (la versión anterior)
+// Las dos leen los mismos datos de `src/data/education.ts`.
+import Education from "./EducationPipeline.astro";
 ---
 
 <Section id="Education">
-  <Timeline>
-    {education.map((item) => <ExperienceEntry item={item} />)}
-  </Timeline>
+  <Education />
 </Section>

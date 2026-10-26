@@ -1,6 +1,6 @@
 // Contenido personal. Los TODO marcan información pendiente de completar.
 // Cada texto traducible lleva una versión en español (es) y otra en inglés (en).
-import type { AboutFact, Profile } from "../types/content";
+import type { LanguageSkill, Profile } from "../types/content";
 import { statusBar } from "./statusBar";
 
 export const profile: Profile = {
@@ -20,33 +20,22 @@ export const profile: Profile = {
   linkedin: "https://www.linkedin.com/in/josesanchezaldana",
 };
 
-// Datos breves de la tarjeta de "Sobre mí". La formación y el puesto actual ya están en Educación y Experiencia,
-// y la ubicación sale de statusBar. El relato de la izquierda está en src/i18n/messages (about).
-// Añade aquí intereses, forma de trabajar y objetivos.
-export const aboutFacts: AboutFact[] = [
+/** Dónde vives y su huso horario (el reloj de «Sobre mí» muestra la hora local de aquí). */
+export const location = {
+  name: statusBar.location,
+  timeZone: "Europe/Madrid",
+};
+
+/** Idiomas con su nivel; `segments` rellena la barra de 5 segmentos (A2 = 1 … C2 o nativo = 5). */
+export const languages: LanguageSkill[] = [
   {
-    label: { es: "Ubicación", en: "Location" },
-    value: statusBar.location,
+    name: { es: "Español", en: "Spanish" },
+    level: { es: "Nativo", en: "Native" },
+    segments: 5,
   },
   {
-    label: { es: "Enfoque", en: "Focus" },
-    value: {
-      es: "Pruebas manuales, exploratorias y de API; automatización con Playwright",
-      en: "Manual, exploratory and API testing; automation with Playwright",
-    },
-  },
-  {
-    label: { es: "Idiomas", en: "Languages" },
-    value: {
-      es: "Español (nativo) · Inglés (B2 Cambridge)",
-      en: "Spanish (native) · English (Cambridge B2)",
-    },
-  },
-  {
-    label: { es: "Habilidades", en: "Skills" },
-    value: {
-      es: "Trabajo en equipo y resolución de problemas",
-      en: "Teamwork and problem solving",
-    },
+    name: { es: "Inglés", en: "English" },
+    level: { es: "B2 Cambridge", en: "Cambridge B2" },
+    segments: 3,
   },
 ];

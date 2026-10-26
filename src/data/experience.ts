@@ -1,4 +1,5 @@
-import type { ExperienceItem, SortableDate } from "../types/content";
+import type { ExperienceItem, SortableDate, UpcomingCertification } from "../types/content";
+import { educationItems, upcomingFromStages } from "./education";
 
 // Fuente: CV (descripciones y centros) y perfil de LinkedIn (fechas de estudios).
 const TORCAL = {
@@ -13,60 +14,65 @@ const items: ExperienceItem[] = [
     title: { es: "QA Tester", en: "QA Tester" },
     organization: TORCAL,
     period: { es: "oct. 2025 – Actualidad", en: "Oct 2025 – Present" },
-    description: {
-      es: "Diseño y ejecución de pruebas manuales y exploratorias sobre aplicaciones internas, validación de APIs y detección de incidencias funcionales, así como planificación y gestión de pruebas mediante JIRA, colaborando estrechamente con los equipos de desarrollo en entornos de metodologías ágiles y automatización de pruebas QA.",
-      en: "Design and execution of manual and exploratory tests on internal applications, API validation and detection of functional issues, plus test planning and management with JIRA, working closely with development teams in agile-methodology environments and QA test automation.",
-    },
+    ticket: "TOR-2025",
+    promotion: true,
+    highlights: [
+      {
+        es: "Diseño y ejecución de pruebas manuales y exploratorias sobre aplicaciones internas",
+        en: "Design and execution of manual and exploratory tests on internal applications",
+      },
+      {
+        es: "Validación de APIs y detección de incidencias funcionales",
+        en: "API validation and detection of functional issues",
+      },
+      {
+        es: "Planificación y gestión de pruebas mediante JIRA",
+        en: "Test planning and management with JIRA",
+      },
+      {
+        es: "Colaboración con los equipos de desarrollo en entornos ágiles y automatización de pruebas QA",
+        en: "Close collaboration with development teams in agile environments and QA test automation",
+      },
+    ],
+    tech: ["JIRA", "Postman", "Playwright"],
   },
   {
     kind: "work",
     start: "2023-05",
     end: "2025-09",
-    title: { es: "Soporte técnico / Programador", en: "Technical support / Developer" },
+    title: { es: "Soporte técnico", en: "Technical support" },
     organization: TORCAL,
     period: { es: "may. 2023 – sep. 2025", en: "May 2023 – Sep 2025" },
-    description: {
-      es: "Asistencia técnica a usuarios internos y externos, gestionando y resolviendo incidencias informáticas, así como desarrollo y mantenimiento de funcionalidades en PHP durante el último año del puesto.",
-      en: "Technical assistance for internal and external users, managing and resolving IT incidents, plus developing and maintaining PHP features during the last year in the role.",
-    },
+    ticket: "TOR-2023",
+    highlights: [
+      {
+        es: "Asistencia técnica a usuarios internos y externos",
+        en: "Technical assistance for internal and external users",
+      },
+      {
+        es: "Gestión y resolución de incidencias informáticas",
+        en: "Management and resolution of IT incidents",
+      },
+    ],
+    // Dentro del mismo puesto, durante su último año.
+    subtasks: [
+      {
+        ticket: "TOR-2023-1",
+        title: { es: "Desarrollo PHP", en: "PHP development" },
+        label: "PHP",
+        start: "2024-10",
+        end: "2025-09",
+        period: { es: "oct. 2024 – sep. 2025", en: "Oct 2024 – Sep 2025" },
+        tech: ["PHP"],
+      },
+    ],
   },
-  {
-    kind: "education",
-    start: "2021",
-    end: "2024",
-    title: {
-      es: "Desarrollo de Aplicaciones Multiplataforma",
-      en: "Multiplatform Application Development",
-    },
-    organization: { es: "Colegio Concertado San José", en: "Colegio Concertado San José" },
-    period: { es: "2021 – 2024", en: "2021 – 2024" },
-    description: {
-      es: "Ciclo formativo de grado superior",
-      en: "Higher vocational training programme",
-    },
-  },
-  {
-    kind: "education",
-    start: "2018",
-    end: "2020",
-    title: { es: "Bachillerato Tecnológico", en: "Baccalaureate, Technology track" },
-    organization: { es: "C.D.P Santa Rosa de Lima", en: "C.D.P Santa Rosa de Lima" },
-    period: { es: "2018 – 2020", en: "2018 – 2020" },
-  },
-  {
-    kind: "certification",
-    start: "2026-08",
-    end: "2026-08",
-    // Fuente: página de verificación de la credencial (la fecha es la de finalización que indica Postman Academy).
-    title: {
-      es: "API Testing Learning Path – Completion Certificate (V12)",
-      en: "API Testing Learning Path – Completion Certificate (V12)",
-    },
-    organization: { es: "Postman Academy", en: "Postman Academy" },
-    period: { es: "Completado: 12 ago. 2026", en: "Completed: Aug 12, 2026" },
-    credential: { url: "https://verify.skilljar.com/c/pu9b9suir8w2" },
-  },
+  // La formación (estudios y certificaciones) vive en `education.ts`; aquí se añade a la lista general.
+  ...educationItems,
 ];
+
+/** Certificaciones activas aún sin completar (la etapa opcional «en curso» de `education.ts`, desactivada por defecto). */
+export const upcomingCertifications: UpcomingCertification[] = upcomingFromStages;
 
 /** Meses desde el año 0 de una fecha "AAAA-MM" (o "AAAA": el inicio vale enero y el fin, diciembre). */
 const monthIndex = (date: SortableDate, defaultMonth: number): number => {
@@ -90,5 +96,5 @@ export const experience: ExperienceItem[] = [...items].sort(byMostRecent);
 /** Sección «Experiencia»: solo puestos de trabajo. */
 export const workExperience: ExperienceItem[] = experience.filter((item) => item.kind === "work");
 
-/** Sección «Educación»: estudios y certificaciones. */
+/** Sección «Formación»: estudios y certificaciones. */
 export const education: ExperienceItem[] = experience.filter((item) => item.kind !== "work");

@@ -15,7 +15,6 @@ const buildContext = (language: Language = "es", overrides: Partial<CommandConte
   localize: (text) => text[language],
   profile,
   projects,
-  debugEnabled: false,
   ...overrides,
 });
 
@@ -52,7 +51,7 @@ describe("help", () => {
   it("lista los comandos con el nombre en verde y su descripción", () => {
     const { lines } = run("help");
 
-    for (const name of ["help", "whoami", "skills", "proyectos", "run tests", "contacto", "cv", "debug", "404", "clear", "exit"]) {
+    for (const name of ["help", "whoami", "skills", "proyectos", "run tests", "contacto", "cv", "404", "clear", "exit"]) {
       const line = lines.find((candidate) => candidate[0]?.text.trim() === name);
       expect(line, `falta ${name}`).toBeDefined();
       expect(line?.[0]?.tone).toBe("ok");
@@ -200,19 +199,6 @@ describe("cv", () => {
 
     expect(result.lines.map(plain)).toEqual(["Abriendo CHANGELOG.md…"]);
     expect(result.effects).toEqual(["openCv", "close"]);
-  });
-});
-
-describe("debug", () => {
-  it("lo activa y lo dice", () => {
-    const result = run("debug");
-
-    expect(result.lines.map(plain)).toEqual(["Modo debug activado."]);
-    expect(result.effects).toEqual(["toggleDebug"]);
-  });
-
-  it("lo desactiva y lo dice si ya estaba activo", () => {
-    expect(texts("debug", "es", { debugEnabled: true })).toEqual(["Modo debug desactivado."]);
   });
 });
 

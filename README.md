@@ -47,8 +47,6 @@ que importa [`Layout.astro`](src/layouts/Layout.astro):
   `@theme` cada uno vale N + 1.
 - **Base:** los estilos de elementos (tipografía de los títulos, foco visible, `scroll-behavior`) están en
   `@layer base`, de modo que cualquier utilidad puede sustituirlos.
-- **Modo debug** (`<html data-debug="true">`): variantes `in-data-[debug=true]:` en
-  [`src/lib/debugSection.ts`](src/lib/debugSection.ts).
 - Los estados se expresan con atributos de datos y ARIA (`data-exiting`, `data-pending`, `data-open`,
   `aria-[current=true]`, `aria-pressed`) que tanto el CSS como los scripts leen y escriben.
 - **Iconos:** SVG propios en [`src/components/ui/icons.ts`](src/components/ui/icons.ts) (Font Awesome 5 Free,
@@ -81,10 +79,9 @@ src/
 │   ├── layout/     Header, Footer, Section (estructura de página)
 │   ├── sections/   una por sección: Hero, Projects (+ Card y Carousel), Experience y Education (+ Entry), Stack (+ TechMarquee), About, Contact
 │   ├── boot/       BootScreen: pantalla de carga con aspecto de terminal
-│   ├── palette/    CommandPalette: paleta de comandos (Ctrl/⌘ + K)
-│   ├── console/    ConsoleDialog: consola interactiva
+│   ├── console/    ConsoleDialog: consola interactiva (Ctrl/⌘ + K)
 │   └── ui/         piezas reutilizables: Button, Icon (+ icons.ts), RichText, Timeline, Toast
-├── scripts/        lógica de navegador sin marcado: guion y tiempos de la carga, comandos y sesión de la consola, búsqueda de la paleta, debug
+├── scripts/        lógica de navegador sin marcado: guion y tiempos de la carga, comandos y sesión de la consola
 ├── i18n/           getI18n (idioma de la página), parseTags y diccionarios de interfaz (messages/)
 ├── data/           contenido estático tipado (perfil, proyectos, experiencia, stack, métricas, secciones)
 ├── types/          modelos de dominio del contenido
@@ -103,7 +100,7 @@ se publica), por eso los tests de las páginas viven en `src/test`.
 No hay islas ni hidratación: cada componente con comportamiento lleva su `<script>` (TypeScript) al final del
 archivo `.astro`, que Astro empaqueta y carga como módulo. Los scripts enlazan con el marcado mediante
 atributos `data-*` (`data-header`, `data-theme-toggle`, `data-console-open`…) y comparten estado a través del
-DOM (`<html data-theme | data-debug | data-boot | data-console-active | data-palette-active | data-menu-active>`).
+DOM (`<html data-theme | data-boot | data-console-active | data-menu-active>`).
 
 - **Tema:** el script inline del `<head>` aplica el tema guardado antes del primer pintado; el botón de la cabecera
   lo alterna (los dos iconos están en el HTML y los muestra el CSS según `data-theme`).
@@ -152,27 +149,11 @@ El `<script>` del componente pone atributos en `<header>` que el CSS (variantes 
 - **Siempre a la vista en escritorio.** En móvil, `data-hidden` la oculta al bajar y la muestra al subir (no ocurre con
   el menú o un diálogo abiertos, al navegar con teclado ni con `prefers-reduced-motion`).
 - **Móvil (≤ 960 px, `max-menu:`):** el `<nav>` pasa a ser un menú a pantalla completa con los enlaces entrando
-  escalonados (`--i` por elemento); dentro van GitHub y LinkedIn. Mientras está abierto, el resto de la página es
+  escalonados (`--i` por elemento). Mientras está abierto, el resto de la página es
   `inert` y no hace scroll; se cierra con Escape, tocando cualquier hueco o al elegir una sección.
-- Los atributos de estado de `<html>` (`data-menu-active`, `data-palette-active`, `data-console-active`) bloquean el
+- Los atributos de estado de `<html>` (`data-menu-active`, `data-console-active`) bloquean el
   scroll de fondo (regla al final de `global.css`); no se llaman como los botones que abren cada cosa para que los
   selectores no se confundan.
-
-## Paleta de comandos
-
-[`components/palette/CommandPalette.astro`](src/components/palette/CommandPalette.astro). **`Ctrl + K` / `⌘ + K`** (también el
-botón de la lupa de la cabecera) abre un buscador para ir a una sección o ejecutar una acción: tema, idioma, copiar el correo
-(con un aviso), descargar el CV, abrir la consola, activar el modo debug y abrir GitHub o LinkedIn.
-
-- **Teclado:** escribe para filtrar (sin tildes ni mayúsculas, por palabras sueltas y por palabras clave), `↑`/`↓` mueven la
-  selección, `Enter` ejecuta, `Esc` o `Ctrl/⌘ + K` cierran. También se puede usar el ratón.
-- **Accesibilidad:** patrón combobox + listbox; el foco se queda en el campo y `aria-activedescendant` apunta a la opción.
-  Al cerrar, el foco vuelve a donde estaba. No se abre durante la pantalla de carga ni encima de otro diálogo.
-- **Cómo funciona:** todas las opciones ya vienen en el HTML (con su texto de búsqueda normalizado); el script solo filtra con
-  [`scripts/palette.ts`](src/scripts/palette.ts) y ejecuta la elegida reutilizando los controles que existen (botón de tema,
-  enlace de idioma, botón de la consola…), así que cada uno conserva su estado.
-- **Añadir un comando:** un elemento en `commands` del frontmatter (y su función en `commands` del `<script>` si es una
-  acción nueva). Los textos van en `palette` de `src/i18n/messages`.
 
 ## Secciones: efectos
 
@@ -201,7 +182,7 @@ botón de la lupa de la cabecera) abre un buscador para ir a una sección o ejec
   de pantalla); el script solo anima. Ver «Dónde editar el contenido» para las cifras.
 - **Contacto:** indicador «Disponible para nuevas oportunidades» con un punto verde que late (sale si `statusBar.available` es
   true) y un aviso animado («✓ Correo copiado») al copiar el correo. El aviso es [`ui/Toast.astro`](src/components/ui/Toast.astro) +
-  `showToast()` de [`scripts/toast.ts`](src/scripts/toast.ts), compartido con la paleta de comandos.
+  `showToast()` de [`scripts/toast.ts`](src/scripts/toast.ts), compartido con otros componentes.
 
 ## Pantalla de carga (consola)
 
@@ -225,19 +206,20 @@ terminal simulada que se desvanece y deja ver el portfolio, que ya está montado
 
 [`components/console/ConsoleDialog.astro`](src/components/console/ConsoleDialog.astro). Una terminal simulada para conocerme escribiendo comandos.
 
-- **Abrir:** la tecla `` ` `` (no si se está escribiendo en un campo; en el teclado español es la tecla muerta a la
-  derecha de la P), el botón `>_ Consola` del footer o el comando «Abrir consola» de la paleta (`Ctrl/⌘ + K`, que ya no
-  abre la consola directamente). No se abre durante la pantalla de carga ni encima de otro diálogo.
+- **Abrir:** **`Ctrl + K` / `⌘ + K`** (también el botón `>_ Ctrl K` de la cabecera, que anuncia el atajo), la tecla `` ` ``
+  (no si se está escribiendo en un campo; en el teclado español es la tecla muerta a la derecha de la P) o el botón
+  `>_ Consola` del footer. Con la consola abierta, `Ctrl/⌘ + K` la cierra. No se abre durante la pantalla de carga ni encima
+  de otro diálogo.
 - **Cerrar:** `Esc`, el botón ×, un clic fuera o el comando `exit`. Al cerrar, el foco
   vuelve al elemento que la abrió.
 - **Comandos:** `help`, `whoami`, `skills`, `proyectos` / `projects`, `run tests` (también `npm test` y
-  `npx playwright test`), `contacto` / `contact`, `cv`, `debug`, `404`, `clear`, `exit` y el oculto
+  `npx playwright test`), `contacto` / `contact`, `cv`, `404`, `clear`, `exit` y el oculto
   `sudo contratar`. No distinguen mayúsculas y ignoran espacios sobrantes.
 - **Historial:** flechas arriba y abajo; se conserva mientras la página esté abierta (al cambiar de idioma
   se empieza de cero, porque es otra página).
 - **Añadir un comando:** un único sitio, [`commands.ts`](src/scripts/console/commands.ts) (`COMMANDS`). Cada
   comando es una función pura que devuelve datos (líneas con tono/enlace y, si hace falta, *efectos* como
-  `close`, `openCv`, `toggleDebug`). El estado (historial, salida escalonada) está en
+  `close`, `openCv`, `show404`). El estado (historial, salida escalonada) está en
   [`session.ts`](src/scripts/console/session.ts), que no toca el DOM, y la parte visual en el `<script>` de
   `ConsoleDialog.astro`, que pinta todo como texto plano. Los textos traducibles van en `src/i18n/messages`.
 - **Datos:** `proyectos` lee `src/data/projects.ts` (campo `status`) y `run tests` usa las mismas líneas que
@@ -252,9 +234,6 @@ Los datos (rama, errores, veces probada, ubicación, disponibilidad) están en
 [`src/data/statusBar.ts`](src/data/statusBar.ts); `testRuns` es un dato de ejemplo marcado con `TODO`.
 El año del copyright se calcula al construir la web.
 
-- **Debug:** activa el modo debug (`<html data-debug="true">`, estilos en
-  [`src/lib/debugSection.ts`](src/lib/debugSection.ts)): cada sección muestra un borde discontinuo y su ancla.
-  El comando `debug` de la consola cambia el mismo estado.
 - **404:** enlace a esa misma ruta inexistente, para ver la página de error de verdad.
 - En móvil se ocultan los elementos secundarios y respeta las zonas seguras (`env(safe-area-inset-*)`).
 

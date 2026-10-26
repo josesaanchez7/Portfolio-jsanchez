@@ -18,7 +18,7 @@ const computed: Metric[] = [
     ? [
         {
           value: fullYearsSince(firstJobStart, new Date()),
-          prefix: "+",
+          suffix: "+",
           label: {
             es: "años de experiencia profesional",
             en: "years of professional experience",

@@ -1,0 +1,48 @@
+---
+import { getI18n } from "../../i18n";
+import type { ExperienceItem } from "../../types/content";
+
+interface Props {
+  item: ExperienceItem;
+  /** Tarjeta principal: más grande y con el sello de birrete. */
+  featured?: boolean;
+}
+
+const { item, featured = false } = Astro.props;
+const { t, localize } = getI18n(Astro.currentLocale);
+---
+
+{/* Estudios reglados. La titulación principal lleva un sello circular con un birrete. */}
+<article
+  class={`flex h-full gap-6 rounded-lg border border-border bg-surface transition-[border-color,translate] duration-250 ease-[ease] hover:-translate-y-[3px] hover:border-border-strong ${featured ? "border-border-strong p-6 shadow-card max-tight:flex-col nav:p-8" : "flex-col gap-[0.35rem] p-5"}`}
+>
+  {
+    featured && (
+      <svg
+        viewBox="0 0 100 100"
+        class="size-24 shrink-0 text-accent"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="50" cy="50" r="46" stroke-width="2" stroke-dasharray="2 5" />
+        <circle cx="50" cy="50" r="37" fill="currentColor" fill-opacity="0.12" stroke-width="2" />
+        <circle cx="50" cy="50" r="30" stroke-width="1" />
+        {/* Birrete: tablero en rombo, base del gorro y borla. */}
+        <path d="M50 30 24 42l26 12 26-12z" stroke-width="3.5" />
+        <path d="M34 49v10c0 4 7 8 16 8s16-4 16-8V49" stroke-width="3.5" />
+        <path d="M76 42v14" stroke-width="3.5" />
+      </svg>
+    )
+  }
+  <div class={`flex min-w-0 flex-col ${featured ? "gap-[0.4rem]" : "gap-[0.35rem]"}`}>
+    <p class="font-code text-[0.82rem] text-accent">{t.experience[item.kind]}</p>
+    <h3 class={featured ? "text-[1.35rem] nav:text-[1.7rem]" : "text-[1.2rem]"}>{localize(item.title)}</h3>
+    {item.organization && <p class={`font-medium ${featured ? "text-[1.05rem]" : ""}`}>{localize(item.organization)}</p>}
+    {item.description && <p class="text-fg-muted">{localize(item.description)}</p>}
+    {item.period && <p class={`pt-2 font-code text-[0.82rem] text-fg-muted ${featured ? "mt-auto" : ""}`}>{localize(item.period)}</p>}
+  </div>
+</article>

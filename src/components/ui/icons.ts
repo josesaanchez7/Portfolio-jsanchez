@@ -1,4 +1,4 @@
-/** Iconos como datos SVG (viewBox + trazado): los de Font Awesome 5 Free (CC BY 4.0, https://fontawesome.com/license/free) y `search` y `expand`, propios. */
+/** Iconos como datos SVG (viewBox + trazado): los de Font Awesome 5 Free (CC BY 4.0, https://fontawesome.com/license/free) y `expand`, propio. */
 export interface IconData {
   viewBox: string;
   path: string;
@@ -52,10 +52,6 @@ export const ICONS = {
   expand: {
     viewBox: "0 0 24 24",
     path: "M4 9V4h5v2H6v3H4zm10-5h5v5h-2V6h-3V4zM6 15v3h3v2H4v-5h2zm12 0h2v5h-5v-2h3v-3z",
-  },
-  search: {
-    viewBox: "0 0 24 24",
-    path: "M10 2a8 8 0 1 0 4.9 14.3l4.8 4.8a1 1 0 0 0 1.4-1.4l-4.8-4.8A8 8 0 0 0 10 2zm0 2a6 6 0 1 1 0 12 6 6 0 0 1 0-12z",
   },
   sun: {
     viewBox: "0 0 512 512",

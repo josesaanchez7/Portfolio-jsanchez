@@ -33,6 +33,19 @@ describe.each(LANGUAGES)("página (%s)", (language) => {
     }
   });
 
+  it("no queda rastro de la sección Stack: ni ancla ni enlace en la navegación", async () => {
+    const { document } = await render();
+
+    expect(document.getElementById("Stack")).toBeNull();
+    expect(document.querySelector('a[href="#Stack"], [data-target="#Stack"]')).toBeNull();
+    // La navegación (escritorio y móvil) tiene una entrada por sección.
+    const nav = [...document.querySelectorAll<HTMLAnchorElement>("header a[href^='#']")].map((link) => link.getAttribute("href"));
+    for (const { id } of SECTIONS) expect(nav, id).toContain(`#${id}`);
+    expect(nav).not.toContain("#Stack");
+    // Las tecnologías, con sus logos, están ahora dentro de «Sobre mí».
+    expect(document.querySelector("#SobreMi .animate-marquee svg[role='img']")).not.toBeNull();
+  });
+
   it("todos los enlaces internos apuntan a un elemento existente (sin '#' vacíos)", async () => {
     const { document } = await render();
 
@@ -75,7 +88,8 @@ describe.each(LANGUAGES)("página (%s)", (language) => {
 
   it("cada proyecto muestra sus botones de demo y código solo si existe el enlace", async () => {
     const { getAllByRole } = await render();
-    const cards = getAllByRole("article");
+    // Experiencia y Educación también usan <article>: solo cuentan las de la sección de proyectos.
+    const cards = getAllByRole("article").filter((card) => card.closest('[data-section="Proyectos"]'));
 
     expect(cards).toHaveLength(projects.length);
     for (const [index, project] of projects.entries()) {

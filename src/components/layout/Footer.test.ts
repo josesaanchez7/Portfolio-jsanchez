@@ -53,10 +53,11 @@ describe("Footer (barra de estado)", () => {
 });
 
 describe("Footer: botones y enlaces", () => {
-  it("Debug parte desactivado (el script lo alterna)", async () => {
-    const { getByRole } = await renderComponent(Footer);
+  it("ya no hay botón de debug", async () => {
+    const { queryByRole, document } = await renderComponent(Footer);
 
-    expect(getByRole("button", { name: "Debug" })).toHaveAttribute("aria-pressed", "false");
+    expect(queryByRole("button", { name: /debug/i })).toBeNull();
+    expect(document.querySelector("[data-debug-toggle]")).toBeNull();
   });
 
   it("404 es un enlace a una ruta que no existe, dentro del idioma de la página", async () => {
@@ -75,7 +76,7 @@ describe("Footer: botones y enlaces", () => {
 
   it("el botón de la consola está activo y el script lo reconoce", async () => {
     const { getByRole } = await renderComponent(Footer);
-    const consoleButton = getByRole("button", { name: "Abrir la consola interactiva (tecla `)" });
+    const consoleButton = getByRole("button", { name: "Abrir la consola interactiva (Ctrl K o tecla `)" });
 
     expect(consoleButton).not.toHaveAttribute("aria-disabled");
     expect(consoleButton).toHaveAttribute("data-console-open");
