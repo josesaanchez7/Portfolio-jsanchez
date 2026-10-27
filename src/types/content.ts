@@ -42,6 +42,11 @@ export interface Project {
    * La primera captura hace de póster. Ruta dentro de public/ (p. ej. "/videos/portfolio.mp4") o URL https.
    */
   video?: string;
+  /**
+   * Vista previa en forma de terminal (en vez de capturas): para proyectos cuyo resultado es una salida de consola,
+   * como una batería de pruebas. Se usa solo si no hay `images`, `image` ni `video`.
+   */
+  terminal?: { title: string; lines: { text: string; tone?: "cmd" | "ok" | "dim" }[] };
   /** Tarjeta destacada del bento (más ancha y en horizontal). Por defecto lo es la primera. */
   featured?: boolean;
   /** Repositorio. Si falta, el botón no se muestra. */

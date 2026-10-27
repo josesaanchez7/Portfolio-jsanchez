@@ -1,4 +1,5 @@
 import type { Project } from "../types/content";
+import testCount from "./testCount.generated.json";
 
 export const projects: Project[] = [
   {
@@ -53,15 +54,15 @@ export const projects: Project[] = [
       {
         src: "/img/projects/portfolio-inicio.webp",
         alt: {
-          es: "Inicio de la web en tema oscuro: barra de navegación flotante, el título «Creo soluciones eficientes y experiencias digitales modernas» y la foto de perfil.",
-          en: "Home of the website in dark theme: floating navigation bar, the headline “I build efficient solutions and modern digital experiences” and the profile photo.",
+          es: "Inicio de la web en tema oscuro: barra de navegación flotante, el título «Desarrollo software con mentalidad de QA», la foto de perfil y los botones «Ver proyectos» y «Descargar CV».",
+          en: "Home of the website in dark theme: floating navigation bar, the headline “I build software with a QA mindset”, the profile photo and the “View projects” and “Download CV” buttons.",
         },
       },
       {
         src: "/img/projects/portfolio-claro.webp",
         alt: {
-          es: "Sección Stack en tema claro: dos filas de tecnologías en movimiento y tarjetas por categoría.",
-          en: "Tech stack section in light theme: two moving rows of technologies and a card for each category.",
+          es: "Inicio de la web en tema claro, con el mismo titular, la foto de perfil y los botones de acción.",
+          en: "Home of the website in light theme, with the same headline, the profile photo and the action buttons.",
         },
       },
       {
@@ -81,5 +82,27 @@ export const projects: Project[] = [
     ],
     code: "https://github.com/josesaanchez7/Portfolio-jsanchez",
     demo: "https://jose-sanchez.vercel.app",
+  },
+  {
+    id: "portfolio-qa",
+    title: { es: "Pruebas automatizadas del portfolio", en: "Portfolio test suite" },
+    description: {
+      es: `${testCount.total} tests de Vitest con Testing Library y jsdom: componentes, textos en español e inglés, consola y secuencia de carga. Cada compilación los ejecuta y se detiene si alguno falla.`,
+      en: `${testCount.total} Vitest tests with Testing Library and jsdom: components, Spanish and English copy, console and loading sequence. Every build runs them and stops if any fails.`,
+    },
+    tags: ["Vitest", "Testing Library", "jsdom", "ESLint", "TypeScript"],
+    status: "in-progress",
+    featured: true,
+    terminal: {
+      title: "pnpm build",
+      lines: [
+        { text: "$ pnpm test:count", tone: "cmd" },
+        { text: `✓ ${testCount.files} test files passed`, tone: "ok" },
+        { text: `✓ ${testCount.total} tests passed`, tone: "ok" },
+        { text: "$ astro check", tone: "cmd" },
+        { text: "✓ 0 errors", tone: "ok" },
+      ],
+    },
+    code: "https://github.com/josesaanchez7/Portfolio-jsanchez",
   },
 ];

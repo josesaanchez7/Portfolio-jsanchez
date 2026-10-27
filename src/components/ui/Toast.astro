@@ -10,7 +10,7 @@ import Icon from "./Icon.astro";
   aria-live="polite"
   class="group pointer-events-none fixed bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-1/2 z-[3000] flex max-w-[calc(100%-2rem)] -translate-x-1/2 translate-y-2 items-center gap-2.5 rounded-full border border-border bg-surface px-4 py-2 text-[0.9rem] text-fg opacity-0 shadow-card transition-[opacity,translate] duration-200 data-visible:translate-y-0 data-visible:opacity-100"
 >
-  <Icon name="check" class="shrink-0 text-boot-ok group-data-[tone=error]:hidden" />
-  <Icon name="times" class="hidden shrink-0 text-boot-warn group-data-[tone=error]:block" />
+  <Icon name="check" class="shrink-0 text-ok group-data-[tone=error]:hidden" />
+  <Icon name="times" class="hidden shrink-0 text-warn group-data-[tone=error]:block" />
   <span data-toast-text></span>
 </div>

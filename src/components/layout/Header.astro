@@ -10,7 +10,7 @@ const { language, t, localize } = getI18n(Astro.currentLocale);
 
 // Botones circulares de la cabecera. Sin ancho ni display: cada botón añade los suyos.
 const ICON_BUTTON =
-  "h-[38px] place-items-center rounded-full bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
+  "h-11 place-items-center rounded-full bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
 
 // El selector muestra y activa el idioma al que se cambiaría.
 const otherLanguage = language === "es" ? "en" : "es";
@@ -109,7 +109,7 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
         <kbd
           data-console-kbd
           aria-hidden="true"
-          class="hidden rounded-[6px] border border-border-strong px-1.5 py-0.5 font-code text-[0.7rem] leading-none text-fg-muted lg:inline"
+          class="hidden rounded-[6px] border border-border-strong px-1.5 py-0.5 font-code text-[0.8125rem] leading-none text-fg-muted lg:inline"
           >Ctrl K</kbd
         >
       </button>
@@ -119,7 +119,7 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
         data-theme-toggle
         data-label-to-light={t.header.themeToLight}
         data-label-to-dark={t.header.themeToDark}
-        class={`inline-grid w-[38px] text-[1.1rem] ${ICON_BUTTON}`}
+        class={`inline-grid w-11 text-[1.1rem] ${ICON_BUTTON}`}
         aria-label={t.header.themeToLight}
       >
         <Icon name="moon" class="in-data-[theme=light]:hidden" />
@@ -131,7 +131,7 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
         data-language-switch={otherLanguage}
         hreflang={otherLanguage}
         lang={otherLanguage}
-        class={`inline-grid w-auto min-w-[38px] px-2 font-code text-[0.8rem] font-semibold tracking-[0.04em] ${ICON_BUTTON}`}
+        class={`inline-grid w-auto min-w-11 px-2 font-code text-[0.8rem] font-semibold tracking-[0.04em] ${ICON_BUTTON}`}
         aria-label={t.header.switchLanguage[otherLanguage]}
       >
         {LANGUAGE_CODE[otherLanguage]}
@@ -141,7 +141,7 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
         data-menu-toggle
         data-label-open={t.header.openMenu}
         data-label-close={t.header.closeMenu}
-        class={`group hidden w-[38px] text-[1.1rem] max-menu:inline-grid ${ICON_BUTTON}`}
+        class={`group hidden w-11 text-[1.1rem] max-menu:inline-grid ${ICON_BUTTON}`}
         aria-label={t.header.openMenu}
         aria-expanded="false"
         aria-controls="main-nav"

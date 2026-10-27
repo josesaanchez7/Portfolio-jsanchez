@@ -2,11 +2,11 @@ import type { Messages } from "./types.ts";
 
 export const es: Messages = {
   meta: {
-    title: "José Sánchez · Desarrollador de aplicaciones multiplataforma",
+    title: "José Sánchez · Desarrollador multiplataforma con base en QA",
     description:
-      "Portfolio de José Sánchez: graduado en Desarrollo de Aplicaciones Multiplataforma y QA Tester. Proyectos, experiencia y contacto.",
+      "Portfolio de José Sánchez: desarrollador de aplicaciones multiplataforma con base en QA. Proyectos, experiencia y contacto.",
     ogDescription:
-      "Soluciones eficientes y experiencias digitales modernas. Proyectos, experiencia y contacto.",
+      "Desarrollo software con mentalidad de QA. Proyectos, experiencia y contacto.",
   },
   skipToContent: "Saltar al contenido",
   boot: { label: "Cargando portfolio", skip: "Saltar", skipLabel: "Saltar la animación de carga" },
@@ -51,7 +51,7 @@ export const es: Messages = {
   },
   hero: {
     eyebrowRole: (job, employer) => `${job} en ${employer}`,
-    title: "Creo soluciones eficientes y <h>experiencias digitales</h> modernas.",
+    title: "Desarrollo software con <h>mentalidad de QA</h>.",
     lead: ({ role, job, employer }) =>
       `Soy ${role.toLowerCase()}. Actualmente trabajo como <b>${job}</b> en <b>${employer}</b>, asegurando la calidad y el buen funcionamiento de las aplicaciones.`,
     viewProjects: "Ver proyectos",
@@ -76,9 +76,9 @@ export const es: Messages = {
     closeImage: "Cerrar imagen ampliada",
     demo: "Demo",
     code: "Código",
-    moreTitle: "Más proyectos en camino",
+    moreTitle: "Todo mi código en GitHub",
     moreDescription:
-      "Voy añadiendo trabajo nuevo con el tiempo. Mientras tanto, puedes ver mi código en GitHub.",
+      "Repositorios, historial de cambios y el resto de mi trabajo.",
     moreButton: "Ver GitHub",
   },
   experience: {
@@ -141,7 +141,7 @@ export const es: Messages = {
   footer: {
     label: "Pie de página",
     errors: (count) => `${count} ${count === 1 ? "error" : "errores"}`,
-    testedTimes: (count) => `Probada ${count} veces`,
+    testsPassing: (count) => `${count} pruebas superadas`,
     available: "Disponible",
     notFound: "404",
     notFoundLabel: "Mostrar la página de error 404",

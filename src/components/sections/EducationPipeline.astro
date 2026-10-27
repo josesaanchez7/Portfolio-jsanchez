@@ -45,9 +45,9 @@ const panelId = (stage: EducationStage) => `edu-panel-${stage.id}`;
     </p>
     <span
       data-badge
-      class={`inline-flex items-center gap-2 rounded-full border px-3 py-[0.2rem] text-[0.8rem] transition-[opacity,scale] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-data-ready:scale-75 group-data-ready:opacity-0 group-data-ready:data-passed:scale-100 group-data-ready:data-passed:opacity-100 ${finished ? "border-boot-ok/50 bg-boot-ok/15" : "border-boot-warn/60 bg-boot-warn/15"}`}
+      class={`inline-flex items-center gap-2 rounded-full border px-3 py-[0.2rem] text-[0.8rem] transition-[opacity,scale] duration-500 ease-out group-data-ready:scale-75 group-data-ready:opacity-0 group-data-ready:data-passed:scale-100 group-data-ready:data-passed:opacity-100 ${finished ? "border-ok/50 bg-ok/15" : "border-warn/60 bg-warn/15"}`}
     >
-      <span aria-hidden="true" class={`size-2 rounded-full ${finished ? "bg-boot-ok" : "bg-boot-warn"}`}></span>
+      <span aria-hidden="true" class={`size-2 rounded-full ${finished ? "bg-ok" : "bg-warn"}`}></span>
       <span class="sr-only">{t.education.workflowStatus}: </span>
       {finished ? t.education.passing : t.education.running}
     </span>
@@ -82,14 +82,14 @@ const panelId = (stage: EducationStage) => `edu-panel-${stage.id}`;
               <span class="flex min-w-0 flex-1 flex-col gap-[0.1rem]">
                 <span class="font-heading text-[1rem] leading-tight font-bold">{name}</span>
                 {organization && <span class="text-[0.85rem] text-fg-muted">{organization}</span>}
-                <span class="font-code text-[0.75rem] text-fg-muted">{pending ? t.education.comingSoon : stageRange(stage)}</span>
+                <span class="font-code text-[0.8125rem] text-fg-muted">{pending ? t.education.comingSoon : stageRange(stage)}</span>
               </span>
               <span class="sr-only">{statusText(stage)}</span>
               {/* Indicador de estado (no depende solo del color: el texto sr-only lo dice). */}
               <span class="relative grid size-7 shrink-0 place-items-center" aria-hidden="true">
                 <span class="hidden size-6 rounded-full border-2 border-border-strong group-data-[state=pending]/job:block" />
                 <span class="hidden size-6 animate-spin rounded-full border-[3px] border-accent border-t-transparent group-data-[state=running]/job:block" />
-                <span class="hidden size-6 place-items-center rounded-full bg-boot-ok text-boot-bg group-data-[state=done]/job:grid">
+                <span class="hidden size-6 place-items-center rounded-full bg-ok text-accent-contrast group-data-[state=done]/job:grid">
                   <Icon name="check" class="size-3" />
                 </span>
               </span>
@@ -99,7 +99,7 @@ const panelId = (stage: EducationStage) => `edu-panel-${stage.id}`;
                 aria-hidden="true"
                 class="absolute top-full left-[2.25rem] h-6 w-[3px] -translate-x-1/2 overflow-hidden rounded-full bg-border nav:top-1/2 nav:left-full nav:h-[3px] nav:w-6 nav:translate-x-0 nav:-translate-y-1/2"
               >
-                <span class="absolute inset-0 origin-top scale-y-0 bg-boot-ok transition-[scale] duration-500 ease-out group-data-[state=done]/job:scale-y-100 nav:origin-left nav:scale-x-0 nav:scale-y-100 nav:group-data-[state=done]/job:scale-x-100" />
+                <span class="absolute inset-0 origin-top scale-y-0 bg-ok transition-[scale] duration-500 ease-out group-data-[state=done]/job:scale-y-100 nav:origin-left nav:scale-x-0 nav:scale-y-100 nav:group-data-[state=done]/job:scale-x-100" />
               </span>
             )}
           </li>

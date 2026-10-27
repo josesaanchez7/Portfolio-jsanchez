@@ -1,4 +1,4 @@
-// Contenido personal. Los TODO marcan información pendiente de completar.
+// Contenido personal.
 // Cada texto traducible lleva una versión en español (es) y otra en inglés (en).
 import type { LanguageSkill, Profile } from "../types/content";
 import { statusBar } from "./statusBar";
@@ -13,8 +13,6 @@ export const profile: Profile = {
   },
   currentJob: { es: "QA Tester", en: "QA Tester" },
   employer: "Torcal",
-  // TODO: confirma cuál de tus dos correos quieres mostrar
-  // (antes: "josesanchezaldana7@gmail.com" en el Hero y "josesanchezaldana02@gmail.com" en Contacto).
   email: "josesanchezaldana02@gmail.com",
   github: "https://github.com/josesaanchez7",
   linkedin: "https://www.linkedin.com/in/josesanchezaldana",

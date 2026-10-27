@@ -10,7 +10,9 @@ import Button from "../ui/Button.astro";
 import RichText, { type TagSpec } from "../ui/RichText.astro";
 
 const { t, localize } = getI18n(Astro.currentLocale);
-const mainStack = (stack[0]?.items ?? []).map(localize);
+// En el hero van primero las herramientas de pruebas y después las de desarrollo.
+const testingItems = stack.find((category) => category.label.en === "Testing and quality")?.items ?? [];
+const mainStack = [...new Set([...testingItems, ...(stack[0]?.items ?? []).slice(0, 3)].map(localize))];
 const job = localize(profile.currentJob);
 
 const TITLE_TAGS: Record<string, TagSpec> = { h: { as: "span", class: "text-accent" } };
@@ -45,9 +47,11 @@ const TITLE_TAGS: Record<string, TagSpec> = { h: { as: "span", class: "text-acce
         />
       </p>
 
-      <div class="mt-2 flex flex-wrap gap-3">
+      <div class="mt-2 flex w-full flex-col gap-3 mini:w-auto mini:flex-row mini:flex-wrap">
         <Button href="#Proyectos" icon="arrowRight">{t.hero.viewProjects}</Button>
-        <Button href="#Contacto" variant="secondary">{t.hero.contact}</Button>
+        <Button href={cvUrl} download="Jose_Sanchez_CV.pdf" variant="secondary" icon="download">
+          {t.hero.downloadCv}
+        </Button>
       </div>
 
       <ul class="-ml-2 flex flex-wrap gap-x-4 gap-y-1" aria-label={t.hero.profileLinksLabel}>
@@ -58,15 +62,13 @@ const TITLE_TAGS: Record<string, TagSpec> = { h: { as: "span", class: "text-acce
           <Button href={profile.linkedin} external variant="ghost" icon="linkedin">LinkedIn</Button>
         </li>
         <li>
-          <Button href={cvUrl} download="Jose_Sanchez_CV.pdf" variant="ghost" icon="download">
-            {t.hero.downloadCv}
-          </Button>
+          <Button href="#Contacto" variant="ghost" icon="envelope">{t.hero.contact}</Button>
         </li>
       </ul>
 
       {
         mainStack.length > 0 && (
-          <p class="border-t border-border pt-5 font-code text-[0.82rem] text-fg-muted">
+          <p class="border-t border-border pt-5 font-code text-[0.82rem] text-pretty text-fg-muted">
             <span class="mr-2 text-accent">{t.hero.stackLabel}</span>{" "}{mainStack.join(" · ")}
           </p>
         )

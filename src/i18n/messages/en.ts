@@ -2,11 +2,11 @@ import type { Messages } from "./types.ts";
 
 export const en: Messages = {
   meta: {
-    title: "José Sánchez · Multiplatform application developer",
+    title: "José Sánchez · Multiplatform developer with a QA background",
     description:
-      "Portfolio of José Sánchez: Multiplatform Application Development graduate and QA Tester. Projects, experience and contact.",
+      "Portfolio of José Sánchez: multiplatform application developer with a QA background. Projects, experience and contact.",
     ogDescription:
-      "Efficient solutions and modern digital experiences. Projects, experience and contact.",
+      "I build software with a QA mindset. Projects, experience and contact.",
   },
   skipToContent: "Skip to content",
   boot: { label: "Loading portfolio", skip: "Skip", skipLabel: "Skip the loading animation" },
@@ -51,7 +51,7 @@ export const en: Messages = {
   },
   hero: {
     eyebrowRole: (job, employer) => `${job} at ${employer}`,
-    title: "I build efficient solutions and modern <h>digital experiences</h>.",
+    title: "I build software with a <h>QA mindset</h>.",
     lead: ({ role, job, employer }) =>
       `I'm a ${role}. I currently work as a <b>${job}</b> at <b>${employer}</b>, making sure applications are reliable and work as intended.`,
     viewProjects: "View projects",
@@ -76,9 +76,9 @@ export const en: Messages = {
     closeImage: "Close enlarged image",
     demo: "Demo",
     code: "Code",
-    moreTitle: "More projects on the way",
+    moreTitle: "All my code on GitHub",
     moreDescription:
-      "I keep adding new work over time. In the meantime, you can browse my code on GitHub.",
+      "Repositories, change history and the rest of my work.",
     moreButton: "View GitHub",
   },
   experience: {
@@ -141,7 +141,7 @@ export const en: Messages = {
   footer: {
     label: "Page footer",
     errors: (count) => `${count} ${count === 1 ? "error" : "errors"}`,
-    testedTimes: (count) => `Tested ${count} times`,
+    testsPassing: (count) => `${count} tests passing`,
     available: "Available",
     notFound: "404",
     notFoundLabel: "Show the 404 error page",

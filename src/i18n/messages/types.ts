@@ -166,7 +166,7 @@ export interface Messages {
   footer: {
     label: string;
     errors: (count: number) => string;
-    testedTimes: (count: string) => string;
+    testsPassing: (count: string) => string;
     available: string;
     notFound: string;
     notFoundLabel: string;

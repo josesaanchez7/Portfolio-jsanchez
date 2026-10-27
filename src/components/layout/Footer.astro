@@ -51,7 +51,7 @@ const SECONDARY = "max-sm:hidden";
       <li class={SECONDARY}>
         <span class={ITEM}>
           <span aria-hidden="true">▶</span>
-          {t.footer.testedTimes(formatInteger(statusBar.testRuns, language))}
+          {t.footer.testsPassing(formatInteger(statusBar.testsPassing, language))}
         </span>
       </li>
       <li class={SECONDARY}>

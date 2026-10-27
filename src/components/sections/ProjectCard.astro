@@ -23,8 +23,26 @@ const title = localize(project.title);
   data-spotlight
   data-project-card
 >
-  <div class="relative aspect-[16/10] border-b border-border bg-page">
-    <ProjectCarousel project={project} title={title} />
+  <div class={`relative border-b border-border bg-page ${project.terminal && !project.images?.length && !project.image && !project.video ? "aspect-[16/8]" : "aspect-[16/10]"}`}>
+    {
+      project.terminal && !project.images?.length && !project.image && !project.video ? (
+        <div class="absolute inset-0 flex flex-col bg-boot-bg font-boot text-boot-text">
+          <div class="flex items-center gap-2 border-b border-white/10 px-4 py-2.5 text-[0.8125rem] text-boot-dim">
+            <span class="size-2.5 rounded-full bg-boot-dot" aria-hidden="true" />
+            <span class="size-2.5 rounded-full bg-boot-dot" aria-hidden="true" />
+            <span class="size-2.5 rounded-full bg-boot-dot" aria-hidden="true" />
+            <span class="ml-2">{project.terminal.title}</span>
+          </div>
+          <pre class="m-0 flex flex-1 flex-col justify-center overflow-hidden px-5 py-4 text-[0.875rem] leading-[1.9] sm:px-7 sm:text-[1.05rem]" role="img" aria-label={project.terminal.lines.map((line) => line.text).join(". ")}>
+            {project.terminal.lines.map((line) => (
+              <span class={`block ${line.tone === "ok" ? "text-boot-ok" : line.tone === "dim" ? "text-boot-dim" : "text-boot-prompt"}`} aria-hidden="true">{line.text}</span>
+            ))}
+          </pre>
+        </div>
+      ) : (
+        <ProjectCarousel project={project} title={title} />
+      )
+    }
   </div>
 
   <div class={`flex flex-1 flex-col gap-4 p-6 ${featured ? "lg:p-8" : ""}`}>
@@ -34,7 +52,7 @@ const title = localize(project.title);
     <ul class="flex flex-wrap gap-2" aria-label={t.projects.techLabel}>
       {
         project.tags.map((tag) => (
-          <li class="rounded-full bg-accent-soft px-[0.65rem] py-[0.2rem] font-code text-[0.78rem] text-accent">
+          <li class="rounded-full bg-accent-soft px-[0.65rem] py-[0.2rem] font-code text-[0.8125rem] text-accent">
             {tag}
           </li>
         ))

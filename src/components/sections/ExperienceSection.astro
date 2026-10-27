@@ -51,8 +51,8 @@ const AXIS_X = "left-[calc(var(--rail)/2)] nav:left-[calc(var(--date)+var(--rail
     <Timeline>
       <li class={`relative mb-6 grid h-[1.8rem] items-center ${COLUMNS}`}>
         <span class={`absolute top-[0.525rem] z-[1] size-3 -translate-x-1/2 ${AXIS_X}`} aria-hidden="true">
-          <span class="absolute inline-flex size-full animate-ping rounded-full bg-boot-ok opacity-60" />
-          <span class="relative inline-flex size-3 rounded-full bg-boot-ok shadow-[0_0_0_4px_var(--bg)]" />
+          <span class="absolute inline-flex size-full animate-ping rounded-full bg-ok opacity-60" />
+          <span class="relative inline-flex size-3 rounded-full bg-ok shadow-[0_0_0_4px_var(--bg)]" />
         </span>
         <span class="col-start-2 pl-4 font-code text-[0.82rem] font-medium nav:col-start-3 nav:pl-6">{t.experience.today}</span>
       </li>
@@ -70,7 +70,7 @@ const AXIS_X = "left-[calc(var(--rail)/2)] nav:left-[calc(var(--date)+var(--rail
                     class={`pointer-events-none absolute inset-y-0 z-[1] w-[7px] -translate-x-1/2 [background:repeating-linear-gradient(to_bottom,transparent_0_5px,var(--bg)_5px_11px)] ${AXIS_X}`}
                   />
                   {gap.months > 0 && (
-                    <span class="relative z-[1] col-start-2 ml-2 w-max justify-self-start rounded-full border border-dashed border-border-strong bg-page px-3 py-1 font-code text-[0.75rem] text-fg-muted nav:ml-0 nav:justify-self-center">
+                    <span class="relative z-[1] col-start-2 ml-2 w-max justify-self-start rounded-full border border-dashed border-border-strong bg-page px-3 py-1 font-code text-[0.8125rem] text-fg-muted nav:ml-0 nav:justify-self-center">
                       {t.experience.gap(formatTenure(gap.months, language))}
                     </span>
                   )}
@@ -86,7 +86,7 @@ const AXIS_X = "left-[calc(var(--rail)/2)] nav:left-[calc(var(--date)+var(--rail
                         <li class={`relative z-[1] -my-4 grid ${COLUMNS}`}>
                           <span
                             data-promotion
-                            class="col-start-2 ml-2 inline-flex w-max items-center gap-[0.35rem] justify-self-start rounded-full border border-border-strong bg-page px-3 py-1 font-code text-[0.75rem] text-fg-muted nav:ml-0 nav:justify-self-center"
+                            class="col-start-2 ml-2 inline-flex w-max items-center gap-[0.35rem] justify-self-start rounded-full border border-border-strong bg-page px-3 py-1 font-code text-[0.8125rem] text-fg-muted nav:ml-0 nav:justify-self-center"
                           >
                             <span aria-hidden="true">↑</span>
                             {t.experience.promotion}

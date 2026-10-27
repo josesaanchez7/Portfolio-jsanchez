@@ -20,7 +20,7 @@ const REVEAL =
 // Escalonado: --i multiplica el retardo de cada criterio, chip y subtarea.
 const STAGGER = "[transition-delay:calc(var(--i)*90ms+250ms)]";
 const CHIP =
-  "rounded-full bg-accent-soft px-[0.65rem] py-[0.2rem] font-code text-[0.78rem] text-accent";
+  "rounded-full bg-accent-soft px-[0.65rem] py-[0.2rem] font-code text-[0.8125rem] text-accent";
 ---
 
 {/* Un puesto: tarjeta tipo ticket de JIRA (ID, estado, criterios de aceptación y subtareas) con su fecha a la izquierda del eje. */}
@@ -48,8 +48,8 @@ const CHIP =
       {
         ongoing && (
           <span class="relative flex size-2.5" aria-hidden="true">
-            <span class="absolute inline-flex size-full animate-ping rounded-full bg-boot-ok opacity-60" />
-            <span class="relative inline-flex size-2.5 rounded-full bg-boot-ok" />
+            <span class="absolute inline-flex size-full animate-ping rounded-full bg-ok opacity-60" />
+            <span class="relative inline-flex size-2.5 rounded-full bg-ok" />
           </span>
         )
       }
@@ -62,10 +62,10 @@ const CHIP =
     data-reveal
     class={`col-start-2 row-start-2 flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-surface p-4 nav:col-start-3 nav:p-5 nav:row-start-1 nav:ml-6 ml-4 group-data-ready:translate-x-8 ${REVEAL}`}
   >
-    <header class="flex flex-wrap items-center justify-between gap-2 font-code text-[0.78rem]">
+    <header class="flex flex-wrap items-center justify-between gap-2 font-code text-[0.8125rem]">
       {item.ticket && <span class="font-medium text-accent">{item.ticket}</span>}
       <span
-        class={`inline-flex items-center gap-[0.4rem] rounded-full border px-[0.65rem] py-[0.15rem] ${ongoing ? "border-accent bg-accent-soft text-accent" : "border-boot-ok/50 bg-boot-ok/15 text-fg"}`}
+        class={`inline-flex items-center gap-[0.4rem] rounded-full border px-[0.65rem] py-[0.15rem] ${ongoing ? "border-accent bg-accent-soft text-accent" : "border-ok/50 bg-ok/15 text-fg"}`}
       >
         <Icon name={ongoing ? "arrowRight" : "check"} class="size-[0.7rem]" />
         {ongoing ? t.experience.statusInProgress : t.experience.statusDone}
@@ -77,7 +77,7 @@ const CHIP =
     {
       item.highlights && item.highlights.length > 0 && (
         <div class="flex flex-col gap-2">
-          <p class="font-code text-[0.75rem] tracking-wide text-fg-muted uppercase">
+          <p class="font-code text-[0.8125rem] tracking-wide text-fg-muted uppercase">
             {t.experience.acceptanceCriteria}
           </p>
           <ul class="flex flex-col gap-[0.45rem]">
@@ -87,7 +87,7 @@ const CHIP =
                 style={`--i:${i}`}
                 class={`flex gap-[0.6rem] text-fg-muted group-data-ready:translate-y-2 ${REVEAL} ${STAGGER}`}
               >
-                <Icon name="check" class="mt-[0.35rem] size-[0.8rem] shrink-0 text-boot-ok" />
+                <Icon name="check" class="mt-[0.35rem] size-[0.8rem] shrink-0 text-ok" />
                 <span>{localize(highlight)}</span>
               </li>
             ))}
@@ -118,7 +118,7 @@ const CHIP =
           class={`relative ml-3 pl-6 group-data-ready:translate-y-2 before:absolute before:-top-5 before:left-0 before:h-[calc(1.25rem+1.1rem)] before:w-4 before:rounded-bl-lg before:border-b-2 before:border-l-2 before:border-border-strong before:content-[''] ${REVEAL} ${STAGGER}`}
         >
           <div class="flex flex-col gap-2 rounded-md border border-border bg-page p-3">
-            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-code text-[0.78rem]">
+            <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 font-code text-[0.8125rem]">
               <span class="font-medium text-accent">{subtask.ticket}</span>
               <span class="flex flex-wrap gap-x-3 text-fg-muted">
                 <span class="whitespace-nowrap">{localize(subtask.period)}</span>

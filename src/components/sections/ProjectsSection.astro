@@ -6,6 +6,7 @@ import { moreTileSpan } from "../../lib/bento";
 import { SPOTLIGHT } from "../../lib/spotlight";
 import Section from "../layout/Section.astro";
 import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
 import ProjectCard from "./ProjectCard.astro";
 
 const { t } = getI18n(Astro.currentLocale);
@@ -37,6 +38,7 @@ const moreLayout = span === 2 ? "" : "lg:flex-row lg:items-center lg:justify-bet
       class={`flex flex-col items-start justify-center gap-4 rounded-lg border border-dashed border-border-strong p-6 ${moreSpan} ${moreLayout} ${SPOTLIGHT}`}
       data-spotlight
     >
+      <Icon name="github" class="size-9 text-fg-muted" />
       <div class="flex flex-col gap-4">
         <h3 class="text-[1.2rem]">{t.projects.moreTitle}</h3>
         <p class="text-fg-muted">{t.projects.moreDescription}</p>

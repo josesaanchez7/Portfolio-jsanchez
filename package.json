@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build",
+    "build": "pnpm test:count && astro check && astro build",
+    "test:count": "node scripts/write-test-count.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "lint": "eslint .",

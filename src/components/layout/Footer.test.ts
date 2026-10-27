@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { statusBar } from "../../data/statusBar";
 import { renderComponent } from "../../test/render";
 import Footer from "./Footer.astro";
 
@@ -29,7 +30,7 @@ describe("Footer (barra de estado)", () => {
 
     expect(footer).toHaveTextContent("main");
     expect(footer).toHaveTextContent("0 errores");
-    expect(footer).toHaveTextContent("Probada 1.284 veces");
+    expect(footer).toHaveTextContent(`${statusBar.testsPassing.toLocaleString("es-ES")} pruebas superadas`);
     expect(footer).toHaveTextContent("España");
     expect(footer).toHaveTextContent("Disponible");
   });
@@ -39,7 +40,7 @@ describe("Footer (barra de estado)", () => {
     const footer = getByRole("contentinfo", { name: "Page footer" });
 
     expect(footer).toHaveTextContent("0 errors");
-    expect(footer).toHaveTextContent("Tested 1,284 times");
+    expect(footer).toHaveTextContent(`${statusBar.testsPassing.toLocaleString("en-US")} tests passing`);
     expect(footer).toHaveTextContent("Spain");
     expect(footer).toHaveTextContent("Available");
   });

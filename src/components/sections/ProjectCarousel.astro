@@ -22,7 +22,7 @@ const slides = gallery.map((image) => ({
 
 // Botones flotantes sobre la imagen: sobre fondo oscuro translúcido para que se lean con cualquier captura.
 const ARROW =
-  "absolute top-1/2 z-10 grid size-9 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-black/55 text-[0.95rem] text-white opacity-0 backdrop-blur-sm transition-[opacity,background-color] duration-200 group-hover/carousel:opacity-100 group-focus-within/carousel:opacity-100 hover:bg-black/75 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white [@media(hover:none)]:opacity-100";
+  "absolute top-1/2 z-10 grid size-9 -translate-y-1/2 after:absolute after:-inset-1 after:content-[''] cursor-pointer place-items-center rounded-full bg-black/55 text-[0.95rem] text-white opacity-0 backdrop-blur-sm transition-[opacity,background-color] duration-200 group-hover/carousel:opacity-100 group-focus-within/carousel:opacity-100 hover:bg-black/75 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white [@media(hover:none)]:opacity-100";
 ---
 
 {

@@ -26,6 +26,8 @@
   --color-accent-soft: var(--accent-soft);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
   --font-sans: var(--font-body);
   --font-heading: var(--font-display);
   --font-code: var(--font-mono);
@@ -123,6 +125,8 @@
   --accent-soft: rgba(140, 165, 255, 0.12);
   --border: #343c52;
   --border-strong: #5f6a87;
+  --ok: #5bd49a;
+  --warn: #f2c14e;
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 
   --font-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -146,6 +150,8 @@
   --accent-soft: rgba(53, 80, 214, 0.1);
   --border: #dce0ea;
   --border-strong: #7d869c;
+  --ok: #15803d; /* ≥ 4,5:1 sobre blanco y sobre --bg */
+  --warn: #a16207;
   --shadow: 0 10px 30px rgba(21, 25, 35, 0.08);
 }
 

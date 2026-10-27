@@ -19,15 +19,19 @@ const base: Project = {
 const renderCard = (project: Project, featured = false) =>
   renderComponent(ProjectCard, { props: { project, featured } });
 
+/** Por defecto solo es destacado el primero; `featured` lo cambia proyecto a proyecto. */
+const isFeatured = (project: Project, index: number) => project.featured ?? index === 0;
+
 describe("ProjectsSection (bento)", () => {
-  it("el proyecto destacado ocupa 4 columnas, los demás 2, y «más proyectos» rellena el hueco", async () => {
+  it("los destacados ocupan 4 columnas, los demás 2, y «más proyectos» rellena el hueco", async () => {
     const { document } = await renderComponent(ProjectsSection);
 
     const cells = [...document.querySelectorAll("[data-project-card]")].map((card) => card.parentElement?.className);
     expect(cells).toHaveLength(projects.length);
-    expect(cells[0]).toContain("lg:col-span-4");
-    for (const cell of cells.slice(1)) expect(cell).toContain("lg:col-span-2");
-    const span = moreTileSpan(projects.map((project, index) => project.featured ?? index === 0));
+    projects.forEach((project, index) => {
+      expect(cells[index]).toContain(isFeatured(project, index) ? "lg:col-span-4" : "lg:col-span-2");
+    });
+    const span = moreTileSpan(projects.map(isFeatured));
     expect(document.querySelector("aside")?.className).toContain(`lg:col-span-${span}`);
   });
 
@@ -35,8 +39,11 @@ describe("ProjectsSection (bento)", () => {
     const { document } = await renderComponent(ProjectsSection);
 
     const titles = [...document.querySelectorAll("[data-project-card] h3")];
-    expect(titles[0]?.className).toContain("lg:text-[1.7rem]");
-    for (const title of titles.slice(1)) expect(title.className).not.toContain("lg:text-[1.7rem]");
+    projects.forEach((project, index) => {
+      const className = titles[index]?.className ?? "";
+      if (isFeatured(project, index)) expect(className).toContain("lg:text-[1.7rem]");
+      else expect(className).not.toContain("lg:text-[1.7rem]");
+    });
     const image = document.querySelector("[data-project-card] img");
     expect(image).toHaveAttribute("src", galleryOf(projects[0] as Project)[0]?.src);
     expect(image).toHaveAttribute("alt", expect.stringContaining("IPTVFlix"));
@@ -56,6 +63,16 @@ describe("ProjectCard", () => {
 
     expect(featured.document.querySelector("h3")?.className).toContain("lg:text-[1.7rem]");
     expect(normal.document.querySelector("h3")?.className).not.toContain("lg:text-[1.7rem]");
+  });
+
+  it("un proyecto con vista previa de terminal la dibuja (sin carrusel) y la describe a los lectores de pantalla", async () => {
+    const terminal = { title: "pnpm test", lines: [{ text: "$ pnpm test", tone: "cmd" as const }, { text: "✓ 3 tests passed", tone: "ok" as const }] };
+    const { document } = await renderCard({ ...base, terminal });
+
+    expect(document.querySelector("pre")).toHaveTextContent("✓ 3 tests passed");
+    expect(document.querySelector("pre")).toHaveAttribute("aria-label", "$ pnpm test. ✓ 3 tests passed");
+    expect(document.querySelector("[data-carousel]")).toBeNull();
+    expect(document.querySelector("img")).toBeNull();
   });
 
   it("sin vídeo no hay elemento <video>; con vídeo es decorativo, mudo y no carga hasta usarse", async () => {
