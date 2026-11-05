@@ -1,15 +1,18 @@
 ---
 import { getSection, type SectionId } from "../../data/sections";
 import { getI18n } from "../../i18n";
+import Icon from "../ui/Icon.astro";
 
 interface Props {
   id: SectionId;
 }
 
 const { id } = Astro.props;
-const { localize } = getI18n(Astro.currentLocale);
+const { t, localize } = getI18n(Astro.currentLocale);
 const { title, number } = getSection(id);
 const headingId = `${id}-title`;
+// El título se parte en palabras para que cada una suba por su propia máscara, una tras otra.
+const words = localize(title).split(" ");
 ---
 
 {/* Sección con encabezado numerado. Título y número salen de `data/sections.ts`. */}
@@ -20,13 +23,38 @@ const headingId = `${id}-title`;
   class={`w-full scroll-mt-(--header-height) border-t border-border px-6 py-24 max-tablet:px-5 max-tablet:py-16`}
 >
   <div class="mx-auto flex w-full max-w-site flex-col gap-10 max-tablet:gap-8">
-    <header class="flex items-baseline gap-4">
-      <span class="font-code text-[0.9rem] text-accent" aria-hidden="true">
+    {/*
+      Título, un filete que cruza la página y, al final, el estado de la sección como el de un test: al verla pasa de
+      «ejecutando» a «superado» (ver .status-pill en global.css). Sin JavaScript o con «reducir movimiento» solo se ve
+      «superado». El número va después, como la paginación de un informe.
+    */}
+    <header data-reveal-head class="flex items-center gap-5 max-tablet:gap-4">
+      <h2 id={headingId} class="text-[clamp(2rem,4.8vw,3.1rem)]">
+        {
+          words.map((word, index) => (
+            <>
+              <span class="inline-block overflow-hidden pb-[0.18em] align-bottom -mb-[0.18em]">
+                <span class="head-word inline-block" style={`--w:${index}`}>{word}</span>
+              </span>
+              {index < words.length - 1 && " "}
+            </>
+          ))
+        }
+      </h2>
+      <span class="rule-draw h-px min-w-6 flex-1 bg-[linear-gradient(90deg,var(--grad-a),var(--border)_60%)]" aria-hidden="true"></span>
+      <span class="status-pill font-code text-[0.75rem]" aria-hidden="true">
+        <span class="st-run inline-flex items-center gap-1.5 text-fg-muted">
+          <span class="size-1.5 animate-pulse rounded-full bg-accent"></span>
+          <span class="max-tight:hidden">{t.sectionStatus.running}</span>
+        </span>
+        <span class="st-pass inline-flex items-center gap-1.5 text-ok">
+          <Icon name="check" />
+          <span class="max-tight:hidden">{t.sectionStatus.passed}</span>
+        </span>
+      </span>
+      <span class="font-code text-[0.85rem] text-accent tabular-nums" aria-hidden="true">
         {number}
       </span>
-      <h2 id={headingId} class="text-[clamp(1.75rem,4vw,2.5rem)]">
-        {localize(title)}
-      </h2>
     </header>
     <slot />
   </div>

@@ -9,6 +9,8 @@ export const en: Messages = {
       "I build software with a QA mindset. Projects, experience and contact.",
   },
   skipToContent: "Skip to content",
+  sectionStatus: { running: "running", passed: "passed" },
+  rail: { home: "Home" },
   boot: { label: "Loading portfolio", skip: "Skip", skipLabel: "Skip the loading animation" },
   console: {
     title: "Console",
@@ -147,6 +149,7 @@ export const en: Messages = {
     notFoundLabel: "Show the 404 error page",
     console: "Console",
     consoleLabel: "Open the interactive console (Ctrl K or the ` key)",
+    backToTop: "Back to top",
   },
   notFound: {
     title: "404 · Page not found",

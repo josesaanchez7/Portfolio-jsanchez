@@ -127,7 +127,6 @@ describe.each(LANGUAGES)("Sobre mí (%s)", (language) => {
       const card = wrapper.querySelector("article");
       expect(card).toHaveAttribute("data-spotlight");
       expect(card?.className).toContain("hover:-translate-y-[3px]");
-      expect(card?.className).toContain("motion-reduce:before:hidden");
       expect(card?.className).toContain("motion-reduce:after:hidden");
     }
     // Sin JavaScript no se prepara nada: todo se ve.

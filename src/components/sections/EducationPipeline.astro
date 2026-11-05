@@ -74,7 +74,7 @@ const panelId = (stage: EducationStage) => `edu-panel-${stage.id}`;
               data-target={stage.id}
               aria-expanded={stage.id === initial?.id ? "true" : "false"}
               aria-controls={panelId(stage)}
-              class={`flex h-full min-h-[7.5rem] w-full cursor-pointer items-center gap-3 rounded-lg border bg-surface p-4 text-left ${pending ? "border-dashed border-border-strong" : "border-border"} transition-[border-color,background-color,box-shadow,translate] duration-200 ease-[ease] hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_0_0_1px_var(--accent),0_10px_24px_-12px_var(--accent)] focus-visible:-translate-y-0.5 focus-visible:border-accent focus-visible:shadow-[0_0_0_1px_var(--accent),0_10px_24px_-12px_var(--accent)] aria-expanded:border-accent aria-expanded:bg-accent-soft`}
+              class={`flex h-full min-h-[7.5rem] w-full cursor-pointer items-center gap-3 rounded-lg border panel p-4 text-left ${pending ? "border-dashed" : ""} transition-[border-color,background-color,box-shadow,translate] duration-200 ease-[ease] hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_0_0_1px_var(--accent),0_10px_24px_-12px_var(--accent)] focus-visible:-translate-y-0.5 focus-visible:border-accent focus-visible:shadow-[0_0_0_1px_var(--accent),0_10px_24px_-12px_var(--accent)] aria-expanded:border-accent aria-expanded:bg-accent-soft`}
             >
               <span class="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-[1.35rem] text-accent" aria-hidden="true">
                 <EducationIcon name={stage.kind === "certification" ? "certificate" : "cap"} />
@@ -116,7 +116,7 @@ const panelId = (stage: EducationStage) => `edu-panel-${stage.id}`;
         const url = stage.credential?.url;
         return (
           <div id={panelId(stage)} role="region" aria-labelledby={buttonId(stage)} data-panel={stage.id}>
-            <div class="flex flex-col gap-2.5 rounded-lg border border-border bg-surface px-5 py-4">
+            <div class="flex flex-col gap-2.5 rounded-lg border panel px-5 py-4">
               <h3 class="text-[1.15rem]">{title}</h3>
               {/* Centro y fechas en una sola línea (en dos si no caben). */}
               <dl class="flex flex-wrap gap-x-6 gap-y-1 text-[0.95rem]">

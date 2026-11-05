@@ -9,6 +9,8 @@ export const es: Messages = {
       "Desarrollo software con mentalidad de QA. Proyectos, experiencia y contacto.",
   },
   skipToContent: "Saltar al contenido",
+  sectionStatus: { running: "ejecutando", passed: "superado" },
+  rail: { home: "Inicio" },
   boot: { label: "Cargando portfolio", skip: "Saltar", skipLabel: "Saltar la animación de carga" },
   console: {
     title: "Consola",
@@ -147,6 +149,7 @@ export const es: Messages = {
     notFoundLabel: "Mostrar la página de error 404",
     console: "Consola",
     consoleLabel: "Abrir la consola interactiva (Ctrl K o tecla `)",
+    backToTop: "Volver arriba",
   },
   notFound: {
     title: "404 · Página no encontrada",

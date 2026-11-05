@@ -2,7 +2,7 @@
 import "../styles/global.css";
 import geistMonoFont from "@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url";
 import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
-import spaceGroteskFont from "@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url";
+import soraFont from "@fontsource-variable/sora/files/sora-latin-wght-normal.woff2?url";
 import jetbrainsMonoFont from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2?url";
 import { getI18n } from "../i18n";
 import { DEFAULT_LANGUAGE, LANGUAGES } from "../lib/language";
@@ -41,7 +41,7 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
     <meta name="description" content={meta.description} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="author" content="José Sánchez" />
-    <meta name="theme-color" content="#151923" />
+    <meta name="theme-color" content="#03050b" />
     {
       seoTags.map(({ tag: Tag, attributes }) => <Tag {...attributes} />)
     }
@@ -49,7 +49,7 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
     {/* Precarga de las fuentes del primer pantallazo (subconjunto latino; Geist Mono es la de la pantalla de carga): evita esperar al CSS para descubrirlas. */}
     <link rel="preload" as="font" type="font/woff2" crossorigin href={geistMonoFont} />
     <link rel="preload" as="font" type="font/woff2" crossorigin href={interFont} />
-    <link rel="preload" as="font" type="font/woff2" crossorigin href={spaceGroteskFont} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={soraFont} />
     <link rel="preload" as="font" type="font/woff2" crossorigin href={jetbrainsMonoFont} />
     <script is:inline define:vars={{ home, language, defaultLanguage: DEFAULT_LANGUAGE, languagePaths }}>
       // Se ejecuta antes del primer pintado para evitar parpadeos. Duplica a propósito parte de
@@ -93,6 +93,15 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
         }
       }
 
+      // Entradas al hacer scroll ([data-reveal-in], ver global.css): solo con JavaScript y sin "reducir movimiento".
+      // Si el script que las activa no llegara a cargar, a los 4 s se desactivan para no dejar contenido oculto.
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        root.dataset.reveal = "";
+        setTimeout(function () {
+          if (!window.__revealReady) delete root.dataset.reveal;
+        }, 4000);
+      }
+
       // Pantalla de carga (solo en la home): se activa con data-boot, salvo con "reducir movimiento" y una
       // vez por sesión (por pestaña): al verla se guarda "boot-seen" en sessionStorage. Si la página va a
       // redirigir al otro idioma no se marca: la animación se verá en la página de destino.
@@ -109,6 +118,19 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
     </script>
   </head>
   <body class="bg-page font-sans text-base leading-[1.65] text-fg antialiased overflow-x-clip">
+    {/* Capa ambiental fija: da algo que desenfocar al vidrio de las tarjetas (ver global.css). */}
+    <div class="ambient" aria-hidden="true">
+      <span class="ambient-orb" data-orb="a"></span>
+      <span class="ambient-orb" data-orb="b"></span>
+      <span class="ambient-orb" data-orb="c"></span>
+      <span class="ambient-grid"></span>
+    </div>
+    <div class="cursor-glow" aria-hidden="true" data-cursor-glow></div>
     <slot />
+    <script>
+      import { initAmbient } from "../scripts/ambient";
+
+      initAmbient();
+    </script>
   </body>
 </html>

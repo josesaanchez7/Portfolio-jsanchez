@@ -78,7 +78,7 @@ const AXIS_X = "left-[calc(var(--rail)/2)] nav:left-[calc(var(--date)+var(--rail
               )}
               <li data-company={name}>
                 <CareerPath items={roles} />
-                <ol class="relative flex flex-col gap-10 before:absolute before:-inset-y-4 before:right-0 before:left-[var(--rail)] before:rounded-r-lg before:bg-linear-to-r before:from-accent/[0.07] before:to-transparent before:content-[''] nav:before:left-[calc(var(--date)+var(--rail))]">
+                <ol class="relative flex flex-col gap-10">
                   {roles.map((item, roleIndex) => (
                     <>
                       <ExperienceEntry item={item} />

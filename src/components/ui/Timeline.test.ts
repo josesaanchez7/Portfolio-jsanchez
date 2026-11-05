@@ -104,11 +104,11 @@ describe("Timeline: eje único", () => {
     expect(document.querySelector("[data-year]")).toBeNull();
   });
 
-  it("agrupa los puestos de una empresa solo con un fondo suave, sin bordes", async () => {
+  it("agrupa los puestos de una empresa sin bordes ni fondo propio (el vidrio de cada tarjeta ya los separa del fondo)", async () => {
     const { document } = await render(WITH_GAP);
 
     const roles = document.querySelector("[data-company] > ol");
-    expect(roles?.className).toContain("before:bg-linear-to-r");
+    expect(roles?.className).not.toContain("before:bg-linear-to-r");
     expect(roles?.className).not.toMatch(/before:border/);
   });
 

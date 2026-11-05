@@ -19,7 +19,7 @@ export interface TechLogo extends TechLogoShape {
 
 export type TechName = keyof typeof techLogoShapes;
 
-// Sobre la baldosa oscura (#202635) no se ven: CSS, Jira, GitHub, Vite y ESLint. Sobre la clara (#fff): JavaScript, Tailwind CSS,
+// Sobre la baldosa oscura (#090e1c) no se ven: CSS, Jira, GitHub y ESLint. Sobre la clara (#fff): JavaScript, Tailwind CSS,
 // Playwright y Postman. En esos casos, en ese tema, el logo se enciende con el acento del sitio.
 const hoverOverrides: Partial<Record<TechName, NonNullable<TechLogo["hoverColor"]>>> = {
   JavaScript: { light: "accent" },
@@ -29,7 +29,6 @@ const hoverOverrides: Partial<Record<TechName, NonNullable<TechLogo["hoverColor"
   Postman: { light: "accent" },
   Jira: { dark: "accent" },
   GitHub: { dark: "accent" },
-  Vite: { dark: "accent" },
   ESLint: { dark: "accent" },
 };
 

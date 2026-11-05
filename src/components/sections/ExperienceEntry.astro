@@ -16,11 +16,11 @@ const criteria = item.highlights?.length ?? 0;
 
 // Las clases se escriben enteras (no se componen) para que Tailwind las detecte.
 const REVEAL =
-  "transition-[opacity,translate] duration-700 ease-out group-data-ready:opacity-0 group-data-ready:data-seen:opacity-100 group-data-ready:data-seen:translate-x-0 group-data-ready:data-seen:translate-y-0";
+  "transition-[opacity,translate] duration-500 ease-out group-data-ready:opacity-0 group-data-ready:data-seen:opacity-100 group-data-ready:data-seen:translate-x-0 group-data-ready:data-seen:translate-y-0";
 // Escalonado: --i multiplica el retardo de cada criterio, chip y subtarea.
 const STAGGER = "[transition-delay:calc(var(--i)*90ms+250ms)]";
 const CHIP =
-  "rounded-full bg-accent-soft px-[0.65rem] py-[0.2rem] font-code text-[0.8125rem] text-accent";
+  "rounded-sm border border-accent/25 bg-accent-soft px-2 py-[0.15rem] font-code text-[0.75rem] text-accent";
 ---
 
 {/* Un puesto: tarjeta tipo ticket de JIRA (ID, estado, criterios de aceptación y subtareas) con su fecha a la izquierda del eje. */}
@@ -60,7 +60,7 @@ const CHIP =
 
   <article
     data-reveal
-    class={`col-start-2 row-start-2 flex min-w-0 flex-col gap-4 rounded-lg border border-border bg-surface p-4 nav:col-start-3 nav:p-5 nav:row-start-1 nav:ml-6 ml-4 group-data-ready:translate-x-8 ${REVEAL}`}
+    class={`col-start-2 row-start-2 flex min-w-0 flex-col gap-4 rounded-lg border panel p-4 nav:col-start-3 nav:p-5 nav:row-start-1 nav:ml-6 ml-4 group-data-ready:translate-x-8 ${REVEAL}`}
   >
     <header class="flex flex-wrap items-center justify-between gap-2 font-code text-[0.8125rem]">
       {item.ticket && <span class="font-medium text-accent">{item.ticket}</span>}

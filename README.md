@@ -39,9 +39,12 @@ que importa [`Layout.astro`](src/layouts/Layout.astro):
   `@theme inline` las expone como utilidades que siguen el tema activo: `bg-page`, `bg-surface`,
   `text-fg`, `text-fg-muted`, `text-accent`, `border-border`, `border-border-strong`, `shadow-card`…
 - **Tipografías** (alojadas en local con Fontsource, sin peticiones a Google Fonts): `font-sans` (Inter),
-  `font-heading` (Space Grotesk), `font-code` (JetBrains Mono) y `font-boot` (Geist Mono, pantalla de carga).
-  Las tres de la primera pantalla se precargan desde `Layout.astro`.
-- **Radios y ancho:** `rounded-sm|md|lg` (8/12/16 px) y `max-w-site` (1040 px).
+  `font-heading` (Fraunces, serif con eje óptico), `font-code` (JetBrains Mono) y `font-boot` (Geist Mono, pantalla de carga).
+  Las de la primera pantalla se precargan desde `Layout.astro`.
+- **Movimiento:** `ease-out` está redefinida en `@theme` como `cubic-bezier(0.23, 1, 0.32, 1)` (las curvas
+  por defecto de CSS son demasiado flojas), y `--ease-in-out` para movimientos en pantalla. La entrada del hero
+  (`animate-rise`, `animate-mark`) espera a que termine la pantalla de carga (`html[data-boot]`).
+- **Radios y ancho:** `rounded-sm|md|lg` (4/6/8 px) y `max-w-site` (1040 px).
 - **Puntos de corte con nombre:** `max-menu:` (≤ 960 px, menú móvil a pantalla completa), `max-nav:` (≤ 820 px, diseños a una columna), `max-tablet:` (≤ 768), `max-tight:` (≤ 640),
   `max-phone:` (≤ 600) y `max-mini:` (≤ 420). Tailwind aplica `max-*` con «ancho < valor», por eso en
   `@theme` cada uno vale N + 1.
@@ -166,10 +169,7 @@ El `<script>` del componente pone atributos en `<header>` que el CSS (variantes 
   ([`ui/ImageLightbox.astro`](src/components/ui/ImageLightbox.astro), un único `<dialog>` modal para toda la web): recorre las imágenes
   del proyecto con las flechas, el teclado (←, →, Inicio, Fin) o deslizando, muestra la descripción como pie de foto y se cierra
   con Esc, el botón ✕ o un clic en el fondo. Al cerrar, el carrusel se queda en la última imagen vista y el foco vuelve a su botón.
-  También se amplía un proyecto con una sola imagen. Las tarjetas
-  tienen **spotlight**:
-  el borde y un brillo suave siguen al ratón ([`lib/spotlight.ts`](src/lib/spotlight.ts) + [`scripts/spotlight.ts`](src/scripts/spotlight.ts),
-  también en las tarjetas del Stack). Con `video` (mp4/webm, sin audio, en `public/`) la tarjeta reproduce una vista previa al
+  También se amplía un proyecto con una sola imagen. Con `video` (mp4/webm, sin audio, en `public/`) la tarjeta reproduce una vista previa al
   pasar el ratón o entrar con el teclado (la `image` hace de póster); no se reproduce con «reducir movimiento» ni con ahorro de
   datos, y si el vídeo falla se queda la imagen. `demo` y `code` muestran sus botones solo si existen.
 - **Experiencia y Educación:** una línea de tiempo ([`ui/Timeline.astro`](src/components/ui/Timeline.astro)). La línea de acento se
@@ -208,7 +208,7 @@ terminal simulada que se desvanece y deja ver el portfolio, que ya está montado
 
 - **Abrir:** **`Ctrl + K` / `⌘ + K`** (también el botón `>_ Ctrl K` de la cabecera, que anuncia el atajo), la tecla `` ` ``
   (no si se está escribiendo en un campo; en el teclado español es la tecla muerta a la derecha de la P) o el botón
-  `>_ Consola` del footer. Con la consola abierta, `Ctrl/⌘ + K` la cierra. No se abre durante la pantalla de carga ni encima
+  `>_ Consola` del pie. Con la consola abierta, `Ctrl/⌘ + K` la cierra. No se abre durante la pantalla de carga ni encima
   de otro diálogo.
 - **Cerrar:** `Esc`, el botón ×, un clic fuera o el comando `exit`. Al cerrar, el foco
   vuelve al elemento que la abrió.
@@ -227,15 +227,16 @@ terminal simulada que se desvanece y deja ver el portfolio, que ya está montado
 - **404:** navega a una ruta que no existe a propósito (`notFoundPath` en [`seo.ts`](src/lib/seo.ts):
   `/esta-pagina-no-existe/` o `/en/this-page-does-not-exist/`), así que la responde la página 404 real.
 
-## Pie de página (barra de estado)
+## Pie de página (informe de ejecución)
 
-[`components/layout/Footer.astro`](src/components/layout/Footer.astro): el footer imita la barra de estado de VS Code.
-Los datos (rama, errores, veces probada, ubicación, disponibilidad) están en
-[`src/data/statusBar.ts`](src/data/statusBar.ts); `testRuns` es un dato de ejemplo marcado con `TODO`.
-El año del copyright se calcula al construir la web.
+[`components/layout/Footer.astro`](src/components/layout/Footer.astro): pie compacto en dos filas finas. Arriba, la franja de
+resultados de la «ejecución» (tests superados, errores, rama, ubicación y disponibilidad); abajo, el © con los contactos
+como iconos (correo, GitHub, LinkedIn y CV) y los atajos (404, consola y volver arriba). Los datos de la primera franja
+están en [`src/data/statusBar.ts`](src/data/statusBar.ts). El año del copyright se calcula al construir la web.
 
 - **404:** enlace a esa misma ruta inexistente, para ver la página de error de verdad.
-- En móvil se ocultan los elementos secundarios y respeta las zonas seguras (`env(safe-area-inset-*)`).
+- En móvil se ocultan los elementos secundarios de la franja de resultados y el pie respeta las zonas seguras
+  (`env(safe-area-inset-bottom)`).
 
 ## Tests
 

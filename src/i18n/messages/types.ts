@@ -22,6 +22,10 @@ export type ConsoleHelpKey =
 export interface Messages {
   meta: { title: string; description: string; ogDescription: string };
   skipToContent: string;
+  /** Estado de cada sección al leerla, como un test: «ejecutando» y luego «superado» (ver Section.astro). */
+  sectionStatus: { running: string; passed: string };
+  /** Guía lateral de secciones (SectionRail.astro): nombre del primer nodo, el inicio de la página. */
+  rail: { home: string };
   boot: { label: string; skip: string; skipLabel: string };
   console: {
     /** Etiqueta accesible del diálogo. */
@@ -172,6 +176,8 @@ export interface Messages {
     notFoundLabel: string;
     console: string;
     consoleLabel: string;
+    /** Nombre accesible del enlace para volver al inicio. */
+    backToTop: string;
   };
   notFound: {
     title: string;

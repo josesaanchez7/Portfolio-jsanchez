@@ -1,87 +1,110 @@
 ---
+import { cvUrl } from "../../data/cv";
 import { profile } from "../../data/profile";
+import { HERO_ID } from "../../data/sections";
 import { statusBar } from "../../data/statusBar";
 import { getI18n } from "../../i18n";
 import { formatInteger } from "../../lib/format";
 import { notFoundPath } from "../../lib/seo";
+import Icon from "../ui/Icon.astro";
 
 const { language, t, localize } = getI18n(Astro.currentLocale);
 
-const ITEM = "inline-flex items-center gap-1.5 px-2.5 py-1 whitespace-nowrap";
+// Botones y enlaces de texto de la fila inferior: filo de 1 px, se iluminan al pasar el ratón y se encogen al pulsar.
+const SMALL =
+  "inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-sm border border-border-strong bg-transparent px-2 font-[inherit] text-inherit transition-[color,border-color,scale] duration-150 ease-[ease] hover:border-accent hover:text-fg active:scale-[0.97]";
+// Iconos de contacto: solo icono (su nombre accesible va en aria-label).
+const ICON =
+  "grid size-7 place-items-center rounded-sm text-[0.95rem] text-fg-muted transition-[color,background-color,scale] duration-150 ease-[ease] hover:bg-surface hover:text-accent active:scale-[0.94]";
 
-// Botones y enlaces que no lo parecen: sin borde ni fondo propio; al pasar el ratón se oscurece el fondo.
-const BUTTON = [
-  ITEM,
-  "cursor-pointer border-0 bg-transparent font-[inherit] text-inherit",
-  "hover:bg-black/20",
-  "focus-visible:rounded-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-contrast",
-].join(" ");
+const contacts = [
+  { href: `mailto:${profile.email}`, label: profile.email, icon: "envelope", external: false },
+  { href: profile.github, label: "GitHub", icon: "github", external: true },
+  { href: profile.linkedin, label: "LinkedIn", icon: "linkedin", external: true },
+] as const;
 
-/** Elemento secundario: se oculta en móvil. */
+/** Elemento secundario de la franja de resultados: se oculta en móvil para que el pie siga siendo bajo. */
 const SECONDARY = "max-sm:hidden";
 ---
 
-{/* Pie de página con aspecto de la barra de estado de VS Code. */}
-<footer
-  aria-label={t.footer.label}
-  class="w-full bg-accent pr-[max(0.25rem,env(safe-area-inset-right))] pb-[env(safe-area-inset-bottom)] pl-[max(0.25rem,env(safe-area-inset-left))] font-code text-[12px] leading-4 text-accent-contrast sm:text-[13px]"
->
-  <div class="flex flex-wrap items-center">
-    <ul class="flex flex-wrap items-center">
-      <li>
-        <span class={ITEM}>
-          <span aria-hidden="true">⎇</span>
-          {statusBar.branch}
-        </span>
+{
+  /*
+    Pie compacto en dos filas finas. Arriba, la franja de resultados de la «ejecución» (tests, errores, rama, lugar y
+    disponibilidad; datos en data/statusBar.ts). Abajo, el © con los contactos como iconos y los atajos (404, consola y
+    volver arriba).
+  */
+}
+<footer aria-label={t.footer.label} class="relative w-full border-t border-border bg-page pb-[env(safe-area-inset-bottom)]">
+  <div class="border-b border-border">
+    <ul class="mx-auto flex max-w-site flex-wrap items-center gap-x-5 gap-y-1 px-6 py-2 font-code text-[0.75rem] text-fg-muted max-tablet:px-5">
+      <li class="inline-flex items-center gap-1.5">
+        <span class="text-ok" aria-hidden="true">✓</span>
+        <span class="text-fg">{t.footer.testsPassing(formatInteger(statusBar.testsPassing, language))}</span>
       </li>
-      <li>
-        <span class={ITEM}>
-          {`© ${new Date().getFullYear()} ${profile.name}`}
-        </span>
+      <li class={`inline-flex items-center gap-1.5 ${SECONDARY}`}>
+        <span class="text-ok" aria-hidden="true">✓</span>
+        {t.footer.errors(statusBar.errors)}
       </li>
-      <li class={SECONDARY}>
-        <span class={ITEM}>
-          <span aria-hidden="true">✓</span>
-          {t.footer.errors(statusBar.errors)}
-        </span>
+      <li class="inline-flex items-center gap-1.5">
+        <span aria-hidden="true">⎇</span>
+        {statusBar.branch}
       </li>
-    </ul>
-
-    <ul class="ml-auto flex flex-wrap items-center">
-      <li class={SECONDARY}>
-        <span class={ITEM}>
-          <span aria-hidden="true">▶</span>
-          {t.footer.testsPassing(formatInteger(statusBar.testsPassing, language))}
-        </span>
-      </li>
-      <li class={SECONDARY}>
-        <span class={ITEM}>
-          <span aria-hidden="true">📍</span>
-          {localize(statusBar.location)}
-        </span>
+      <li class={`inline-flex items-center gap-1.5 ${SECONDARY}`}>
+        <span aria-hidden="true">⌖</span>
+        {localize(statusBar.location)}
       </li>
       {
         statusBar.available && (
-          <li class={SECONDARY}>
-            <span class={ITEM}>
-              <span aria-hidden="true">●</span>
-              {t.footer.available}
+          <li class="ml-auto inline-flex items-center gap-1.5">
+            <span class="relative flex size-2" aria-hidden="true">
+              <span class="absolute inline-flex size-full animate-ping rounded-full bg-ok opacity-60" />
+              <span class="relative inline-flex size-2 rounded-full bg-ok" />
             </span>
+            <span class="text-fg">{t.footer.available}</span>
           </li>
         )
       }
+    </ul>
+  </div>
+
+  <div class="mx-auto flex max-w-site flex-wrap items-center gap-x-4 gap-y-2 px-6 py-3 font-code text-[0.75rem] text-fg-muted max-tablet:px-5">
+    <span>{`© ${new Date().getFullYear()} ${profile.name}`}</span>
+
+    <ul class="flex items-center gap-0.5" aria-label={t.hero.profileLinksLabel}>
+      {
+        contacts.map((contact) => (
+          <li>
+            <a
+              href={contact.href}
+              class={ICON}
+              aria-label={contact.label}
+              {...(contact.external && { target: "_blank", rel: "noopener noreferrer" })}
+            >
+              <Icon name={contact.icon} />
+            </a>
+          </li>
+        ))
+      }
       <li>
-        {/* Una ruta que no existe a propósito: la responde la página 404 real. */}
-        <a href={notFoundPath(language)} class={BUTTON} aria-label={t.footer.notFoundLabel}>
-          {t.footer.notFound}
+        <a href={cvUrl} download="Jose_Sanchez_CV.pdf" class={ICON} aria-label={t.hero.downloadCv}>
+          <Icon name="download" />
         </a>
       </li>
-      <li>
-        <button type="button" class={BUTTON} aria-label={t.footer.consoleLabel} data-console-open>
-          <span aria-hidden="true">&gt;_</span>
-          {t.footer.console}
-        </button>
-      </li>
     </ul>
+
+    <div class="ml-auto flex flex-wrap items-center gap-2">
+      {/* Una ruta que no existe a propósito: la responde la página 404 real. */}
+      <a href={notFoundPath(language)} class={SMALL} aria-label={t.footer.notFoundLabel}>
+        {t.footer.notFound}
+      </a>
+      <button type="button" class={SMALL} aria-label={t.footer.consoleLabel} data-console-open>
+        <span class="text-accent" aria-hidden="true">&gt;_</span>
+        {t.footer.console}
+      </button>
+      <a href={`#${HERO_ID}`} class={`${SMALL} max-sm:px-1.5`} aria-label={t.footer.backToTop}>
+        <Icon name="arrowRight" class="-rotate-90 text-accent" />
+        <span class="max-sm:hidden">{t.footer.backToTop}</span>
+      </a>
+    </div>
   </div>
 </footer>

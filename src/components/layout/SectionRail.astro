@@ -1,0 +1,54 @@
+---
+import { HERO_ID, SECTIONS } from "../../data/sections";
+import { getI18n } from "../../i18n";
+
+const { t, localize } = getI18n(Astro.currentLocale);
+
+// Un nodo por «commit»: el inicio de la página y cada sección, en orden.
+const items = [
+  { id: HERO_ID, label: t.rail.home },
+  ...SECTIONS.map((section) => ({ id: section.id, label: localize(section.navLabel) })),
+];
+
+const NODE =
+  "relative z-[1] block size-[13px] shrink-0 rounded-full border-2 border-border-strong bg-page transition-[border-color,background-color,box-shadow,scale] duration-300 ease-out group-data-[state=done]/node:border-accent group-data-[state=done]/node:bg-accent group-data-[state=active]/node:scale-125 group-data-[state=active]/node:border-accent group-data-[state=active]/node:bg-accent group-data-[state=active]/node:shadow-[0_0_0_4px_var(--accent-soft),0_0_14px_var(--accent)]";
+const LABEL =
+  "pointer-events-none absolute top-1/2 left-7 -translate-x-1 -translate-y-1/2 rounded-sm border panel px-2 py-0.5 font-code text-[0.7rem] whitespace-nowrap text-fg-muted opacity-0 transition-[opacity,translate] duration-200 ease-out group-hover/rail:translate-x-0 group-hover/rail:opacity-100 group-data-[state=active]/node:translate-x-0 group-data-[state=active]/node:text-fg group-data-[state=active]/node:opacity-100";
+---
+
+{
+  /*
+    Guía lateral con forma de grafo de git (el pie de página ya enseña la rama «main»): un nodo por sección, los
+    recorridos encendidos y un trazo que se rellena hasta el activo. Solo en pantallas anchas, donde hay margen a los
+    lados. Es una ayuda visual redundante con el menú: va oculta a los lectores de pantalla y fuera del tabulador.
+  */
+}
+<nav
+  aria-hidden="true"
+  data-rail
+  class="group/rail pointer-events-none fixed top-1/2 left-6 z-[900] hidden -translate-y-1/2 min-[1360px]:block"
+>
+  <ol class="relative flex flex-col gap-10">
+    <span class="absolute top-[7px] bottom-[7px] left-[6px] w-px bg-border" aria-hidden="true"></span>
+    <span
+      class="absolute top-[7px] bottom-[7px] left-[6px] w-px origin-top bg-[linear-gradient(var(--grad-a),var(--grad-b))] shadow-[0_0_8px_var(--grad-b)] transition-[transform] duration-500 ease-out [transform:scaleY(var(--p,0))]"
+      aria-hidden="true"
+    ></span>
+    {
+      items.map((item) => (
+        <li class="group/node relative" data-rail-link={item.id} data-state="todo">
+          <a href={`#${item.id}`} tabindex="-1" class="pointer-events-auto relative flex items-center">
+            <span class={NODE}></span>
+            <span class={LABEL}>{item.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<script>
+  import { initRail } from "../../scripts/rail";
+
+  initRail();
+</script>

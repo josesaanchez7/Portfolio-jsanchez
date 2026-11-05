@@ -2,8 +2,8 @@
 import { profile } from "../../data/profile";
 import { projects } from "../../data/projects";
 import { getI18n } from "../../i18n";
-import { moreTileSpan } from "../../lib/bento";
 import { SPOTLIGHT } from "../../lib/spotlight";
+import { moreTileSpan } from "../../lib/bento";
 import Section from "../layout/Section.astro";
 import Button from "../ui/Button.astro";
 import Icon from "../ui/Icon.astro";
@@ -27,7 +27,7 @@ const moreLayout = span === 2 ? "" : "lg:flex-row lg:items-center lg:justify-bet
       projects.map((project, index) => {
         const featured = project.featured ?? index === 0;
         return (
-          <div class={featured ? "lg:col-span-4" : "lg:col-span-2"}>
+          <div class={featured ? "lg:col-span-4" : "lg:col-span-2"} data-reveal-in style={`--d:${index * 90}ms`}>
             <ProjectCard project={project} featured={featured} />
           </div>
         );
@@ -35,7 +35,7 @@ const moreLayout = span === 2 ? "" : "lg:flex-row lg:items-center lg:justify-bet
     }
 
     <aside
-      class={`flex flex-col items-start justify-center gap-4 rounded-lg border border-dashed border-border-strong p-6 ${moreSpan} ${moreLayout} ${SPOTLIGHT}`}
+      class={`flex flex-col items-start justify-center gap-4 rounded-lg border border-dashed panel p-6 ${moreSpan} ${moreLayout} ${SPOTLIGHT}`}
       data-spotlight
     >
       <Icon name="github" class="size-9 text-fg-muted" />

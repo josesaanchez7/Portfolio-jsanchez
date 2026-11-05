@@ -20,12 +20,11 @@ const display = (value: number, prefix = "", suffix = "") => `${prefix}${formatI
 const KEYWORD: Record<string, TagSpec> = { k: { as: "strong", class: "font-semibold text-accent" } };
 
 // Las clases se escriben enteras (no se componen) para que Tailwind las detecte.
-// Tarjeta: mismo borde y fondo que el resto del sitio, elevación sutil y «spotlight» que sigue al cursor.
-// Con «reducir movimiento» no hay elevación ni spotlight.
-const CARD = `flex h-full flex-col gap-4 rounded-lg border border-border bg-surface transition-[translate,border-color] duration-200 ease-[ease] hover:-translate-y-[3px] hover:border-border-strong motion-reduce:hover:translate-y-0 motion-reduce:before:hidden motion-reduce:after:hidden ${SPOTLIGHT}`;
+// Panel con marcas de esquina, elevación sutil y reflejo (spotlight) que sigue al cursor. Con «reducir movimiento» no hay ni lo uno ni lo otro.
+const CARD = `flex h-full flex-col gap-4 rounded-lg border panel transition-[translate,border-color] duration-200 ease-[ease] hover:-translate-y-[3px] hover:border-accent/50 motion-reduce:hover:translate-y-0 motion-reduce:after:hidden ${SPOTLIGHT}`;
 // Entrada: fundido + 16 px hacia arriba, una sola vez. El retardo escalonado (70 ms) lo pone el script.
 const REVEAL =
-  "transition-[opacity,translate] duration-500 ease-out group-data-ready:translate-y-4 group-data-ready:opacity-0 group-data-ready:data-seen:translate-y-0 group-data-ready:data-seen:opacity-100";
+  "transition-[opacity,translate] duration-[450ms] ease-out group-data-ready:translate-y-4 group-data-ready:opacity-0 group-data-ready:data-seen:translate-y-0 group-data-ready:data-seen:opacity-100";
 const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-accent uppercase";
 ---
 
@@ -54,10 +53,6 @@ const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-acc
     {/* 2 · Ubicación y hora local */}
     <div data-reveal class={REVEAL}>
       <article aria-labelledby="about-location" data-spotlight class={`${CARD} overflow-hidden p-6`}>
-        <span
-          aria-hidden="true"
-          class="pointer-events-none absolute inset-0 [background-image:radial-gradient(var(--border-strong)_1px,transparent_1.5px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_at_100%_0%,#000,transparent_72%)]"
-        ></span>
         <h3 id="about-location" class={`${LABEL} relative`}>{t.about.locationLabel}</h3>
         <p class="relative flex items-center gap-3 font-heading text-[1.3rem] leading-tight font-bold">
           {/* Pin con pulso suave en bucle. */}
