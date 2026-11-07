@@ -12,7 +12,7 @@ export const profile: Profile = {
     en: "Multiplatform Application Development graduate",
   },
   currentJob: { es: "QA Tester", en: "QA Tester" },
-  employer: "Torcal",
+  employer: "Torcal Formación",
   email: "josesanchezaldana02@gmail.com",
   github: "https://github.com/josesaanchez7",
   linkedin: "https://www.linkedin.com/in/josesanchezaldana",

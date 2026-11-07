@@ -33,16 +33,21 @@ describe("Header", () => {
     expect(document.querySelector("[data-header]")).not.toHaveAttribute("data-menu-open");
   });
 
-  it("es una cápsula flotante con indicador deslizante y barra de progreso, ambos decorativos", async () => {
+  it("es un panel flotante con indicador deslizante decorativo y sin barra de progreso", async () => {
     const { document } = await renderComponent(Header);
 
     const header = document.querySelector("[data-header]");
-    expect(header).toHaveAttribute("style", expect.stringContaining("--progress:0"));
-    for (const selector of ["[data-indicator]", "[data-progress]"]) {
-      const element = document.querySelector(selector);
-      expect(element, selector).not.toBeNull();
-      expect((element as HTMLElement).closest('[aria-hidden="true"]'), selector).not.toBeNull();
-    }
+    expect(header).not.toHaveAttribute("style");
+    expect(document.querySelector("[data-progress]")).toBeNull();
+    const indicator = document.querySelector("[data-indicator]");
+    expect(indicator).not.toBeNull();
+    expect((indicator as HTMLElement).closest('[aria-hidden="true"]')).not.toBeNull();
+    // El indicador y el hover van en azul de acento.
+    expect((indicator as HTMLElement).className).toContain("bg-accent/15");
+    // El texto del enlace con la píldora (señalado o activo) usa el mismo azul: `data-lit` lo pone el script.
+    expect(document.querySelector("[data-nav-link]")?.className).toContain("hover:text-accent");
+    expect(document.querySelector("[data-nav-link]")?.className).toContain("data-lit:text-accent");
+    expect(document.querySelector("[data-nav-link]")?.className).not.toContain("aria-[current=true]:text-fg");
   });
 
   it("los enlaces del menú móvil entran escalonados (un retardo más por enlace)", async () => {

@@ -116,7 +116,7 @@ describe.each(LANGUAGES)("Sobre mí (%s)", (language) => {
     expect(document.querySelector("[data-bento]")?.lastElementChild).toBe(wrapper);
   });
 
-  it("las tarjetas entran en cascada (envoltorio con fundido y 16 px) y tienen spotlight y elevación en el hover", async () => {
+  it("las tarjetas entran en cascada (envoltorio con fundido y 16 px) y resaltan el borde y suben 2 px en el hover", async () => {
     const { document } = await render();
 
     const wrappers = document.querySelectorAll("[data-bento] > [data-reveal]");
@@ -125,9 +125,9 @@ describe.each(LANGUAGES)("Sobre mí (%s)", (language) => {
       expect(wrapper.className).toContain("group-data-ready:translate-y-4");
       expect(wrapper.className).toContain("group-data-ready:opacity-0");
       const card = wrapper.querySelector("article");
-      expect(card).toHaveAttribute("data-spotlight");
-      expect(card?.className).toContain("hover:-translate-y-[3px]");
-      expect(card?.className).toContain("motion-reduce:after:hidden");
+      expect(card).not.toHaveAttribute("data-spotlight");
+      expect(card?.className).toContain("hover:-translate-y-0.5");
+      expect(card?.className).toContain("motion-reduce:hover:translate-y-0");
     }
     // Sin JavaScript no se prepara nada: todo se ve.
     expect(document.querySelector("[data-bento]")).not.toHaveAttribute("data-ready");

@@ -74,7 +74,7 @@ const panelId = (stage: EducationStage) => `edu-panel-${stage.id}`;
               data-target={stage.id}
               aria-expanded={stage.id === initial?.id ? "true" : "false"}
               aria-controls={panelId(stage)}
-              class={`flex h-full min-h-[7.5rem] w-full cursor-pointer items-center gap-3 rounded-lg border panel p-4 text-left ${pending ? "border-dashed" : ""} transition-[border-color,background-color,box-shadow,translate] duration-200 ease-[ease] hover:-translate-y-0.5 hover:border-accent hover:shadow-[0_0_0_1px_var(--accent),0_10px_24px_-12px_var(--accent)] focus-visible:-translate-y-0.5 focus-visible:border-accent focus-visible:shadow-[0_0_0_1px_var(--accent),0_10px_24px_-12px_var(--accent)] aria-expanded:border-accent aria-expanded:bg-accent-soft`}
+              class={`flex h-full min-h-[7.5rem] w-full cursor-pointer items-center gap-3 rounded-lg border panel p-4 text-left ${pending ? "border-dashed" : ""} transition-[border-color,background-color] duration-200 ease-[ease] hover:border-accent/60 focus-visible:border-accent aria-expanded:border-accent aria-expanded:bg-accent-soft`}
             >
               <span class="grid size-11 shrink-0 place-items-center rounded-full bg-accent-soft text-[1.35rem] text-accent" aria-hidden="true">
                 <EducationIcon name={stage.kind === "certification" ? "certificate" : "cap"} />

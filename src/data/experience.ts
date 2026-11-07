@@ -1,4 +1,8 @@
-import type { ExperienceItem, SortableDate, UpcomingCertification } from "../types/content";
+import type {
+  ExperienceItem,
+  SortableDate,
+  UpcomingCertification,
+} from "../types/content";
 import { educationItems, upcomingFromStages } from "./education";
 
 // Fuente: CV (descripciones y centros) y perfil de LinkedIn (fechas de estudios).
@@ -72,7 +76,8 @@ const items: ExperienceItem[] = [
 ];
 
 /** Certificaciones activas aún sin completar (la etapa opcional «en curso» de `education.ts`, desactivada por defecto). */
-export const upcomingCertifications: UpcomingCertification[] = upcomingFromStages;
+export const upcomingCertifications: UpcomingCertification[] =
+  upcomingFromStages;
 
 /** Meses desde el año 0 de una fecha "AAAA-MM" (o "AAAA": el inicio vale enero y el fin, diciembre). */
 const monthIndex = (date: SortableDate, defaultMonth: number): number => {
@@ -94,7 +99,11 @@ export const byMostRecent = (a: ExperienceItem, b: ExperienceItem): number => {
 export const experience: ExperienceItem[] = [...items].sort(byMostRecent);
 
 /** Sección «Experiencia»: solo puestos de trabajo. */
-export const workExperience: ExperienceItem[] = experience.filter((item) => item.kind === "work");
+export const workExperience: ExperienceItem[] = experience.filter(
+  (item) => item.kind === "work",
+);
 
 /** Sección «Formación»: estudios y certificaciones. */
-export const education: ExperienceItem[] = experience.filter((item) => item.kind !== "work");
+export const education: ExperienceItem[] = experience.filter(
+  (item) => item.kind !== "work",
+);

@@ -1,6 +1,5 @@
 ---
 import { getI18n } from "../../i18n";
-import { SPOTLIGHT } from "../../lib/spotlight";
 import type { Project } from "../../types/content";
 import Button from "../ui/Button.astro";
 import ProjectCarousel from "./ProjectCarousel.astro";
@@ -18,9 +17,8 @@ const title = localize(project.title);
 ---
 
 <article
-  class={`flex h-full flex-col overflow-hidden rounded-lg border panel transition-[border-color,translate] duration-250 ease-[ease] hover:-translate-y-[3px] hover:border-accent/50 ${SPOTLIGHT}`}
+  class={`flex h-full flex-col overflow-hidden rounded-lg border panel transition-[border-color,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/50 motion-reduce:hover:translate-y-0`}
   aria-labelledby={titleId}
-  data-spotlight
   data-project-card
 >
   <div class={`relative border-b border-border bg-page ${project.terminal && !project.images?.length && !project.image && !project.video ? "aspect-[16/8]" : "aspect-[16/10]"}`}>
@@ -79,10 +77,6 @@ const title = localize(project.title);
 </article>
 
 <script>
-  import { initSpotlight } from "../../scripts/spotlight";
-
-  initSpotlight();
-
   // Vista previa en vídeo: se reproduce al pasar el ratón o al entrar con el teclado en la tarjeta, y se
   // detiene (y vuelve al principio) al salir. No se hace con «reducir movimiento» ni con ahorro de datos.
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

@@ -14,7 +14,7 @@ const { t, localize } = getI18n(Astro.currentLocale);
 
 {/* Estudios reglados. La titulación principal lleva un sello circular con un birrete. */}
 <article
-  class={`flex h-full gap-6 rounded-lg border panel transition-[border-color,translate] duration-250 ease-[ease] hover:-translate-y-[3px] hover:border-accent/50 ${featured ? "p-6 max-tight:flex-col nav:p-8" : "flex-col gap-[0.35rem] p-5"}`}
+  class={`flex h-full gap-6 rounded-lg border panel transition-[border-color,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/50 motion-reduce:hover:translate-y-0 ${featured ? "p-6 max-tight:flex-col nav:p-8" : "flex-col gap-[0.35rem] p-5"}`}
 >
   {
     featured && (

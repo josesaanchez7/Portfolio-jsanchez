@@ -49,10 +49,15 @@ describe("ProjectsSection (bento)", () => {
     expect(image).toHaveAttribute("alt", expect.stringContaining("IPTVFlix"));
   });
 
-  it("todas las tarjetas tienen el efecto spotlight", async () => {
+  it("las tarjetas suben 2 px en el hover (sin spotlight) y respetan «reducir movimiento»", async () => {
     const { document } = await renderComponent(ProjectsSection);
 
-    expect(document.querySelectorAll("[data-spotlight]")).toHaveLength(projects.length + 1);
+    expect(document.querySelectorAll("[data-spotlight]")).toHaveLength(0);
+    expect(document.querySelectorAll("[data-project-card]")).toHaveLength(projects.length);
+    for (const card of document.querySelectorAll("[data-project-card]")) {
+      expect(card.className).toContain("hover:-translate-y-0.5");
+      expect(card.className).toContain("motion-reduce:hover:translate-y-0");
+    }
   });
 });
 

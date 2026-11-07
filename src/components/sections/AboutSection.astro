@@ -3,7 +3,6 @@ import { metrics } from "../../data/metrics";
 import { languages, location, profile } from "../../data/profile";
 import { getI18n } from "../../i18n";
 import { formatInteger } from "../../lib/format";
-import { SPOTLIGHT } from "../../lib/spotlight";
 import Section from "../layout/Section.astro";
 import RichText, { type TagSpec } from "../ui/RichText.astro";
 import TechMarquee from "./TechMarquee.astro";
@@ -20,8 +19,8 @@ const display = (value: number, prefix = "", suffix = "") => `${prefix}${formatI
 const KEYWORD: Record<string, TagSpec> = { k: { as: "strong", class: "font-semibold text-accent" } };
 
 // Las clases se escriben enteras (no se componen) para que Tailwind las detecte.
-// Panel con marcas de esquina, elevación sutil y reflejo (spotlight) que sigue al cursor. Con «reducir movimiento» no hay ni lo uno ni lo otro.
-const CARD = `flex h-full flex-col gap-4 rounded-lg border panel transition-[translate,border-color] duration-200 ease-[ease] hover:-translate-y-[3px] hover:border-accent/50 motion-reduce:hover:translate-y-0 motion-reduce:after:hidden ${SPOTLIGHT}`;
+// Panel sólido con filo de 1 px; al pasar el ratón resalta el borde y sube 2 px (no con «reducir movimiento»).
+const CARD = `flex h-full flex-col gap-4 rounded-lg border panel transition-[border-color,translate] duration-200 ease-out hover:-translate-y-0.5 hover:border-accent/50 motion-reduce:hover:translate-y-0`;
 // Entrada: fundido + 16 px hacia arriba, una sola vez. El retardo escalonado (70 ms) lo pone el script.
 const REVEAL =
   "transition-[opacity,translate] duration-[450ms] ease-out group-data-ready:translate-y-4 group-data-ready:opacity-0 group-data-ready:data-seen:translate-y-0 group-data-ready:data-seen:opacity-100";
@@ -39,7 +38,7 @@ const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-acc
   <div data-bento class="group grid grid-cols-1 gap-4 tight:grid-cols-2 nav:grid-cols-4">
     {/* 1 · Presentación (2×2) */}
     <div data-reveal class={`${REVEAL} tight:col-span-2 nav:row-span-2`}>
-      <article aria-labelledby="about-intro" data-spotlight class={`${CARD} justify-center p-8 nav:p-10`}>
+      <article aria-labelledby="about-intro" class={`${CARD} justify-center p-8 nav:p-10`}>
         <h3 id="about-intro" class="sr-only">{t.about.introLabel}</h3>
         <p class="text-[clamp(1.3rem,2.6vw,1.85rem)] leading-[1.4] font-medium text-fg">
           <RichText
@@ -52,7 +51,7 @@ const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-acc
 
     {/* 2 · Ubicación y hora local */}
     <div data-reveal class={REVEAL}>
-      <article aria-labelledby="about-location" data-spotlight class={`${CARD} overflow-hidden p-6`}>
+      <article aria-labelledby="about-location" class={`${CARD} overflow-hidden p-6`}>
         <h3 id="about-location" class={`${LABEL} relative`}>{t.about.locationLabel}</h3>
         <p class="relative flex items-center gap-3 font-heading text-[1.3rem] leading-tight font-bold">
           {/* Pin con pulso suave en bucle. */}
@@ -81,7 +80,7 @@ const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-acc
 
     {/* 3 · Idiomas */}
     <div data-reveal class={REVEAL}>
-      <article aria-labelledby="about-languages" data-spotlight class={`${CARD} p-6`}>
+      <article aria-labelledby="about-languages" class={`${CARD} p-6`}>
         <h3 id="about-languages" class={LABEL}>{t.about.languagesLabel}</h3>
         <ul class="flex flex-col gap-4">
           {
@@ -108,7 +107,7 @@ const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-acc
 
     {/* 4 · Cifras con contador animado: el HTML ya trae el valor final y el script lo cuenta al verse. */}
     <div data-reveal class={`${REVEAL} tight:col-span-2`}>
-      <article aria-labelledby="about-numbers" data-spotlight class={`${CARD} p-6`}>
+      <article aria-labelledby="about-numbers" class={`${CARD} p-6`}>
         <h3 id="about-numbers" class={LABEL}>{t.about.numbersLabel}</h3>
         <ul class="grid grid-cols-2 gap-4" data-metrics>
           {
@@ -135,7 +134,7 @@ const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-acc
 
     {/* 5 · Stack (ancho completo): el carrusel de logos de siempre, sin cambios. */}
     <div data-reveal class={`${REVEAL} tight:col-span-2 nav:col-span-4`}>
-      <article aria-labelledby="about-stack" data-spotlight class={`${CARD} gap-5 py-6`}>
+      <article aria-labelledby="about-stack" class={`${CARD} gap-5 py-6`}>
         <h3 id="about-stack" class="px-6 font-code text-[0.85rem] font-medium text-accent">{t.about.stackLabel}</h3>
         <TechMarquee />
       </article>
@@ -146,7 +145,6 @@ const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-acc
 <script>
   import { formatInteger } from "../../lib/format";
   import { DEFAULT_LANGUAGE, parseLanguage } from "../../lib/language";
-  import { initSpotlight } from "../../scripts/spotlight";
 
   const DURATION_MS = 1400;
   const STAGGER_MS = 70;
@@ -233,9 +231,8 @@ const LABEL = "font-code text-[0.8125rem] font-medium tracking-[0.04em] text-acc
     }
   }
 
-  // --- Entrada en cascada (una sola vez) y spotlight: ninguno de los dos con «reducir movimiento».
+  // --- Entrada en cascada (una sola vez): no con «reducir movimiento».
   if (!reducedMotion) {
-    initSpotlight();
 
     for (const grid of document.querySelectorAll<HTMLElement>("[data-bento]")) {
       const cards = [...grid.querySelectorAll<HTMLElement>("[data-reveal]")];

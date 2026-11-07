@@ -41,7 +41,7 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
     <meta name="description" content={meta.description} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="author" content="José Sánchez" />
-    <meta name="theme-color" content="#03050b" />
+    <meta name="theme-color" content="#0a0a0a" />
     {
       seoTags.map(({ tag: Tag, attributes }) => <Tag {...attributes} />)
     }
@@ -118,14 +118,6 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
     </script>
   </head>
   <body class="bg-page font-sans text-base leading-[1.65] text-fg antialiased overflow-x-clip">
-    {/* Capa ambiental fija: da algo que desenfocar al vidrio de las tarjetas (ver global.css). */}
-    <div class="ambient" aria-hidden="true">
-      <span class="ambient-orb" data-orb="a"></span>
-      <span class="ambient-orb" data-orb="b"></span>
-      <span class="ambient-orb" data-orb="c"></span>
-      <span class="ambient-grid"></span>
-    </div>
-    <div class="cursor-glow" aria-hidden="true" data-cursor-glow></div>
     <slot />
     <script>
       import { initAmbient } from "../scripts/ambient";

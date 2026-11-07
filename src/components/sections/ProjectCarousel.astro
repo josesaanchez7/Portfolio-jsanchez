@@ -22,7 +22,7 @@ const slides = gallery.map((image) => ({
 
 // Botones flotantes sobre la imagen: sobre fondo oscuro translúcido para que se lean con cualquier captura.
 const ARROW =
-  "absolute top-1/2 z-10 grid size-9 -translate-y-1/2 after:absolute after:-inset-1 after:content-[''] cursor-pointer place-items-center rounded-full bg-black/55 text-[0.95rem] text-white opacity-0 backdrop-blur-sm transition-[opacity,background-color] duration-200 group-hover/carousel:opacity-100 group-focus-within/carousel:opacity-100 hover:bg-black/75 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white [@media(hover:none)]:opacity-100";
+  "material-dark absolute top-1/2 z-10 grid size-9 -translate-y-1/2 after:absolute after:-inset-1 after:content-[''] cursor-pointer place-items-center rounded-full bg-black/55 text-[0.95rem] text-white opacity-0 backdrop-blur-sm transition-[opacity,background-color,scale] duration-200 group-hover/carousel:opacity-100 group-focus-within/carousel:opacity-100 hover:bg-black/75 active:scale-90 active:duration-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white [@media(hover:none)]:opacity-100";
 ---
 
 {
@@ -100,7 +100,7 @@ const ARROW =
               />
               <span
                 aria-hidden="true"
-                class="absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-black/55 text-[0.85rem] text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover/zoom:opacity-100 group-focus-visible/zoom:opacity-100 [@media(hover:none)]:opacity-100"
+                class="material-dark absolute top-3 right-3 grid size-8 place-items-center rounded-full bg-black/55 text-[0.85rem] text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover/zoom:opacity-100 group-focus-visible/zoom:opacity-100 [@media(hover:none)]:opacity-100"
               >
                 <Icon name="expand" />
               </span>
@@ -134,13 +134,13 @@ const ARROW =
           <Icon name="arrowRight" class="rotate-180" />
         </button>
         <div class="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex justify-center">
-          <div class="pointer-events-auto flex items-center rounded-full bg-black/45 px-1.5 backdrop-blur-sm">
+          <div class="material-dark pointer-events-auto flex items-center rounded-full bg-black/45 px-1.5 backdrop-blur-sm">
             {gallery.map((_, index) => (
               <button
                 type="button"
                 data-carousel-dot
                 aria-label={t.projects.goToImage(index + 1, total)}
-                class="group grid size-6 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-white"
+                class="group grid size-6 cursor-pointer place-items-center rounded-full transition-[scale] duration-100 active:scale-85 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-white"
               >
                 <span class="block size-2 rounded-full bg-white/50 transition-[background-color,scale] duration-200 group-aria-[current=true]:scale-125 group-aria-[current=true]:bg-white" />
               </button>

@@ -10,7 +10,7 @@ const { language, t, localize } = getI18n(Astro.currentLocale);
 
 // Botones circulares de la cabecera. Sin ancho ni display: cada botón añade los suyos.
 const ICON_BUTTON =
-  "h-11 place-items-center rounded-full bg-transparent text-fg-muted cursor-pointer transition-[color,background-color] duration-200 ease-[ease] hover:bg-surface hover:text-accent";
+  "h-11 place-items-center rounded-md bg-transparent text-fg-muted cursor-pointer transition-[color,background-color,scale] duration-200 ease-[ease] hover:bg-accent/15 hover:text-accent active:scale-[0.92] active:duration-100";
 
 // El selector muestra y activa el idioma al que se cambiaría.
 const otherLanguage = language === "es" ? "en" : "es";
@@ -21,32 +21,27 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
 
 {
   /*
-  Navbar «isla»: una cápsula flotante y centrada, siempre a la vista en escritorio. La cabecera es sticky con alto 0 (no ocupa sitio en la página);
+  Navbar «isla»: un panel rectangular flotante y centrado, con el mismo filo de 1 px y radio que el resto de paneles, siempre a la vista en escritorio. La cabecera es sticky con alto 0 (no ocupa sitio en la página);
   la cápsula se ajusta a su contenido. El <script> de abajo pone estos atributos en <header>:
-    data-scrolled   la cápsula se encoge y gana opacidad
+    data-scrolled   el panel se encoge y su borde se refuerza
     data-hidden     solo en móvil: se oculta al bajar y reaparece al subir
     data-menu-open  menú móvil a pantalla completa abierto
-  y la variable --progress (0–1) que dibuja la barra de lectura. En móvil el <nav> pasa a ser el menú a pantalla
+  En móvil el <nav> pasa a ser el menú a pantalla
   completa; los hijos «relative z-10» quedan por encima de él para que el botón ✕ siga a la vista.
 */
 }
 <header
   data-header
-  style="--progress:0"
   class="group pointer-events-none sticky top-0 z-[1000] flex h-0 justify-center transition-[translate] duration-300 ease-out data-hidden:-translate-y-24"
 >
   <div
     class="pointer-events-auto relative isolate mx-3 mt-[max(0.75rem,env(safe-area-inset-top))] flex h-14 w-fit max-w-[calc(100%-1.5rem)] items-center gap-4 pr-3 pl-4 transition-[height,margin,gap] duration-300 ease-out group-data-scrolled:mt-[max(0.5rem,env(safe-area-inset-top))] group-data-scrolled:h-12 group-data-scrolled:gap-3 max-menu:w-full max-menu:justify-between"
   >
-    {/* Fondo de la cápsula: va aparte para que el desenfoque no afecte al menú móvil (backdrop-filter crea un bloque contenedor). */}
+    {/* Fondo del panel: sólido y aparte del contenido, para que el recorte redondeado (overflow) solo afecte a la barra de progreso. */}
     <span
       aria-hidden="true"
-      class="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-full border border-border bg-[color-mix(in_srgb,var(--bg)_62%,transparent)] shadow-card backdrop-blur-xl transition-[background-color,box-shadow] duration-300 group-data-scrolled:bg-[color-mix(in_srgb,var(--bg)_90%,transparent)] group-data-scrolled:shadow-[0_8px_30px_rgba(0,0,0,0.28)]"
+      class="pointer-events-none absolute inset-0 -z-10 rounded-lg border border-border bg-(--panel) transition-[border-color] duration-300 group-data-scrolled:border-border-strong"
     >
-      {/* Progreso de lectura: 2px en el borde inferior; el recorte redondeado de la cápsula lo curva. */}
-      <span
-        data-progress
-        class="absolute bottom-0 left-0 h-0.5 w-full origin-left scale-x-(--progress) bg-accent"></span>
     </span>
 
     <a
@@ -55,7 +50,7 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
       aria-label={t.header.homeLabel(profile.name)}
     >
       <span
-        class="grid h-8 w-8 place-items-center rounded-full border border-border bg-surface text-[0.8rem] text-accent"
+        class="grid h-8 w-8 place-items-center rounded-md border border-border bg-surface text-[0.8rem] text-accent"
         aria-hidden="true"
       >
         JS
@@ -67,14 +62,14 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
       id="main-nav"
       aria-label={t.header.navLabel}
       data-nav
-      class="max-menu:invisible max-menu:fixed max-menu:inset-0 max-menu:z-0 max-menu:flex max-menu:flex-col max-menu:justify-center max-menu:gap-10 max-menu:bg-[color-mix(in_srgb,var(--bg)_94%,transparent)] max-menu:px-8 max-menu:pt-24 max-menu:pb-10 max-menu:opacity-0 max-menu:backdrop-blur-xl max-menu:transition-[opacity,visibility] max-menu:duration-300 max-menu:group-data-menu-open:visible max-menu:group-data-menu-open:opacity-100"
+      class="max-menu:invisible max-menu:fixed max-menu:inset-0 max-menu:z-0 max-menu:flex max-menu:flex-col max-menu:justify-center max-menu:gap-10 max-menu:bg-page max-menu:px-8 max-menu:pt-24 max-menu:pb-10 max-menu:opacity-0 max-menu:transition-[opacity,visibility] max-menu:duration-300 max-menu:group-data-menu-open:visible max-menu:group-data-menu-open:opacity-100"
     >
       <div class="relative" data-nav-track>
         {/* Indicador deslizante: una píldora que se mueve bajo el enlace al que apunta el ratón o, si no, bajo el de la sección activa. */}
         <span
           data-indicator
           aria-hidden="true"
-          class="pointer-events-none absolute top-0 left-0 h-full w-0 rounded-full bg-accent-soft opacity-0 max-menu:hidden"
+          class="pointer-events-none absolute top-0 left-0 h-full w-0 rounded-md bg-accent/15 ring-1 ring-accent/35 ring-inset opacity-0 max-menu:hidden"
         ></span>
         <ul class="flex gap-0.5 max-menu:flex-col max-menu:gap-1">
           {
@@ -83,7 +78,7 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
                 <a
                   href={`#${id}`}
                   data-nav-link
-                  class="relative z-10 block rounded-full px-3 py-1.5 text-[0.92rem] font-medium text-fg-muted transition-colors duration-200 ease-[ease] hover:text-fg aria-[current=true]:text-fg max-menu:px-0 max-menu:py-3 max-menu:font-heading max-menu:text-[1.9rem] max-menu:font-bold max-menu:tracking-[-0.02em] max-menu:aria-[current=true]:text-accent"
+                  class="relative z-10 block rounded-md px-3 py-1.5 text-[0.92rem] font-medium text-fg-muted transition-colors duration-200 ease-[ease] hover:text-accent data-lit:text-accent max-menu:px-0 max-menu:py-3 max-menu:font-heading max-menu:text-[1.9rem] max-menu:font-bold max-menu:tracking-[-0.02em] max-menu:aria-[current=true]:text-accent"
                 >
                   {localize(navLabel)}
                 </a>
@@ -191,6 +186,8 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
   const placeIndicator = () => {
     if (!indicator) return;
     const target = pointed ?? activeLink();
+    // El texto sigue al indicador: el enlace que lleva la píldora (señalado o, si no, el de la sección activa) va en azul.
+    for (const link of links) link.toggleAttribute("data-lit", link === target);
     if (!target || target.offsetWidth === 0) {
       indicator.style.opacity = "0";
       return;
@@ -296,7 +293,7 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
     });
   }
 
-  // --- Scroll: encoger, progreso de lectura y ocultar al bajar -----------------------------------
+  // --- Scroll: encoger y ocultar al bajar -----------------------------------
   if (header) {
     const SCROLLED_AFTER = 16;
     const HIDE_AFTER = 120;
@@ -305,9 +302,6 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
     // con el diseño sin calcular fuerza un reflow.
     let lastY: number | null = null;
     let frame = 0;
-    // Recorrido total del scroll. Se mide en un ResizeObserver (con el diseño ya calculado) y no en cada
-    // fotograma: leer scrollHeight con el diseño sin calcular obliga al navegador a hacerlo de golpe.
-    let maxScroll = 0;
 
     // En escritorio la barra está siempre a la vista; ocultarla al bajar solo se hace en móvil, para ganar pantalla.
 
@@ -315,7 +309,6 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
       frame = 0;
       const y = Math.max(0, window.scrollY);
 
-      header.style.setProperty("--progress", String(maxScroll > 0 ? Math.min(1, y / maxScroll) : 0));
       header.toggleAttribute("data-scrolled", y > SCROLLED_AFTER);
 
       if (!mobile || lastY === null) {
@@ -345,14 +338,8 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
       },
       { passive: true },
     );
-    const measure = () => {
-      maxScroll = html.scrollHeight - window.innerHeight;
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    // El alto de la página cambia al cargar fuentes e imágenes; la ventana, al redimensionarla.
-    // El observador también avisa al empezar a observar: esa es la primera medición.
-    new ResizeObserver(measure).observe(document.body);
-    window.addEventListener("resize", measure);
+    // Estado inicial (p. ej. al recargar a mitad de página): una actualización tras el primer pintado.
+    frame = requestAnimationFrame(update);
     // Si se llega con el teclado a la cabecera mientras está oculta, reaparece.
     header.addEventListener("focusin", () => {
       if (header.querySelector(":focus-visible")) header.removeAttribute("data-hidden");
@@ -371,9 +358,17 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
     syncLabel();
     themeToggle.addEventListener("click", () => {
       const next: Theme = currentTheme() === "dark" ? "light" : "dark";
-      html.dataset.theme = next;
-      storeTheme(next);
-      syncLabel();
+      const apply = () => {
+        html.dataset.theme = next;
+        storeTheme(next);
+        syncLabel();
+      };
+      // Fundido cruzado en vez de un salto de brillo; sin soporte o con «reducir movimiento», cambio directo.
+      if (!prefersReducedMotion && typeof document.startViewTransition === "function") {
+        document.startViewTransition(apply);
+      } else {
+        apply();
+      }
     });
   }
 

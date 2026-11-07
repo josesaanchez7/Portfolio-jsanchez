@@ -5,7 +5,6 @@
  * JetBrains Mono se carga solo en peso 500, como antes (el resto de pesos usan ese).
  */
 @import "@fontsource-variable/inter/wght.css";
-@import "@fontsource-variable/sora/wght.css";
 @import "@fontsource-variable/geist-mono/wght.css";
 @import "@fontsource/jetbrains-mono/latin-500.css";
 
@@ -65,9 +64,6 @@
   --animate-panel-in: panel-in 0.25s ease-out;
   --animate-digit-in: digit-in 0.35s ease-out;
   --animate-rise: rise 600ms var(--ease-out) both;
-  --animate-sheen: sheen 1800ms var(--ease-in-out) 350ms both;
-  --animate-float: float 7s ease-in-out infinite;
-  --animate-orbit: orbit 7s linear infinite;
   --animate-line: line-in 380ms var(--ease-out) both;
 
   /* La pista lleva cuatro copias iguales: desplazar la mitad vuelve al punto de partida sin saltos. */
@@ -119,19 +115,7 @@
     }
   }
 
-  /* Un destello recorre el degradado del titular una sola vez. */
-  @keyframes sheen {
-    from {
-      background-position: 100% 0;
-    }
-  }
 
-  /* Flotación lenta de los elementos decorativos del hero (solo `translate`, va en el compositor). */
-  @keyframes float {
-    50% {
-      translate: 0 -10px;
-    }
-  }
 
   /* Una línea de la salida del test aparece desde la izquierda, como si se imprimiera. */
   @keyframes line-in {
@@ -141,61 +125,50 @@
     }
   }
 
-  /* Giro del haz de luz del marco del retrato. */
-  @keyframes orbit {
-    to {
-      rotate: 360deg;
-    }
-  }
 }
 
 /* Pantalla de carga: siempre oscura, independiente del tema de la web. */
 @theme static {
-  --color-boot-bg: #02040a;
-  --color-boot-text: #d5e0fb;
-  --color-boot-dim: #7a8aa8; /* contraste ≥ 4,5:1 sobre --color-boot-bg */
+  --color-boot-bg: #050505;
+  --color-boot-text: #e5e5e5;
+  --color-boot-dim: #8a8a8a; /* contraste ≥ 4,5:1 sobre --color-boot-bg */
   --color-boot-ok: #4fe3a1;
   --color-boot-prompt: #6fb0ff;
   --color-boot-warn: #f2c14e;
-  --color-boot-dot: #131c33;
+  --color-boot-dot: #222222;
   --font-boot: "Geist Mono Variable", "Geist Mono", ui-monospace, Menlo, "SFMono-Regular", Consolas, monospace;
 }
 
+/*
+ * Base neutra (negro, blanco roto, escala de grises) y un único acento azul, sólido y sin degradados de color: es lo
+ * que da vida a botones, enlaces, la frase clave y los estados. El verde de `--ok` y el ámbar de `--warn` solo marcan
+ * estados (superado, en curso).
+ */
 :root {
   color-scheme: dark;
 
-  /* Negro azulado + un único azul de acento, contenido (nada de neón). */
-  --bg: #03050b;
-  --surface: #090e1c; /* baldosas y elementos de énfasis; los test de contraste de los logos leen este valor */
-  --surface-hover: #0f1730;
-  --text: #e8eefc;
-  --text-muted: #8f9db8;
+  --bg: #0a0a0a;
+  --surface: #111111; /* baldosas y elementos de énfasis; los test de contraste de los logos leen este valor */
+  --surface-hover: #1a1a1a;
+  --text: #ededed;
+  --text-muted: #a1a1a1;
   --accent: #4a90ff;
   --accent-hover: #7db0ff;
-  --accent-contrast: #02060f;
+  --accent-contrast: #04070f;
   --accent-soft: rgba(74, 144, 255, 0.13);
-  --grad-a: #3f7bff; /* degradado de marca: azul → azul hielo (ya sin el cian saturado) */
-  --grad-b: #62c4ff;
-  --border: #121a31;
-  --border-strong: #4c6194;
+  --grad-a: #4a90ff; /* solo filetes y trazos: azul → azul hielo */
+  --grad-b: #8ecbff;
+  --border: #212121;
+  --border-strong: #5e5e5e;
   --ok: #4fe3a1;
   --warn: #f2c14e;
-  --shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
 
-  /* Panel: fondo sólido un punto más claro que la página y marcas de esquina en el acento. */
-  --panel: #060a15;
-  --tick: rgba(74, 144, 255, 0.95);
-  --panel-shadow: 0 1px 0 rgba(255, 255, 255, 0.025) inset;
-
-  /* Capa ambiental (aurora y rejilla): apenas un resplandor sobre el negro. */
-  --orb-a: oklch(0.4 0.2 var(--hue-a));
-  --orb-b: oklch(0.5 0.12 var(--hue-b));
-  --orb-c: oklch(0.3 0.17 var(--hue-c));
-  --orb-opacity: 0.3;
-  --grid-line: rgba(120, 160, 255, 0.045);
+  /* Panel: superficie sólida con filo de 1 px. */
+  --panel: #0e0e0e;
 
   --font-body: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: "Sora Variable", "Sora", "Inter Variable", "Inter", system-ui, sans-serif;
+  --font-display: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
 
   --header-height: 88px; /* cápsula (56px) + hueco superior + aire: margen de scroll de las anclas */
@@ -204,130 +177,66 @@
 :root[data-theme="light"] {
   color-scheme: light;
 
-  --bg: #edf3ff;
+  --bg: #fafafa;
   --surface: #ffffff;
-  --surface-hover: #e2ecff;
-  --text: #071230;
-  --text-muted: #46557a;
+  --surface-hover: #f0f0f0;
+  --text: #0a0a0a;
+  --text-muted: #525252;
   --accent: #1553e0;
   --accent-hover: #0f3fb5;
   --accent-contrast: #ffffff;
   --accent-soft: rgba(21, 83, 224, 0.1);
   --grad-a: #1553e0;
-  --grad-b: #0e7490;
-  --border: #cfdcf5;
-  --border-strong: #6f82ad;
+  --grad-b: #4f8dff;
+  --border: #e5e5e5;
+  --border-strong: #8a8a8a;
   --ok: #0f7a4a; /* ≥ 4,5:1 sobre blanco y sobre --bg */
   --warn: #a16207;
-  --shadow: 0 18px 44px rgba(20, 50, 130, 0.14);
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
 
-  --panel: #fbfdff;
-  --tick: rgba(21, 83, 224, 0.8);
-  --panel-shadow: 0 1px 2px rgba(20, 50, 130, 0.06);
-
-  --orb-a: oklch(0.78 0.12 var(--hue-a));
-  --orb-b: oklch(0.85 0.1 var(--hue-b));
-  --orb-c: oklch(0.82 0.08 var(--hue-c));
-  --orb-opacity: 0.34;
-  --grid-line: rgba(30, 80, 200, 0.07);
+  --panel: #ffffff;
 }
 
 /*
- * El matiz de la aurora cambia suavemente con la sección que se está leyendo (src/scripts/rail.ts pone
- * <html data-section>). Siempre dentro de la gama azul (230–265): ni hacia el violeta ni hacia el verde azulado. Las propiedades están
- * registradas con @property para que el navegador pueda interpolarlas; donde no se soporta, el cambio es instantáneo.
+ * Panel: superficie sólida con filo de 1 px y nada más. Sin vidrio, sin marcas ni brillos: la separación la da el
+ * contraste con el fondo y el filo. Al pasar el ratón cada tarjeta resalta su borde con el acento y sube 2 px.
  */
-@property --hue-a {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 264;
-}
-@property --hue-b {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 246;
-}
-@property --hue-c {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 266;
-}
-
-:root {
-  transition:
-    --hue-a 1500ms var(--ease-in-out),
-    --hue-b 1500ms var(--ease-in-out),
-    --hue-c 1500ms var(--ease-in-out);
-}
-
-html[data-section="Proyectos"] {
-  --hue-a: 252;
-  --hue-b: 248;
-  --hue-c: 250;
-}
-html[data-section="Experience"] {
-  --hue-a: 238;
-  --hue-b: 240;
-  --hue-c: 236;
-}
-html[data-section="Education"] {
-  --hue-a: 260;
-  --hue-b: 254;
-  --hue-c: 262;
-}
-html[data-section="SobreMi"] {
-  --hue-a: 228;
-  --hue-b: 238;
-  --hue-c: 224;
-}
-html[data-section="Contacto"] {
-  --hue-a: 246;
-  --hue-b: 234;
-  --hue-c: 240;
-}
-
-/*
- * Panel: superficie sólida con filo de 1 px y marcas de registro en las cuatro esquinas, como las de un informe
- * técnico o la mira de un test. Sustituye al vidrio translúcido (demasiado visto): no desenfoca nada ni depende de
- * lo que haya detrás. Las marcas son ocho degradados de fondo (sin pseudo-elementos, que ya usa el spotlight) y
- * al pasar el ratón se alargan (animación, ver `tick-lock`), como cuando una mira «fija» su objetivo; `--tick-len` está registrada para poder animarla. Al salir vuelven al instante.
- */
-@property --tick-len {
-  syntax: "<length>";
-  inherits: false;
-  initial-value: 14px;
-}
-
 @utility panel {
-  --tick-len: 14px;
   border-color: var(--border);
-  background:
-    linear-gradient(var(--tick), var(--tick)) 0 0 / var(--tick-len) 1px no-repeat,
-    linear-gradient(var(--tick), var(--tick)) 0 0 / 1px var(--tick-len) no-repeat,
-    linear-gradient(var(--tick), var(--tick)) 100% 0 / var(--tick-len) 1px no-repeat,
-    linear-gradient(var(--tick), var(--tick)) 100% 0 / 1px var(--tick-len) no-repeat,
-    linear-gradient(var(--tick), var(--tick)) 0 100% / var(--tick-len) 1px no-repeat,
-    linear-gradient(var(--tick), var(--tick)) 0 100% / 1px var(--tick-len) no-repeat,
-    linear-gradient(var(--tick), var(--tick)) 100% 100% / var(--tick-len) 1px no-repeat,
-    linear-gradient(var(--tick), var(--tick)) 100% 100% / 1px var(--tick-len) no-repeat,
-    var(--panel);
-  background-origin: border-box;
-  box-shadow: var(--panel-shadow);
-
-  /* Animación y no transición: las tarjetas ya declaran sus propias `transition-[…]` y no deben pisarse. */
-  @media (hover: hover) {
-    &:hover {
-      animation: tick-lock 240ms var(--ease-out) forwards;
-    }
-  }
+  background: var(--panel);
 }
 
-@keyframes tick-lock {
-  from {
-    --tick-len: 14px;
-  }
-  to {
-    --tick-len: 26px;
+/*
+ * Textura de fondo: símbolos de programación (llaves, etiquetas, flecha, `();`, `//`, `&&`…) repetidos en un mosaico
+ * escalonado, a ~8 % de opacidad. Es una máscara (`mask-image`) sobre el color del texto, así que sirve en los dos temas
+ * sin duplicar nada. Más visible en los márgenes y más tenue detrás de la columna de contenido, para no restar lectura.
+ * Estática y fija (no se mueve ni repinta al hacer scroll). Con «más contraste» se oculta.
+ */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--text);
+  opacity: 0.08;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='220'%20viewBox='0%200%20260%20220'%3E%3Cg%20font-family='ui-monospace,SFMono-Regular,Menlo,Consolas,monospace'%20font-size='15'%20font-weight='500'%20fill='black'%3E%3Ctext%20x='18'%20y='34'%3E%7B%20%7D%3C/text%3E%3Ctext%20x='150'%20y='22'%3E%26lt%3B/%26gt%3B%3C/text%3E%3Ctext%20x='96'%20y='84'%3E=%26gt%3B%3C/text%3E%3Ctext%20x='206'%20y='96'%3E()%3B%3C/text%3E%3Ctext%20x='30'%20y='128'%3E%5B%20%5D%3C/text%3E%3Ctext%20x='140'%20y='150'%3E//%3C/text%3E%3Ctext%20x='64'%20y='194'%3E%26amp%3B%26amp%3B%3C/text%3E%3Ctext%20x='198'%20y='190'%3E%21==%3C/text%3E%3C/g%3E%3C/svg%3E"), linear-gradient(90deg, #000, rgb(0 0 0 / 0.4) 28%, rgb(0 0 0 / 0.4) 72%, #000);
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='220'%20viewBox='0%200%20260%20220'%3E%3Cg%20font-family='ui-monospace,SFMono-Regular,Menlo,Consolas,monospace'%20font-size='15'%20font-weight='500'%20fill='black'%3E%3Ctext%20x='18'%20y='34'%3E%7B%20%7D%3C/text%3E%3Ctext%20x='150'%20y='22'%3E%26lt%3B/%26gt%3B%3C/text%3E%3Ctext%20x='96'%20y='84'%3E=%26gt%3B%3C/text%3E%3Ctext%20x='206'%20y='96'%3E()%3B%3C/text%3E%3Ctext%20x='30'%20y='128'%3E%5B%20%5D%3C/text%3E%3Ctext%20x='140'%20y='150'%3E//%3C/text%3E%3Ctext%20x='64'%20y='194'%3E%26amp%3B%26amp%3B%3C/text%3E%3Ctext%20x='198'%20y='190'%3E%21==%3C/text%3E%3C/g%3E%3C/svg%3E"), linear-gradient(90deg, #000, rgb(0 0 0 / 0.4) 28%, rgb(0 0 0 / 0.4) 72%, #000);
+  -webkit-mask-size: 260px 220px, 100% 100%;
+  mask-size: 260px 220px, 100% 100%;
+  -webkit-mask-repeat: repeat, no-repeat;
+  mask-repeat: repeat, no-repeat;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+:root[data-theme="light"] body::before {
+  opacity: 0.09;
+}
+
+@media (prefers-contrast: more) {
+  body::before {
+    display: none;
   }
 }
 
@@ -344,10 +253,25 @@ html[data-section="Contacto"] {
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 650;
+    font-weight: 600;
     line-height: 1.12;
     letter-spacing: -0.03em;
     color: var(--text);
+    text-wrap: balance;
+  }
+
+  /*
+   * El tracking depende del tamaño: los titulares grandes piden letras más juntas, pero a 15–27 px (títulos de
+   * tarjeta) -0.03em las aprieta de más. Los h3/h4 relajan el valor y ganan un punto de aire entre líneas si saltan.
+   */
+  h3,
+  h4 {
+    letter-spacing: -0.012em;
+    line-height: 1.22;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   ::selection {
@@ -359,116 +283,6 @@ html[data-section="Contacto"] {
     outline: 2px solid var(--accent);
     outline-offset: 3px;
     border-radius: 4px;
-  }
-}
-
-/*
- * Capa ambiental fija detrás de todo: aurora azul (tres halos que derivan muy despacio), rejilla fina y,
- * encima, un resplandor que sigue al cursor (src/scripts/ambient.ts). Discreta a propósito: es ambiente, no protagonista.
- * Los halos solo animan `transform`, así que no repintan; en móvil y con «reducir movimiento» se quedan quietos.
- */
-.ambient {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  pointer-events: none;
-  background:
-    radial-gradient(120% 70% at 50% -10%, color-mix(in srgb, var(--orb-a) 14%, transparent), transparent 60%),
-    var(--bg);
-}
-
-.ambient-orb {
-  position: absolute;
-  width: 62vmax;
-  height: 62vmax;
-  border-radius: 50%;
-  opacity: var(--orb-opacity);
-  background: radial-gradient(closest-side, var(--c), transparent);
-  will-change: transform;
-}
-
-.ambient-orb[data-orb="a"] {
-  --c: var(--orb-a);
-  top: -26vmax;
-  left: -18vmax;
-}
-
-.ambient-orb[data-orb="b"] {
-  --c: var(--orb-b);
-  top: 18vh;
-  right: -28vmax;
-  width: 52vmax;
-  height: 52vmax;
-}
-
-.ambient-orb[data-orb="c"] {
-  --c: var(--orb-c);
-  bottom: -22vmax;
-  left: -12vmax;
-}
-
-.ambient-grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 75% 65% at 50% 18%, #000 0%, transparent 78%);
-}
-
-@media (min-width: 769px) and (prefers-reduced-motion: no-preference) {
-  .ambient-orb[data-orb="a"] {
-    animation: drift-a 26s ease-in-out infinite alternate;
-  }
-  .ambient-orb[data-orb="b"] {
-    animation: drift-b 32s ease-in-out infinite alternate;
-  }
-  .ambient-orb[data-orb="c"] {
-    animation: drift-c 38s ease-in-out infinite alternate;
-  }
-
-  @keyframes drift-a {
-    to {
-      transform: translate3d(14vmax, 10vmax, 0) scale(1.12);
-    }
-  }
-  @keyframes drift-b {
-    to {
-      transform: translate3d(-16vmax, 8vmax, 0) scale(0.9);
-    }
-  }
-  @keyframes drift-c {
-    to {
-      transform: translate3d(10vmax, -12vmax, 0) scale(1.15);
-    }
-  }
-}
-
-/* Resplandor que sigue al cursor: solo con puntero fino, y se oculta hasta el primer movimiento. */
-.cursor-glow {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
-  width: 640px;
-  height: 640px;
-  margin: -320px 0 0 -320px;
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 16%, transparent), transparent);
-  transition: opacity 600ms var(--ease-out);
-  will-change: transform;
-}
-
-.cursor-glow[data-active] {
-  opacity: 1;
-}
-
-@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .cursor-glow {
-    display: none;
   }
 }
 
@@ -587,6 +401,62 @@ html[data-reveal] [data-seen] .st-pass {
 }
 
 /*
+ * Cambio de tema: fundido cruzado del conjunto (View Transitions) en vez de un salto brusco de brillo entre oscuro y
+ * claro. Lo dispara el botón de tema de la cabecera; sin soporte o con «reducir movimiento» el cambio es instantáneo.
+ */
+::view-transition-group(root) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-out);
+}
+
+/*
+ * Materiales (`.material`: cápsula y menú de la cabecera; `.material-dark`: controles flotantes sobre imágenes).
+ * Con «reducir transparencia» pasan a superficies sólidas y sin desenfoque; con «más contraste», además, llevan un
+ * filo definido. Van fuera de @layer a propósito: deben ganar a las utilidades de Tailwind.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  .material,
+  .material-dark,
+  dialog[data-lightbox] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .material {
+    background-color: var(--bg);
+  }
+  .material-dark {
+    background-color: rgb(0 0 0 / 0.88);
+  }
+  dialog[data-lightbox] {
+    background-color: rgb(5 5 5);
+  }
+  /* Menú móvil a pantalla completa (solo ≤ 960 px, donde la navegación es un panel y no la cápsula). */
+  @media (max-width: 960px) {
+    [data-nav] {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background-color: var(--bg);
+    }
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --text-muted: #c4cee4;
+    --border: #3a4a78;
+    --border-strong: #8fa4d8;
+  }
+  :root[data-theme="light"] {
+    --text-muted: #2a3858;
+    --border: #7f93c2;
+    --border-strong: #3a4f86;
+  }
+  .material {
+    border-color: var(--border-strong);
+  }
+}
+
+/*
  * La entrada del hero espera a que termine la pantalla de carga: mientras <html data-boot> está puesto los
  * elementos se quedan en su estado inicial y la animación arranca al quitarse el atributo.
  */
@@ -598,11 +468,6 @@ html[data-boot] .animate-rise {
 html[data-boot] .animate-line {
   animation: none;
   opacity: 0;
-}
-
-html[data-boot] .animate-sheen {
-  animation: none;
-  background-position: 100% 0;
 }
 
 /*

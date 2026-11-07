@@ -9,7 +9,10 @@ import type { Project } from "../../types/content";
 import { COMMANDS, normalizeInput, runCommand, welcomeLine } from "./commands";
 import type { CommandContext, ConsoleLine } from "./consoleTypes";
 
-const buildContext = (language: Language = "es", overrides: Partial<CommandContext> = {}): CommandContext => ({
+const buildContext = (
+  language: Language = "es",
+  overrides: Partial<CommandContext> = {},
+): CommandContext => ({
   t: messages[language],
   language,
   localize: (text) => text[language],
@@ -18,11 +21,18 @@ const buildContext = (language: Language = "es", overrides: Partial<CommandConte
   ...overrides,
 });
 
-const plain = (line: ConsoleLine) => line.map((segment) => segment.text).join("");
-const run = (input: string, language: Language = "es", overrides: Partial<CommandContext> = {}) =>
-  runCommand(input, buildContext(language, overrides));
-const texts = (input: string, language: Language = "es", overrides: Partial<CommandContext> = {}) =>
-  run(input, language, overrides).lines.map(plain);
+const plain = (line: ConsoleLine) =>
+  line.map((segment) => segment.text).join("");
+const run = (
+  input: string,
+  language: Language = "es",
+  overrides: Partial<CommandContext> = {},
+) => runCommand(input, buildContext(language, overrides));
+const texts = (
+  input: string,
+  language: Language = "es",
+  overrides: Partial<CommandContext> = {},
+) => run(input, language, overrides).lines.map(plain);
 
 describe("normalizeInput", () => {
   it("quita espacios sobrantes y colapsa los repetidos", () => {
@@ -51,8 +61,21 @@ describe("help", () => {
   it("lista los comandos con el nombre en verde y su descripción", () => {
     const { lines } = run("help");
 
-    for (const name of ["help", "whoami", "skills", "proyectos", "run tests", "contacto", "cv", "404", "clear", "exit"]) {
-      const line = lines.find((candidate) => candidate[0]?.text.trim() === name);
+    for (const name of [
+      "help",
+      "whoami",
+      "skills",
+      "proyectos",
+      "run tests",
+      "contacto",
+      "cv",
+      "404",
+      "clear",
+      "exit",
+    ]) {
+      const line = lines.find(
+        (candidate) => candidate[0]?.text.trim() === name,
+      );
       expect(line, `falta ${name}`).toBeDefined();
       expect(line?.[0]?.tone).toBe("ok");
     }
@@ -74,7 +97,10 @@ describe("help", () => {
   it("cada comando con ayuda tiene descripción en ambos idiomas", () => {
     for (const language of ["es", "en"] as const) {
       for (const command of COMMANDS) {
-        if (command.helpKey) expect(messages[language].console.help[command.helpKey].trim()).not.toBe("");
+        if (command.helpKey)
+          expect(
+            messages[language].console.help[command.helpKey].trim(),
+          ).not.toBe("");
       }
     }
   });
@@ -83,12 +109,14 @@ describe("help", () => {
 describe("whoami", () => {
   it("presenta a Jose con el texto acordado", () => {
     expect(texts("whoami")).toEqual([
-      "José Sánchez. QA Tester en Torcal y desarrollador multiplataforma. Pruebo aplicaciones y las construyo con Astro y TypeScript.",
+      "José Sánchez. QA Tester en Torcal Formación y desarrollador multiplataforma. Pruebo aplicaciones y las construyo con Astro y TypeScript.",
     ]);
   });
 
   it("también en inglés", () => {
-    expect(texts("whoami", "en")[0]).toContain("QA Tester at Torcal and multiplatform developer");
+    expect(texts("whoami", "en")[0]).toContain(
+      "QA Tester at Torcal Formación and multiplatform developer",
+    );
   });
 });
 
@@ -104,11 +132,20 @@ describe("skills", () => {
   });
 
   it("solo menciona tecnologías que existen en el stack de la web", () => {
-    const known = new Set(stack.flatMap((category) => category.items.map((item) => item.es)));
-    const named = texts("skills").flatMap((line) => line.split(":")[1]?.split("·").map((name) => name.trim()) ?? []);
+    const known = new Set(
+      stack.flatMap((category) => category.items.map((item) => item.es)),
+    );
+    const named = texts("skills").flatMap(
+      (line) =>
+        line
+          .split(":")[1]
+          ?.split("·")
+          .map((name) => name.trim()) ?? [],
+    );
 
     expect(named.length).toBeGreaterThan(0);
-    for (const name of named) expect(known.has(name), `${name} no está en data/stack`).toBe(true);
+    for (const name of named)
+      expect(known.has(name), `${name} no está en data/stack`).toBe(true);
   });
 });
 
@@ -124,18 +161,23 @@ describe("proyectos", () => {
     const [first] = lines;
     // La clave se rellena con espacios hasta la longitud de la más larga.
     const width = Math.max(...projects.map((project) => project.id.length));
-    expect(first?.[0]).toMatchObject({ text: projects[0]?.id.padEnd(width), tone: "dim" });
+    expect(first?.[0]).toMatchObject({
+      text: projects[0]?.id.padEnd(width),
+      tone: "dim",
+    });
     expect(plain(first ?? [])).toContain(projects[0]?.title.es ?? "");
   });
 
   it("colorea el estado: Hecho en verde, En curso en azul, Por hacer en gris", () => {
-    const sample: Project[] = (["done", "in-progress", "todo"] as const).map((status) => ({
-      id: status,
-      title: { es: `Proyecto ${status}`, en: `Project ${status}` },
-      description: { es: "d", en: "d" },
-      tags: [],
-      status,
-    }));
+    const sample: Project[] = (["done", "in-progress", "todo"] as const).map(
+      (status) => ({
+        id: status,
+        title: { es: `Proyecto ${status}`, en: `Project ${status}` },
+        description: { es: "d", en: "d" },
+        tags: [],
+        status,
+      }),
+    );
     const { lines } = run("proyectos", "es", { projects: sample });
 
     const statuses = lines.map((line) => line[line.length - 1]);
@@ -148,10 +190,15 @@ describe("proyectos", () => {
 });
 
 describe("run tests", () => {
-  it.each(["run tests", "npm test", "npx playwright test", "NPX  Playwright  Test"])("«%s» muestra la batería", (input) => {
+  it.each([
+    "run tests",
+    "npm test",
+    "npx playwright test",
+    "NPX  Playwright  Test",
+  ])("«%s» muestra la batería", (input) => {
     expect(texts(input)).toEqual([
       "Running 5 tests using 1 worker",
-      "  ✓ perfil › es QA Tester en Torcal",
+      "  ✓ perfil › es QA Tester en Torcal Formación",
       "  ✓ qa › automatiza con Playwright + Node",
       "  ✓ qa › prueba APIs con Postman",
       "  ✓ qa › reporta bugs claros en Jira",
@@ -169,12 +216,16 @@ describe("run tests", () => {
 
     expect(lines[1]?.find((segment) => segment.text === "✓")?.tone).toBe("ok");
     const last = lines[lines.length - 1] ?? [];
-    expect(last.find((segment) => segment.text === "5 passed")?.tone).toBe("ok");
+    expect(last.find((segment) => segment.text === "5 passed")?.tone).toBe(
+      "ok",
+    );
     expect(last.find((segment) => segment.text === "(1.9s)")?.tone).toBe("dim");
   });
 
   it("traduce los nombres de las pruebas", () => {
-    expect(texts("run tests", "en")[1]).toBe("  ✓ profile › is a QA Tester at Torcal");
+    expect(texts("run tests", "en")[1]).toBe(
+      "  ✓ profile › is a QA Tester at Torcal Formación",
+    );
   });
 });
 
@@ -185,11 +236,18 @@ describe("contacto", () => {
 
   it("muestra el email como texto y LinkedIn y GitHub como enlaces", () => {
     const { lines } = run("contacto");
-    const valueOf = (label: string) => lines.find((line) => line[0]?.text.startsWith(label))?.[1];
+    const valueOf = (label: string) =>
+      lines.find((line) => line[0]?.text.startsWith(label))?.[1];
 
     expect(valueOf("email")).toEqual({ text: profile.email, href: undefined });
-    expect(valueOf("linkedin")).toMatchObject({ text: profile.linkedin, href: profile.linkedin });
-    expect(valueOf("github")).toMatchObject({ text: profile.github, href: profile.github });
+    expect(valueOf("linkedin")).toMatchObject({
+      text: profile.linkedin,
+      href: profile.linkedin,
+    });
+    expect(valueOf("github")).toMatchObject({
+      text: profile.github,
+      href: profile.github,
+    });
   });
 });
 
@@ -206,12 +264,16 @@ describe("404", () => {
   it("navega a una ruta que no existe y cierra la consola", () => {
     const result = run("404");
 
-    expect(result.lines.map(plain)).toEqual(["Navegando a /esta-pagina-no-existe/…"]);
+    expect(result.lines.map(plain)).toEqual([
+      "Navegando a /esta-pagina-no-existe/…",
+    ]);
     expect(result.effects).toEqual(["show404", "close"]);
   });
 
   it("la ruta lleva el prefijo del idioma", () => {
-    expect(run("404", "en").lines.map(plain)).toEqual(["Navigating to /en/this-page-does-not-exist/…"]);
+    expect(run("404", "en").lines.map(plain)).toEqual([
+      "Navigating to /en/this-page-does-not-exist/…",
+    ]);
   });
 });
 
@@ -229,36 +291,51 @@ describe("sudo", () => {
   it("sudo contratar concede el permiso en verde", () => {
     const { lines } = run("sudo contratar");
 
-    expect(lines.map(plain)).toEqual([`Permiso concedido. Escríbeme a ${profile.email} 😉`]);
+    expect(lines.map(plain)).toEqual([
+      `Permiso concedido. Escríbeme a ${profile.email} 😉`,
+    ]);
     expect(lines[0]?.[0]?.tone).toBe("ok");
   });
 
   it("sudo hire hace lo mismo en inglés", () => {
-    expect(texts("sudo hire", "en")[0]).toBe(`Permission granted. Write to me at ${profile.email} 😉`);
+    expect(texts("sudo hire", "en")[0]).toBe(
+      `Permission granted. Write to me at ${profile.email} 😉`,
+    );
   });
 
-  it.each(["sudo", "sudo rm -rf /", "SUDO apt install trabajo"])("«%s» responde con la pista", (input) => {
-    expect(texts(input)).toEqual(["Buen intento. Prueba con sudo contratar"]);
-  });
+  it.each(["sudo", "sudo rm -rf /", "SUDO apt install trabajo"])(
+    "«%s» responde con la pista",
+    (input) => {
+      expect(texts(input)).toEqual(["Buen intento. Prueba con sudo contratar"]);
+    },
+  );
 
   it("una palabra que solo empieza por «sudo» no cuenta como sudo", () => {
-    expect(texts("sudoku")).toEqual(["comando no encontrado: sudoku. Escribe help."]);
+    expect(texts("sudoku")).toEqual([
+      "comando no encontrado: sudoku. Escribe help.",
+    ]);
   });
 });
 
 describe("comando desconocido", () => {
   it("repite lo escrito, sin espacios sobrantes y respetando las mayúsculas", () => {
-    expect(texts("  Foo   BAR ")).toEqual(["comando no encontrado: Foo BAR. Escribe help."]);
+    expect(texts("  Foo   BAR ")).toEqual([
+      "comando no encontrado: Foo BAR. Escribe help.",
+    ]);
   });
 
   it("devuelve el texto tal cual, sin interpretarlo", () => {
     const [line] = run('<img src=x onerror="alert(1)">').lines;
 
-    expect(plain(line ?? [])).toBe('comando no encontrado: <img src=x onerror="alert(1)">. Escribe help.');
+    expect(plain(line ?? [])).toBe(
+      'comando no encontrado: <img src=x onerror="alert(1)">. Escribe help.',
+    );
   });
 
   it("en inglés", () => {
-    expect(texts("nope", "en")).toEqual(["command not found: nope. Type help."]);
+    expect(texts("nope", "en")).toEqual([
+      "command not found: nope. Type help.",
+    ]);
   });
 });
 

@@ -20,8 +20,8 @@ export const TEST_RUN_LINES: readonly TestRunLine[] = [
   { text: "Running 5 tests using 1 worker", tone: "dim" },
   {
     text: {
-      es: "  <ok>✓</ok> perfil › es QA Tester en Torcal",
-      en: "  <ok>✓</ok> profile › is a QA Tester at Torcal",
+      es: "  <ok>✓</ok> perfil › es QA Tester en Torcal Formación",
+      en: "  <ok>✓</ok> profile › is a QA Tester at Torcal Formación",
     },
   },
   {

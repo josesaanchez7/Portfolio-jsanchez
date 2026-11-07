@@ -11,7 +11,7 @@ const items = [
 ];
 
 const NODE =
-  "relative z-[1] block size-[13px] shrink-0 rounded-full border-2 border-border-strong bg-page transition-[border-color,background-color,box-shadow,scale] duration-300 ease-out group-data-[state=done]/node:border-accent group-data-[state=done]/node:bg-accent group-data-[state=active]/node:scale-125 group-data-[state=active]/node:border-accent group-data-[state=active]/node:bg-accent group-data-[state=active]/node:shadow-[0_0_0_4px_var(--accent-soft),0_0_14px_var(--accent)]";
+  "relative z-[1] block size-[13px] shrink-0 rounded-full border-2 border-border-strong bg-page transition-[border-color,background-color,box-shadow,scale] duration-300 ease-out group-data-[state=done]/node:border-accent group-data-[state=done]/node:bg-accent group-data-[state=active]/node:scale-125 group-data-[state=active]/node:border-accent group-data-[state=active]/node:bg-accent group-data-[state=active]/node:shadow-[0_0_0_4px_var(--accent-soft)]";
 const LABEL =
   "pointer-events-none absolute top-1/2 left-7 -translate-x-1 -translate-y-1/2 rounded-sm border panel px-2 py-0.5 font-code text-[0.7rem] whitespace-nowrap text-fg-muted opacity-0 transition-[opacity,translate] duration-200 ease-out group-hover/rail:translate-x-0 group-hover/rail:opacity-100 group-data-[state=active]/node:translate-x-0 group-data-[state=active]/node:text-fg group-data-[state=active]/node:opacity-100";
 ---
@@ -31,7 +31,7 @@ const LABEL =
   <ol class="relative flex flex-col gap-10">
     <span class="absolute top-[7px] bottom-[7px] left-[6px] w-px bg-border" aria-hidden="true"></span>
     <span
-      class="absolute top-[7px] bottom-[7px] left-[6px] w-px origin-top bg-[linear-gradient(var(--grad-a),var(--grad-b))] shadow-[0_0_8px_var(--grad-b)] transition-[transform] duration-500 ease-out [transform:scaleY(var(--p,0))]"
+      class="absolute top-[7px] bottom-[7px] left-[6px] w-px origin-top bg-[linear-gradient(var(--grad-a),var(--grad-b))] transition-[transform] duration-500 ease-out [transform:scaleY(var(--p,0))]"
       aria-hidden="true"
     ></span>
     {
