@@ -65,7 +65,7 @@ const CHIP =
     <header class="flex flex-wrap items-center justify-between gap-2 font-code text-[0.8125rem]">
       {item.ticket && <span class="font-medium text-accent">{item.ticket}</span>}
       <span
-        class={`inline-flex items-center gap-[0.4rem] rounded-full border px-[0.65rem] py-[0.15rem] ${ongoing ? "border-accent bg-accent-soft text-accent" : "border-ok/50 bg-ok/15 text-fg"}`}
+        class={`inline-flex items-center gap-[0.4rem] rounded-md border px-[0.65rem] py-[0.15rem] ${ongoing ? "border-accent bg-accent-soft text-accent" : "border-ok/50 bg-ok/15 text-fg"}`}
       >
         <Icon name={ongoing ? "arrowRight" : "check"} class="size-[0.7rem]" />
         {ongoing ? t.experience.statusInProgress : t.experience.statusDone}

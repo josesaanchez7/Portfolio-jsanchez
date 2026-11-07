@@ -1,54 +1,45 @@
 import { describe, expect, it } from "vitest";
 import { profile } from "../../data/profile";
 import { projects } from "../../data/projects";
-import { stack } from "../../data/stack";
-import { TEST_RUN_LINES } from "../../data/testRun";
 import { messages } from "../../i18n/messages";
-import type { Language } from "../../lib/language";
-import type { Project } from "../../types/content";
-import { COMMANDS, normalizeInput, runCommand, welcomeLine } from "./commands";
+import { COMMANDS, completeInput, normalizeInput, promptFor, runCommand, welcomeLine } from "./commands";
 import type { CommandContext, ConsoleLine } from "./consoleTypes";
 
-const buildContext = (
-  language: Language = "es",
-  overrides: Partial<CommandContext> = {},
-): CommandContext => ({
-  t: messages[language],
-  language,
-  localize: (text) => text[language],
+// La consola es siempre en inglés (ConsoleDialog fija el contexto así en las dos versiones de la web).
+const buildContext = (overrides: Partial<CommandContext> = {}): CommandContext => ({
+  t: messages.en,
+  language: "en",
+  localize: (text) => text.en,
   profile,
   projects,
   ...overrides,
 });
 
-const plain = (line: ConsoleLine) =>
-  line.map((segment) => segment.text).join("");
-const run = (
-  input: string,
-  language: Language = "es",
-  overrides: Partial<CommandContext> = {},
-) => runCommand(input, buildContext(language, overrides));
-const texts = (
-  input: string,
-  language: Language = "es",
-  overrides: Partial<CommandContext> = {},
-) => run(input, language, overrides).lines.map(plain);
+const plain = (line: ConsoleLine) => line.map((segment) => segment.text).join("");
+const run = (input: string, overrides: Partial<CommandContext> = {}) => runCommand(input, buildContext(overrides));
+const texts = (input: string, overrides: Partial<CommandContext> = {}) => run(input, overrides).lines.map(plain);
+
+describe("idioma", () => {
+  it("la versión en español de la web usa los mismos textos de consola (en inglés)", () => {
+    expect(messages.es.console).toBe(messages.en.console);
+  });
+});
 
 describe("normalizeInput", () => {
   it("quita espacios sobrantes y colapsa los repetidos", () => {
-    expect(normalizeInput("  run    tests  ")).toBe("run tests");
+    expect(normalizeInput("  open    cv.pdf  ")).toBe("open cv.pdf");
   });
 });
 
 describe("reconocimiento de comandos", () => {
   it("no distingue mayúsculas ni minúsculas", () => {
     expect(texts("HELP")).toEqual(texts("help"));
-    expect(texts("WhoAmI")).toEqual(texts("whoami"));
+    expect(texts("LS")).toEqual(texts("ls"));
+    expect(texts("open EMAIL.TXT")).toEqual(texts("open email.txt"));
   });
 
   it("ignora los espacios sobrantes", () => {
-    expect(texts("   whoami   ")).toEqual(texts("whoami"));
-    expect(run("  RUN     TESTS ").lines).toHaveLength(TEST_RUN_LINES.length);
+    expect(texts("  OPEN     email.txt ")).toEqual(texts("open email.txt"));
   });
 
   it("una línea vacía no produce salida", () => {
@@ -57,293 +48,247 @@ describe("reconocimiento de comandos", () => {
   });
 });
 
-describe("help", () => {
-  it("lista los comandos con el nombre en verde y su descripción", () => {
+describe("help y man", () => {
+  it("lista los comandos de shell con su forma de uso en verde", () => {
     const { lines } = run("help");
+    const names = lines.map((line) => line[0]?.text.trim());
 
-    for (const name of [
-      "help",
-      "whoami",
-      "skills",
-      "proyectos",
-      "run tests",
-      "contacto",
-      "cv",
-      "404",
-      "clear",
-      "exit",
-    ]) {
-      const line = lines.find(
-        (candidate) => candidate[0]?.text.trim() === name,
-      );
-      expect(line, `falta ${name}`).toBeDefined();
-      expect(line?.[0]?.tone).toBe("ok");
-    }
-    expect(texts("help").join("\n")).toContain("muestra esta ayuda");
+    expect(names).toEqual(["ls [-l]", "cd <folder>", "open <file>", "wget cv.pdf", "pbcopy < email.txt", "clear", "exit"]);
+    expect(lines.every((line) => line[0]?.tone === "ok")).toBe(true);
+    expect(texts("help").join("\n")).toContain("list folders (sections) and files");
   });
 
-  it("no revela el comando oculto sudo", () => {
-    expect(texts("help").join("\n")).not.toContain("sudo");
+  it("no se lista a sí mismo ni revela los atajos ocultos ni sudo", () => {
+    const help = texts("help").join("\n");
+    expect(help).not.toMatch(/^help\b/m);
+    expect(help).not.toContain("sudo");
+    expect(help).not.toMatch(/^projects\b/m);
   });
 
-  it("muestra los nombres en inglés cuando el idioma es inglés", () => {
-    const names = texts("help", "en").join("\n");
-
-    expect(names).toContain("projects");
-    expect(names).toContain("contact");
-    expect(names).toContain("show this help");
+  it("man <comando> muestra solo esa entrada", () => {
+    expect(texts("man cd")).toEqual([`cd <folder>  ${messages.en.console.help.cd}`]);
+    expect(texts("man nothing")).toEqual(["No manual entry for nothing"]);
   });
 
-  it("cada comando con ayuda tiene descripción en ambos idiomas", () => {
-    for (const language of ["es", "en"] as const) {
-      for (const command of COMMANDS) {
-        if (command.helpKey)
-          expect(
-            messages[language].console.help[command.helpKey].trim(),
-          ).not.toBe("");
-      }
+  it("cada comando con ayuda tiene descripción", () => {
+    for (const command of COMMANDS) {
+      if (command.helpKey) expect(messages.en.console.help[command.helpKey].trim()).not.toBe("");
     }
   });
 });
 
-describe("whoami", () => {
-  it("presenta a Jose con el texto acordado", () => {
-    expect(texts("whoami")).toEqual([
-      "José Sánchez. QA Tester en Torcal Formación y desarrollador multiplataforma. Pruebo aplicaciones y las construyo con Astro y TypeScript.",
-    ]);
+describe("ls", () => {
+  it("en ~ muestra las secciones como carpetas (azul, con /) y los archivos", () => {
+    const [line] = run("ls").lines;
+
+    expect(plain(line ?? [])).toBe(
+      "projects/  experience/  education/  about/  contact/  email.txt  cv.pdf  github.url  linkedin.url",
+    );
+    expect(line?.find((segment) => segment.text === "projects/")?.tone).toBe("info");
   });
 
-  it("también en inglés", () => {
-    expect(texts("whoami", "en")[0]).toContain(
-      "QA Tester at Torcal Formación and multiplatform developer",
-    );
+  it("ls -l y ls -la dan un listado largo con permisos", () => {
+    const lines = texts("ls -la");
+    expect(lines[0]).toBe("drwxr-xr-x  jose  projects/");
+    expect(lines).toContain("-rw-r--r--  jose  cv.pdf");
+    expect(texts("ls -l")).toEqual(lines);
+  });
+
+  it("dentro de projects/ hay una carpeta por proyecto", () => {
+    expect(texts("ls projects")).toEqual([projects.map((project) => `${project.id}/`).join("  ")]);
+    expect(texts("ls", { cwd: "~/projects" })).toEqual(texts("ls projects"));
+  });
+
+  it("una ruta que no existe da el error de la shell", () => {
+    expect(texts("ls secrets")).toEqual(["ls: no such file or directory: secrets"]);
   });
 });
 
-describe("skills", () => {
-  it("muestra dos líneas con las categorías en amarillo", () => {
-    const { lines } = run("skills");
-
-    expect(lines.map(plain)).toEqual([
-      "Testing: Playwright · Node.js · Postman · Jira",
-      "Desarrollo: Astro · TypeScript · Tailwind CSS · Vite · Git",
-    ]);
-    expect(lines.map((line) => line[0]?.tone)).toEqual(["warn", "warn"]);
-  });
-
-  it("solo menciona tecnologías que existen en el stack de la web", () => {
-    const known = new Set(
-      stack.flatMap((category) => category.items.map((item) => item.es)),
-    );
-    const named = texts("skills").flatMap(
-      (line) =>
-        line
-          .split(":")[1]
-          ?.split("·")
-          .map((name) => name.trim()) ?? [],
-    );
-
-    expect(named.length).toBeGreaterThan(0);
-    for (const name of named)
-      expect(known.has(name), `${name} no está en data/stack`).toBe(true);
-  });
-});
-
-describe("proyectos", () => {
-  it("proyectos y projects dan lo mismo", () => {
-    expect(texts("projects")).toEqual(texts("proyectos"));
-  });
-
-  it("muestra una línea por proyecto con clave, título y estado", () => {
-    const { lines } = run("proyectos");
-
-    expect(lines).toHaveLength(projects.length);
-    const [first] = lines;
-    // La clave se rellena con espacios hasta la longitud de la más larga.
-    const width = Math.max(...projects.map((project) => project.id.length));
-    expect(first?.[0]).toMatchObject({
-      text: projects[0]?.id.padEnd(width),
-      tone: "dim",
-    });
-    expect(plain(first ?? [])).toContain(projects[0]?.title.es ?? "");
-  });
-
-  it("colorea el estado: Hecho en verde, En curso en azul, Por hacer en gris", () => {
-    const sample: Project[] = (["done", "in-progress", "todo"] as const).map(
-      (status) => ({
-        id: status,
-        title: { es: `Proyecto ${status}`, en: `Project ${status}` },
-        description: { es: "d", en: "d" },
-        tags: [],
-        status,
-      }),
-    );
-    const { lines } = run("proyectos", "es", { projects: sample });
-
-    const statuses = lines.map((line) => line[line.length - 1]);
-    expect(statuses).toEqual([
-      { text: "Hecho", tone: "ok" },
-      { text: "En curso", tone: "info" },
-      { text: "Por hacer", tone: "dim" },
-    ]);
-  });
-});
-
-describe("run tests", () => {
+describe("cd", () => {
   it.each([
-    "run tests",
-    "npm test",
-    "npx playwright test",
-    "NPX  Playwright  Test",
-  ])("«%s» muestra la batería", (input) => {
-    expect(texts(input)).toEqual([
-      "Running 5 tests using 1 worker",
-      "  ✓ perfil › es QA Tester en Torcal Formación",
-      "  ✓ qa › automatiza con Playwright + Node",
-      "  ✓ qa › prueba APIs con Postman",
-      "  ✓ qa › reporta bugs claros en Jira",
-      "  ✓ dev › desarrolla con Astro + TypeScript",
-      "  5 passed (1.9s)",
-    ]);
-  });
-
-  it("pide mostrar las líneas una a una con una pausa", () => {
-    expect(run("run tests").lineDelayMs).toBeGreaterThan(0);
-  });
-
-  it("colorea los ✓ y «5 passed» en verde y el tiempo en gris", () => {
-    const { lines } = run("run tests");
-
-    expect(lines[1]?.find((segment) => segment.text === "✓")?.tone).toBe("ok");
-    const last = lines[lines.length - 1] ?? [];
-    expect(last.find((segment) => segment.text === "5 passed")?.tone).toBe(
-      "ok",
-    );
-    expect(last.find((segment) => segment.text === "(1.9s)")?.tone).toBe("dim");
-  });
-
-  it("traduce los nombres de las pruebas", () => {
-    expect(texts("run tests", "en")[1]).toBe(
-      "  ✓ profile › is a QA Tester at Torcal Formación",
-    );
-  });
-});
-
-describe("contacto", () => {
-  it("contacto y contact dan lo mismo", () => {
-    expect(texts("contact")).toEqual(texts("contacto"));
-  });
-
-  it("muestra el email como texto y LinkedIn y GitHub como enlaces", () => {
-    const { lines } = run("contacto");
-    const valueOf = (label: string) =>
-      lines.find((line) => line[0]?.text.startsWith(label))?.[1];
-
-    expect(valueOf("email")).toEqual({ text: profile.email, href: undefined });
-    expect(valueOf("linkedin")).toMatchObject({
-      text: profile.linkedin,
-      href: profile.linkedin,
-    });
-    expect(valueOf("github")).toMatchObject({
-      text: profile.github,
-      href: profile.github,
+    ["cd projects", "Proyectos", "~/projects"],
+    ["cd projects/", "Proyectos", "~/projects"],
+    ["cd ~/experience", "Experience", "~/experience"],
+    ["cd ./education", "Education", "~/education"],
+    ["cd about", "SobreMi", "~/about"],
+    ["cd /home/jose/contact", "Contacto", "~/contact"],
+    // Los nombres en español siguen valiendo como alias.
+    ["cd proyectos", "Proyectos", "~/projects"],
+    ["cd formación", "Education", "~/education"],
+    ["cd sobre-mi", "SobreMi", "~/about"],
+  ])("«%s» cierra la consola, va a #%s y cambia a %s", (input, sectionId, cwd) => {
+    expect(run(input)).toEqual({
+      lines: [],
+      cwd,
+      effects: [{ type: "close" }, { type: "scrollTo", sectionId }],
     });
   });
-});
 
-describe("cv", () => {
-  it("escribe el aviso, abre el CV y cierra la consola", () => {
-    const result = run("cv");
+  it.each(["cd", "cd ~", "cd ..", "cd /", "cd -"])("«%s» vuelve al inicio (~)", (input) => {
+    expect(run(input, { cwd: "~/projects" })).toMatchObject({
+      cwd: "~",
+      effects: [{ type: "close" }, { type: "scrollTo", sectionId: "hero" }],
+    });
+  });
 
-    expect(result.lines.map(plain)).toEqual(["Abriendo CHANGELOG.md…"]);
-    expect(result.effects).toEqual(["openCv", "close"]);
+  it("no entra en archivos ni en carpetas que no existen", () => {
+    expect(texts("cd cv.pdf")).toEqual(["cd: not a directory: cv.pdf (try open cv.pdf)"]);
+    expect(texts("cd secrets")).toEqual(["cd: no such file or directory: secrets"]);
+  });
+
+  it("el nombre de una sección a secas es un atajo de cd", () => {
+    expect(run("experience")).toEqual(run("cd experience"));
+    expect(run("experiencia")).toEqual(run("cd experience"));
   });
 });
 
-describe("404", () => {
-  it("navega a una ruta que no existe y cierra la consola", () => {
-    const result = run("404");
-
-    expect(result.lines.map(plain)).toEqual([
-      "Navegando a /esta-pagina-no-existe/…",
-    ]);
-    expect(result.effects).toEqual(["show404", "close"]);
+describe("echo y prompt", () => {
+  it("echo repite el texto y expande $USER, $HOME y $PWD", () => {
+    expect(texts('echo "Hello $USER"')).toEqual(["Hello jose"]);
+    expect(texts("echo $HOME")).toEqual(["/home/jose"]);
+    expect(texts("echo $PWD", { cwd: "~/projects" })).toEqual(["/home/jose/projects"]);
   });
 
-  it("la ruta lleva el prefijo del idioma", () => {
-    expect(run("404", "en").lines.map(plain)).toEqual([
-      "Navigating to /en/this-page-does-not-exist/…",
+  it("el prompt incluye la carpeta actual", () => {
+    expect(promptFor("~/projects")).toBe("jose@portfolio ~/projects $");
+  });
+});
+
+describe("open", () => {
+  it("open cv.pdf abre el PDF en otra pestaña (no lo descarga)", () => {
+    expect(run("open cv.pdf").effects).toEqual([{ type: "openCv" }]);
+    expect(run("xdg-open cv.pdf").effects).toEqual([{ type: "openCv" }]);
+    expect(texts("open cv.pdf")).toEqual(["Opening cv.pdf in a new tab…"]);
+  });
+
+  it("open github.url y open linkedin.url abren el perfil", () => {
+    expect(run("open github.url").effects).toEqual([{ type: "openUrl", url: profile.github }]);
+    expect(run("open linkedin.url").effects).toEqual([{ type: "openUrl", url: profile.linkedin }]);
+    expect(run("github").effects).toEqual(run("open github.url").effects);
+    expect(texts("open github.url")).toEqual(["Opening GitHub in a new tab…"]);
+  });
+
+  it("open email.txt muestra el correo", () => {
+    expect(texts("open email.txt")).toEqual([profile.email]);
+  });
+
+  it("open de una carpeta es como cd", () => {
+    expect(run("open projects")).toEqual(run("cd projects"));
+  });
+
+  it("errores de open", () => {
+    expect(texts("open")).toEqual(["open: missing operand. Type man open."]);
+    expect(texts("open nothing.txt")).toEqual(["open: no such file or directory: nothing.txt"]);
+  });
+});
+
+describe("wget y pbcopy", () => {
+  it("wget, curl y el atajo cv descargan el CV", () => {
+    const download = { lines: run("wget cv.pdf").lines, effects: [{ type: "downloadCv" }] };
+    expect(run("wget cv.pdf")).toEqual(download);
+    expect(run("curl -O cv.pdf")).toEqual(download);
+    expect(run("cv")).toEqual(download);
+    expect(texts("wget cv.pdf")).toEqual(["Downloading cv.pdf…"]);
+  });
+
+  it.each(["pbcopy < email.txt", "pbcopy<email.txt", "xclip email.txt", "xclip -sel c < email.txt", "email"])(
+    "«%s» copia el correo (la interfaz confirma)",
+    (input) => {
+      expect(run(input)).toEqual({ lines: [], effects: [{ type: "copy", text: profile.email }] });
+    },
+  );
+
+  it("pbcopy también copia los enlaces, pero no el PDF", () => {
+    expect(run("pbcopy < github.url").effects).toEqual([{ type: "copy", text: profile.github }]);
+    expect(texts("pbcopy < cv.pdf")).toEqual([
+      "pbcopy: cv.pdf: only email.txt, github.url and linkedin.url can be copied",
     ]);
+    expect(texts("pbcopy")).toEqual(["pbcopy: missing operand. Type man pbcopy."]);
+  });
+
+  it("los textos de confirmación de la copia", () => {
+    expect(messages.en.console.copied("a@b.c")).toBe("✓ Copied to clipboard: a@b.c");
+    expect(messages.en.console.copyFailed("a@b.c")).toContain("a@b.c");
   });
 });
 
 describe("clear y exit", () => {
-  it("clear pide limpiar los resultados", () => {
+  it("clear limpia la consola", () => {
     expect(run("clear")).toEqual({ lines: [], clear: true });
   });
 
   it("exit cierra la consola", () => {
-    expect(run("exit")).toEqual({ lines: [], effects: ["close"] });
+    expect(run("exit")).toEqual({ lines: [], effects: [{ type: "close" }] });
+  });
+});
+
+describe("comandos retirados", () => {
+  it.each(["whoami", "history", "npm test", "run tests", "404", "pwd", "cat email.txt", "skills"])(
+    "«%s» ya no existe",
+    (input) => {
+      expect(texts(input)[0]).toContain("zsh: command not found");
+    },
+  );
+
+  it("README.md y skills.txt ya no existen", () => {
+    expect(texts("open README.md")).toEqual(["open: no such file or directory: README.md"]);
+    expect(texts("open skills.txt")).toEqual(["open: no such file or directory: skills.txt"]);
   });
 });
 
 describe("sudo", () => {
-  it("sudo contratar concede el permiso en verde", () => {
-    const { lines } = run("sudo contratar");
-
-    expect(lines.map(plain)).toEqual([
-      `Permiso concedido. Escríbeme a ${profile.email} 😉`,
-    ]);
+  it.each(["sudo hire", "sudo contratar"])("«%s» concede el permiso en verde", (input) => {
+    const { lines } = run(input);
+    expect(lines.map(plain)).toEqual([`Permission granted. Write to me at ${profile.email} 😉`]);
     expect(lines[0]?.[0]?.tone).toBe("ok");
   });
 
-  it("sudo hire hace lo mismo en inglés", () => {
-    expect(texts("sudo hire", "en")[0]).toBe(
-      `Permission granted. Write to me at ${profile.email} 😉`,
-    );
+  it.each(["sudo", "sudo rm -rf /", "SUDO apt install job"])("«%s» responde con la pista", (input) => {
+    expect(texts(input)).toEqual(["Nice try. Try sudo hire"]);
   });
 
-  it.each(["sudo", "sudo rm -rf /", "SUDO apt install trabajo"])(
-    "«%s» responde con la pista",
-    (input) => {
-      expect(texts(input)).toEqual(["Buen intento. Prueba con sudo contratar"]);
-    },
-  );
-
   it("una palabra que solo empieza por «sudo» no cuenta como sudo", () => {
-    expect(texts("sudoku")).toEqual([
-      "comando no encontrado: sudoku. Escribe help.",
-    ]);
+    expect(texts("sudoku")).toEqual(["zsh: command not found: sudoku. Type help."]);
   });
 });
 
 describe("comando desconocido", () => {
-  it("repite lo escrito, sin espacios sobrantes y respetando las mayúsculas", () => {
-    expect(texts("  Foo   BAR ")).toEqual([
-      "comando no encontrado: Foo BAR. Escribe help.",
-    ]);
+  it("responde como zsh, repitiendo lo escrito sin espacios sobrantes", () => {
+    expect(texts("  Foo   BAR ")).toEqual(["zsh: command not found: Foo BAR. Type help."]);
   });
 
   it("devuelve el texto tal cual, sin interpretarlo", () => {
     const [line] = run('<img src=x onerror="alert(1)">').lines;
+    expect(plain(line ?? [])).toBe('zsh: command not found: <img src=x onerror="alert(1)">. Type help.');
+  });
+});
 
-    expect(plain(line ?? [])).toBe(
-      'comando no encontrado: <img src=x onerror="alert(1)">. Escribe help.',
-    );
+describe("autocompletado (Tab)", () => {
+  it("completa un comando único y deja un espacio", () => {
+    expect(completeInput("wg", "en")).toEqual({ value: "wget ", options: [] });
   });
 
-  it("en inglés", () => {
-    expect(texts("nope", "en")).toEqual([
-      "command not found: nope. Type help.",
-    ]);
+  it("con varias opciones completa lo común y las lista", () => {
+    expect(completeInput("c", "en")).toEqual({ value: "c", options: ["cd", "clear"] });
+  });
+
+  it("completa carpetas tras cd (sin espacio, con /) y archivos tras pbcopy", () => {
+    expect(completeInput("cd pro", "en")).toEqual({ value: "cd projects/", options: [] });
+    expect(completeInput("cd ex", "en")).toEqual({ value: "cd experience/", options: [] });
+    expect(completeInput("pbcopy < em", "en")).toEqual({ value: "pbcopy < email.txt ", options: [] });
+  });
+
+  it("open ofrece carpetas y archivos; sin coincidencias no cambia nada", () => {
+    expect(completeInput("open c", "en").options).toEqual(["contact/", "cv.pdf"]);
+    expect(completeInput("zz", "en")).toEqual({ value: "zz", options: [] });
   });
 });
 
 describe("bienvenida", () => {
-  it("resalta help en verde", () => {
+  it("resalta help y ls en verde y menciona el Tab", () => {
     const line = welcomeLine(buildContext());
-
-    expect(plain(line)).toBe("Bienvenido. Escribe help para ver los comandos.");
+    expect(plain(line)).toContain("Tab completes");
     expect(line.find((segment) => segment.text === "help")?.tone).toBe("ok");
+    expect(line.find((segment) => segment.text === "ls")?.tone).toBe("ok");
   });
 });

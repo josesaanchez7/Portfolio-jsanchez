@@ -18,7 +18,7 @@ const { t } = getI18n(Astro.currentLocale);
       <p class="max-w-[44ch] text-[1.1rem] text-fg-muted">{t.contact.intro}</p>
       {
         statusBar.available && (
-          <p class="inline-flex items-center gap-3 rounded-full border border-border-strong bg-surface px-4 py-2 text-[0.92rem] font-medium">
+          <p class="inline-flex items-center gap-3 rounded-md border border-border-strong bg-surface px-4 py-2 text-[0.92rem] font-medium">
             {/* Punto verde que late; con «reducir movimiento» queda fijo. */}
             <span class="relative flex size-2.5" aria-hidden="true">
               <span class="absolute inline-flex size-full animate-ping rounded-full bg-ok opacity-60" />
@@ -34,9 +34,10 @@ const { t } = getI18n(Astro.currentLocale);
       <div class="flex items-stretch overflow-hidden rounded-sm border border-border-strong bg-page">
         <a
           href={`mailto:${profile.email}`}
-          class="min-w-0 flex-1 px-4 py-[0.8rem] font-code text-[0.92rem] [overflow-wrap:anywhere] text-fg hover:text-accent"
+          class="min-w-0 flex-1 px-4 py-[0.8rem] font-code text-[0.92rem] [overflow-wrap:anywhere] text-fg hover:text-accent max-mini:text-[0.85rem]"
         >
-          {profile.email}
+          {/* Si no cabe, se parte tras la @ (no a mitad de palabra). */}
+          {profile.email.split("@")[0]}@<wbr />{profile.email.split("@")[1]}
         </a>
         <button
           type="button"
@@ -63,6 +64,7 @@ const { t } = getI18n(Astro.currentLocale);
 </Section>
 
 <script>
+  import { copyText } from "../../scripts/clipboard";
   import { showToast } from "../../scripts/toast";
 
   const ICON_RESET_MS = 2500;
@@ -73,13 +75,8 @@ const { t } = getI18n(Astro.currentLocale);
     let resetTimer: number | undefined;
 
     button.addEventListener("click", async () => {
-      let copied = false;
-      try {
-        await navigator.clipboard.writeText(button.dataset.copyEmail ?? "");
-        copied = true;
-      } catch {
-        // También cubre contextos sin Clipboard API (p. ej. http sin TLS).
-      }
+      // Clipboard API y, si falla (http sin TLS, ventana sin foco…), el método antiguo: ver scripts/clipboard.ts.
+      const copied = await copyText(button.dataset.copyEmail ?? "");
 
       // El aviso (región role="status") lo anuncia a los lectores de pantalla; el botón muestra un ✓ un rato.
       showToast((copied ? button.dataset.copiedMessage : button.dataset.errorMessage) ?? "", copied ? "ok" : "error");

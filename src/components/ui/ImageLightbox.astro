@@ -19,7 +19,7 @@ const BUTTON =
 <dialog
   data-lightbox
   aria-label={t.projects.lightboxLabel()}
-  class="m-0 size-full max-h-none max-w-none overflow-hidden bg-[rgba(5,5,5,0.96)] p-0 text-white opacity-100 backdrop-blur-xl backdrop:bg-transparent open:flex starting:open:opacity-0 transition-opacity duration-200"
+  class="m-0 size-full max-h-none max-w-none overflow-hidden bg-[rgba(5,5,5,0.96)] p-0 text-white opacity-0 backdrop-blur-xl backdrop:bg-transparent open:flex open:opacity-100 starting:open:opacity-0 [&:not([open])]:pointer-events-none transition-[opacity,display,overlay] transition-discrete duration-200 ease-out"
 >
   <div
     data-lightbox-stage
@@ -126,7 +126,10 @@ const BUTTON =
       const buttons = group ? [...group.querySelectorAll<HTMLElement>("[data-lightbox-open]")] : [];
       (buttons[index] ?? opener)?.focus({ preventScroll: true });
       group = opener = null;
-      image.removeAttribute("src");
+      // La imagen se vacía cuando acaba el fundido de salida (200 ms), salvo que se haya vuelto a abrir.
+      window.setTimeout(() => {
+        if (!dialog.open) image.removeAttribute("src");
+      }, 200);
     });
 
     document.addEventListener("click", (event) => {

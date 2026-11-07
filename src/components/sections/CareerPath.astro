@@ -65,7 +65,7 @@ const stages = chronological.flatMap((item) => [
                   </li>
                 )}
                 <li
-                  class={`rounded-full border px-[0.8rem] py-[0.3rem] text-[0.9rem] font-medium ${stage.current ? "border-accent bg-accent-soft text-accent" : stage.subtask ? "border-dashed border-border-strong text-fg-muted" : "border-border-strong text-fg"}`}
+                  class={`rounded-md border px-[0.8rem] py-[0.3rem] text-[0.9rem] font-medium ${stage.current ? "border-accent bg-accent-soft text-accent" : stage.subtask ? "border-dashed border-border-strong text-fg-muted" : "border-border-strong text-fg"}`}
                   aria-current={stage.current ? "step" : undefined}
                 >
                   {stage.label}

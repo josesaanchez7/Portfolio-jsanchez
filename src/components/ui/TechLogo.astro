@@ -28,7 +28,7 @@ const logo = getTechLogo(name);
       fill="currentColor"
       focusable="false"
       {...(decorative ? { "aria-hidden": "true" } : { role: "img", "aria-label": name })}
-      style={`--hover-dark:${hoverCss(logo, "dark")};--hover-light:${hoverCss(logo, "light")}`}
+      style={`--hover:${hoverCss(logo)}`}
       class="tech-logo shrink-0 text-fg opacity-70 transition-[color,opacity] duration-200 group-hover/tile:text-(--hover) group-hover/tile:opacity-100 group-focus-within/tile:text-(--hover) group-focus-within/tile:opacity-100"
     >
       {logo.paths.map((d) => (
@@ -37,12 +37,3 @@ const logo = getTechLogo(name);
     </svg>
   )
 }
-
-<style>
-  .tech-logo {
-    --hover: var(--hover-dark);
-  }
-  :global(:root[data-theme="light"]) .tech-logo {
-    --hover: var(--hover-light);
-  }
-</style>

@@ -2,7 +2,7 @@
 
 Portfolio personal construido con [Astro](https://astro.build) 7, TypeScript y Tailwind CSS v4. Todo son
 componentes `.astro` (HTML + CSS + JavaScript de servidor en el frontmatter); no hay React ni ningún otro
-framework de UI. La web se genera como HTML estático y la interactividad (menú, tema, idioma, pantalla de
+framework de UI. La web se genera como HTML estático y la interactividad (menú, idioma, pantalla de
 carga, consola…) es JavaScript vanilla en etiquetas `<script>` dentro de los propios componentes.
 Todos los estilos son utilidades de Tailwind (no hay hojas CSS por componente).
 
@@ -35,11 +35,11 @@ Todo el estilo es Tailwind v4 (preflight incluido), cargado con su plugin de Vit
 [`astro.config.mjs`](astro.config.mjs); la configuración vive en [`src/styles/global.css`](src/styles/global.css),
 que importa [`Layout.astro`](src/layouts/Layout.astro):
 
-- **Tokens de color:** variables CSS (`--bg`, `--surface`, `--accent`…) con tema claro/oscuro en `:root`.
-  `@theme inline` las expone como utilidades que siguen el tema activo: `bg-page`, `bg-surface`,
+- **Tokens de color:** variables CSS (`--bg`, `--surface`, `--accent`…) en `:root`; la web solo tiene modo oscuro.
+  `@theme inline` las expone como utilidades: `bg-page`, `bg-surface`,
   `text-fg`, `text-fg-muted`, `text-accent`, `border-border`, `border-border-strong`, `shadow-card`…
 - **Tipografías** (alojadas en local con Fontsource, sin peticiones a Google Fonts): `font-sans` (Inter),
-  `font-heading` (Fraunces, serif con eje óptico), `font-code` (JetBrains Mono) y `font-boot` (Geist Mono, pantalla de carga).
+  `font-heading` (Inter también, con tracking negativo en los titulares), `font-code` (JetBrains Mono) y `font-boot` (Geist Mono, pantalla de carga).
   Las de la primera pantalla se precargan desde `Layout.astro`.
 - **Movimiento:** `ease-out` está redefinida en `@theme` como `cubic-bezier(0.23, 1, 0.32, 1)` (las curvas
   por defecto de CSS son demasiado flojas), y `--ease-in-out` para movimientos en pantalla. La entrada del hero
@@ -88,7 +88,7 @@ src/
 ├── i18n/           getI18n (idioma de la página), parseTags y diccionarios de interfaz (messages/)
 ├── data/           contenido estático tipado (perfil, proyectos, experiencia, stack, métricas, secciones)
 ├── types/          modelos de dominio del contenido
-├── lib/            funciones puras (tema, idioma, formato, SEO) y utilidades de estilo
+├── lib/            funciones puras (idioma, formato, SEO) y utilidades de estilo
 ├── styles/         global.css: Tailwind, tokens de diseño y base
 ├── assets/         imágenes y CV que procesa Astro (con hash en el build)
 └── test/           utilidades de los tests (renderComponent) y los tests de las páginas
@@ -102,14 +102,12 @@ se publica), por eso los tests de las páginas viven en `src/test`.
 
 No hay islas ni hidratación: cada componente con comportamiento lleva su `<script>` (TypeScript) al final del
 archivo `.astro`, que Astro empaqueta y carga como módulo. Los scripts enlazan con el marcado mediante
-atributos `data-*` (`data-header`, `data-theme-toggle`, `data-console-open`…) y comparten estado a través del
-DOM (`<html data-theme | data-boot | data-console-active | data-menu-active>`).
+atributos `data-*` (`data-header`, `data-console-open`…) y comparten estado a través del
+DOM (`<html data-boot | data-console-active | data-menu-active>`).
 
-- **Tema:** el script inline del `<head>` aplica el tema guardado antes del primer pintado; el botón de la cabecera
-  lo alterna (los dos iconos están en el HTML y los muestra el CSS según `data-theme`).
 - **Menú móvil, sección activa, copiar correo, casos de estudio:** scripts de su componente.
 - **Lo que no puede importar módulos** (el script del `<head>`) duplica a propósito un poco de lógica de
-  `src/lib/theme.ts` y `src/lib/language.ts`: mantener en sincronía.
+  `src/lib/language.ts`: mantener en sincronía.
 
 ## Idiomas (español / inglés)
 
@@ -242,13 +240,13 @@ están en [`src/data/statusBar.ts`](src/data/statusBar.ts). El año del copyrigh
 
 Vitest, con dos tipos de prueba:
 
-- **Lógica pura** (jsdom): contenido, idioma, tema, SEO, `parseTags`, línea de tiempo de la carga, comandos y
+- **Lógica pura** (jsdom): contenido, idioma, SEO, `parseTags`, línea de tiempo de la carga, comandos y
   sesión de la consola.
 - **Componentes `.astro`** (Node): se renderizan con la
   [Container API](https://docs.astro.build/en/reference/container-reference/) de Astro
   ([`src/test/render.ts`](src/test/render.ts)) y se consultan con Testing Library. Esos archivos empiezan por
   `// @vitest-environment node`. Es HTML estático: los `<script>` no se ejecutan, así que el comportamiento del
-  navegador (menú, tema, pantalla de carga, atajos de la consola…) no está cubierto por los tests.
+  navegador (menú, pantalla de carga, atajos de la consola…) no está cubierto por los tests.
 
 ## Dónde editar el contenido
 

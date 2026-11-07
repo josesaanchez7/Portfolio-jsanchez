@@ -20,7 +20,7 @@ const INLINE_TAGS: Record<string, TagSpec> = {
 // Oculta salvo que el script del <head> la active con <html data-boot>. Duración del fundido:
 // debe coincidir con EXIT_DURATION_MS (scripts/boot/bootTimeline.ts).
 const ROOT =
-  "fixed inset-0 z-[9999] hidden in-data-[boot]:flex cursor-pointer items-center justify-center overflow-hidden bg-boot-bg p-6 font-boot text-[15px] leading-[1.7] text-boot-text transition-[opacity,scale] duration-500 ease-[ease] [-webkit-tap-highlight-color:transparent] max-phone:text-[13px] data-exiting:pointer-events-none data-exiting:scale-[1.02] data-exiting:opacity-0";
+  "fixed inset-0 z-[9999] hidden in-data-[boot]:flex cursor-pointer items-center justify-center overflow-hidden bg-boot-bg p-6 font-boot text-[15px] leading-[1.7] text-boot-text transition-[opacity,scale] duration-300 ease-out [-webkit-tap-highlight-color:transparent] max-phone:text-[13px] data-exiting:pointer-events-none data-exiting:scale-[1.02] data-exiting:opacity-0";
 
 // Las líneas con `data-pending` aún no se han escrito: se mantienen ocultas para reservar su espacio
 // y que el bloque, centrado en vertical, no se desplace ni reajuste el salto de línea al aparecer el texto.

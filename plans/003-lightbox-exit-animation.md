@@ -1,6 +1,6 @@
 # 003 — Give the image lightbox a matching exit (fade out like it fades in)
 
-- **Status**: TODO
+- **Status**: DONE (2026-11-07)
 - **Commit**: 815deb1
 - **Severity**: MEDIUM
 - **Category**: Physicality & origin / Interruptibility (asymmetric enter vs. exit)

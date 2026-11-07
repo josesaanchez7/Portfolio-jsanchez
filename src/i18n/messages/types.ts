@@ -1,5 +1,4 @@
 import type { Language } from "../../lib/language";
-import type { ProjectStatus } from "../../types/content";
 
 /**
  * Textos de interfaz. Los textos con variables son funciones; las marcas <b>…</b> y <h>…</h>
@@ -8,14 +7,11 @@ import type { ProjectStatus } from "../../types/content";
  */
 /** Comandos que aparecen en la ayuda de la consola. */
 export type ConsoleHelpKey =
-  | "help"
-  | "whoami"
-  | "skills"
-  | "projects"
-  | "tests"
-  | "contact"
-  | "cv"
-  | "notFound"
+  | "ls"
+  | "cd"
+  | "open"
+  | "wget"
+  | "pbcopy"
   | "clear"
   | "exit";
 
@@ -36,13 +32,19 @@ export interface Messages {
     /** Admite <ok>…</ok> para resaltar el comando. */
     welcome: string;
     help: Record<ConsoleHelpKey, string>;
-    whoami: (values: { name: string; job: string; employer: string }) => string;
-    skillsTesting: string;
-    skillsDevelopment: string;
-    projectStatus: Record<ProjectStatus, string>;
     openingCv: string;
-    /** Recibe la ruta a la que se navega. */
-    navigatingToNotFound: (path: string) => string;
+    downloadingCv: string;
+    /** Recibe el nombre del perfil (GitHub, LinkedIn). */
+    openingProfile: (name: string) => string;
+    /** Confirmación de `pbcopy`; recibe lo copiado. */
+    copied: (value: string) => string;
+    copyFailed: (value: string) => string;
+    /** Errores de la shell, al estilo de zsh (reciben el comando y/o la ruta). */
+    noSuchFile: (command: string, path: string) => string;
+    notADirectory: (path: string) => string;
+    missingOperand: (command: string) => string;
+    cannotCopy: (path: string) => string;
+    noManual: (command: string) => string;
     sudoGranted: (email: string) => string;
     sudoDenied: string;
     unknownCommand: (input: string) => string;
@@ -50,8 +52,6 @@ export interface Messages {
   header: {
     homeLabel: (name: string) => string;
     navLabel: string;
-    themeToLight: string;
-    themeToDark: string;
     openMenu: string;
     closeMenu: string;
     /** Botón de la cabecera que abre la consola (Ctrl/⌘ + K). */
@@ -64,10 +64,8 @@ export interface Messages {
     title: string;
     lead: (values: { role: string; job: string; employer: string }) => string;
     viewProjects: string;
-    contact: string;
     profileLinksLabel: string;
     downloadCv: string;
-    stackLabel: string;
     portraitAlt: (name: string) => string;
   };
   projects: {

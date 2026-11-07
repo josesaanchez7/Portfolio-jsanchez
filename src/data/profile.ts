@@ -8,8 +8,8 @@ export const profile: Profile = {
   fullName: "José Francisco Sánchez Aldana",
   nickname: "José",
   role: {
-    es: "Graduado en Desarrollo de Aplicaciones Multiplataforma",
-    en: "Multiplatform Application Development graduate",
+    es: "Técnico Superior en Desarrollo de Aplicaciones Multiplataforma (DAM)",
+    en: "Higher Technician in Multiplatform Application Development (DAM)",
   },
   currentJob: { es: "QA Tester", en: "QA Tester" },
   employer: "Torcal Formación",

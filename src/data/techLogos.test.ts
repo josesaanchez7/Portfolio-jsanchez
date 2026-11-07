@@ -2,20 +2,18 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { contrastRatio } from "../lib/color";
 import { stack } from "./stack";
-import { getTechLogo, hoverCss, techLogos, type ThemeName } from "./techLogos";
+import { getTechLogo, hoverCss, techLogos } from "./techLogos";
 
 const css = readFileSync("src/styles/global.css", "utf8");
-/** Valor de una variable CSS dentro de un bloque (`:root {` o `:root[data-theme="light"] {`). */
+/** Valor de una variable CSS dentro de un bloque (`:root {`). */
 const token = (block: string, name: string): string => {
   const start = css.indexOf(block);
   const value = new RegExp(`--${name}:\\s*(#[0-9a-fA-F]{6})`).exec(css.slice(start))?.[1];
   if (!value) throw new Error(`No se encuentra --${name} en ${block}`);
   return value;
 };
-const THEMES: Record<ThemeName, { surface: string; accent: string }> = {
-  dark: { surface: token(":root {", "surface"), accent: token(":root {", "accent") },
-  light: { surface: token(':root[data-theme="light"]', "surface"), accent: token(':root[data-theme="light"]', "accent") },
-};
+const SURFACE = token(":root {", "surface");
+const ACCENT = token(":root {", "accent");
 
 describe("logos de tecnologías", () => {
   it("cada tecnología del stack tiene su logo", () => {
@@ -50,24 +48,18 @@ describe("logos de tecnologías", () => {
     }
   });
 
-  it.each(["dark", "light"] as const)(
-    "el color de hover de cada logo contrasta al menos 3:1 con la baldosa en tema %s (marca o acento)",
-    (theme) => {
-      const { surface, accent } = THEMES[theme];
-      for (const [name, logo] of Object.entries(techLogos)) {
-        const color = hoverCss(logo, theme);
-        const resolved = color === "var(--accent)" ? accent : color;
-        expect(contrastRatio(resolved, surface), `${name} (${resolved}) en ${theme}`).toBeGreaterThanOrEqual(3);
-      }
-    },
-  );
+  it("el color de hover de cada logo contrasta al menos 3:1 con la baldosa oscura (marca o acento)", () => {
+    for (const [name, logo] of Object.entries(techLogos)) {
+      const color = hoverCss(logo);
+      const resolved = color === "var(--accent)" ? ACCENT : color;
+      expect(contrastRatio(resolved, SURFACE), `${name} (${resolved})`).toBeGreaterThanOrEqual(3);
+    }
+  });
 
   it("solo se sustituye el color de marca por el acento donde de verdad no contrasta", () => {
     for (const [name, logo] of Object.entries(techLogos)) {
-      for (const theme of ["dark", "light"] as const) {
-        const brandFails = contrastRatio(logo.brandColor, THEMES[theme].surface) < 3;
-        expect(Boolean(logo.hoverColor?.[theme]), `${name} en ${theme}`).toBe(brandFails);
-      }
+      const brandFails = contrastRatio(logo.brandColor, SURFACE) < 3;
+      expect(Boolean(logo.hoverColor), name).toBe(brandFails);
     }
   });
 });

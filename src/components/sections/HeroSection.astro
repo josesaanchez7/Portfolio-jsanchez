@@ -4,16 +4,12 @@ import perfil from "../../assets/img/hero.webp";
 import { cvUrl } from "../../data/cv";
 import { profile } from "../../data/profile";
 import { HERO_ID } from "../../data/sections";
-import { stack } from "../../data/stack";
-import { TEST_RUN_LINES } from "../../data/testRun";
 import { getI18n } from "../../i18n";
 import Button from "../ui/Button.astro";
+import Icon from "../ui/Icon.astro";
 import RichText, { type TagSpec } from "../ui/RichText.astro";
 
 const { t, localize } = getI18n(Astro.currentLocale);
-// En el hero van primero las herramientas de pruebas y después las de desarrollo.
-const testingItems = stack.find((category) => category.label.en === "Testing and quality")?.items ?? [];
-const mainStack = [...new Set([...testingItems, ...(stack[0]?.items ?? []).slice(0, 3)].map(localize))];
 const job = localize(profile.currentJob);
 
 // La frase clave va en el azul de acento, en un solo color (sin degradado ni destello).
@@ -24,28 +20,29 @@ const TITLE_TAGS: Record<string, TagSpec> = {
 // Entrada escalonada (ver `animate-rise` en global.css): cada elemento pone su posición en --i.
 const RISE = "animate-rise [animation-delay:calc(var(--i)*70ms)]";
 
-// Tarjeta del test: la misma salida de Playwright que ven la pantalla de carga y la consola (data/testRun.ts), que se
-// va «imprimiendo» línea a línea al terminar la carga. Decorativa: el contenido ya está en la consola.
-const RUN_TAGS: Record<string, TagSpec> = {
-  ok: { as: "span", class: "text-boot-ok" },
-  dim: { as: "span", class: "text-boot-dim" },
-  warn: { as: "span", class: "text-boot-warn" },
-};
-const runText = (text: (typeof TEST_RUN_LINES)[number]["text"]) => (typeof text === "string" ? text : localize(text)).trim();
+// Perfiles como botones cuadrados de solo icono, a la altura de los botones de acción (su nombre va en aria-label).
+const ICON_LINK =
+  "grid aspect-square place-items-center rounded-sm border border-border-strong text-[1.1rem] text-fg-muted transition-[color,border-color,scale] duration-150 ease-[ease] hover:border-accent hover:text-accent active:scale-[0.97]";
+const links = [
+  { href: profile.github, label: "GitHub", icon: "github" },
+  { href: profile.linkedin, label: "LinkedIn", icon: "linkedin" },
+] as const;
+
 ---
 
 <section
   id={HERO_ID}
   data-section={HERO_ID}
   aria-labelledby="hero-title"
-  class={`relative scroll-mt-(--header-height) px-6 pt-[calc(var(--header-height)+clamp(2rem,7vw,5.5rem))] pb-[clamp(4rem,9vw,7rem)]`}
+  class="hero-screen relative flex flex-col justify-center scroll-mt-(--header-height) px-6 pt-[calc(var(--header-height)+1.5rem)] pb-20"
 >
   <div
-    class="mx-auto grid max-w-site grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-[clamp(2rem,6vw,5rem)] max-nav:grid-cols-1"
+    class="mx-auto grid w-full max-w-site grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] items-center gap-[clamp(2rem,6vw,5rem)] max-nav:grid-cols-1"
   >
     <div class="flex flex-col items-start gap-6">
-      <p class={`${RISE} font-code text-[0.85rem] text-accent`} style="--i:0">
-        {profile.name}{" "}<span class="px-[0.15rem] text-fg-muted" aria-hidden="true">/</span>{" "}{t.hero.eyebrowRole(job, profile.employer)}
+      <p class={`${RISE} flex flex-wrap items-baseline gap-x-3 gap-y-1`} style="--i:0">
+        <span class="text-[clamp(1.15rem,2.2vw,1.35rem)] font-semibold tracking-[-0.01em] text-fg">{profile.name}</span>
+        <span class="font-code text-[0.85rem] text-accent">{t.hero.eyebrowRole(job, profile.employer)}</span>
       </p>
 
       <h1
@@ -65,68 +62,51 @@ const runText = (text: (typeof TEST_RUN_LINES)[number]["text"]) => (typeof text 
         />
       </p>
 
-      <div class={`${RISE} mt-2 flex w-full flex-col gap-3 mini:w-auto mini:flex-row mini:flex-wrap`} style="--i:3">
+      <div class={`${RISE} mt-2 flex flex-wrap items-stretch gap-3`} style="--i:3">
         <Button href="#Proyectos" icon="arrowRight">{t.hero.viewProjects}</Button>
         <Button href={cvUrl} download="Jose_Sanchez_CV.pdf" variant="secondary" icon="download">
           {t.hero.downloadCv}
         </Button>
+        <ul class="flex items-stretch gap-3" aria-label={t.hero.profileLinksLabel}>
+          {
+            links.map(({ href, label, icon }) => (
+              <li class="flex">
+                <a href={href} target="_blank" rel="noopener noreferrer" aria-label={label} class={ICON_LINK}>
+                  <Icon name={icon} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </div>
-
-      <ul class={`${RISE} -ml-2 flex flex-wrap gap-x-4 gap-y-1`} style="--i:4" aria-label={t.hero.profileLinksLabel}>
-        <li>
-          <Button href={profile.github} external variant="ghost" icon="github">GitHub</Button>
-        </li>
-        <li>
-          <Button href={profile.linkedin} external variant="ghost" icon="linkedin">LinkedIn</Button>
-        </li>
-        <li>
-          <Button href="#Contacto" variant="ghost" icon="envelope">{t.hero.contact}</Button>
-        </li>
-      </ul>
-
-      {
-        mainStack.length > 0 && (
-          <p class={`${RISE} border-t border-border pt-5 font-code text-[0.82rem] text-pretty text-fg-muted`} style="--i:5">
-            <span class="mr-2 text-accent">{t.hero.stackLabel}</span>{" "}{mainStack.join(" · ")}
-          </p>
-        )
-      }
     </div>
 
     {/*
-      Retrato con un filo de 1 px y la tarjeta del test solapada. Todo quieto: sin flotación, haz de luz ni inclinación.
+      Retrato con un filo de 1 px. Todo quieto: sin flotación, haz de luz ni inclinación.
     */}
-    <div class={`${RISE} relative w-[min(100%,320px)] justify-self-center max-nav:order-first max-nav:w-[120px] max-nav:justify-self-start`} style="--i:2">
-      <figure class="relative m-0 overflow-hidden rounded-lg border border-border bg-surface p-3 max-nav:p-1.5">
+    <div class={`${RISE} relative w-[min(100%,300px)] justify-self-end max-nav:order-first max-nav:w-[112px] max-nav:justify-self-start`} style="--i:2">
+      <figure class="relative m-0 overflow-hidden rounded-lg border border-border">
         <Image
           src={perfil}
           alt={t.hero.portraitAlt(profile.name)}
           width={340}
           height={340}
           widths={[340, 680]}
-          sizes="(max-width: 820px) 120px, 320px"
+          sizes="(max-width: 820px) 112px, 300px"
           loading="eager"
-          class="aspect-square w-full rounded-md object-cover"
+          class="aspect-square w-full object-cover"
         />
       </figure>
-      <div
-        class="absolute -bottom-[8.25rem] -left-12 z-10 w-[330px] rounded-md border border-border-strong/50 bg-boot-bg p-3 font-code text-[0.7rem] leading-[1.75] text-boot-text shadow-card max-[1000px]:hidden"
-        aria-hidden="true"
-      >
-        <p class="mb-1.5 flex items-center gap-1.5 text-boot-dim">
-          <span class="size-2 rounded-full bg-boot-dot"></span>
-          <span class="size-2 rounded-full bg-boot-dot"></span>
-          <span class="size-2 rounded-full bg-boot-dot"></span>
-          <span class="ml-1">npx playwright test</span>
-        </p>
-        {
-          TEST_RUN_LINES.map((line, index) => (
-            <p class="animate-line truncate [animation-delay:calc(1200ms+var(--l)*320ms)]" style={`--l:${index}`}>
-              <RichText text={runText(line.text)} tags={RUN_TAGS} />
-            </p>
-          ))
-        }
-      </div>
     </div>
+  </div>
+
+  {/* Indicador de que hay más abajo: el hero ocupa toda la pantalla y la siguiente sección empieza justo bajo el borde. Decorativo. */}
+  <div
+    class={`${RISE} pointer-events-none absolute bottom-6 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 font-code text-[0.75rem] text-fg-muted max-nav:hidden [@media(max-height:620px)]:hidden`}
+    style="--i:5"
+    aria-hidden="true"
+  >
+    <span>scroll</span>
+    <span class="h-8 w-px bg-linear-to-b from-border-strong to-transparent"></span>
   </div>
 </section>

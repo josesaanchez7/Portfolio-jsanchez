@@ -32,20 +32,26 @@
       let visible = false;
       let frame = 0;
 
+      // Se resuelven una sola vez: el DOM de la lista no cambia.
+      const tracks = nodes.map((node) => [...node.querySelectorAll("[data-track]")]);
+      const reveals = nodes.map((node) => [...node.querySelectorAll("[data-reveal]")]);
+
       // La franja de lectura está a un 65 % de la altura de la ventana: el nodo se enciende al cruzarla.
+      // Primero se leen todas las posiciones y después se escribe: así el navegador calcula el diseño una sola vez.
       const update = () => {
         frame = 0;
         const mark = window.innerHeight * READING_LINE;
         const rect = list.getBoundingClientRect();
+        const tops = nodes.map((node) => node.getBoundingClientRect().top);
         const fill = Math.min(1, Math.max(0, (mark - rect.top) / rect.height));
         list.style.setProperty("--fill", String(fill));
-        for (const node of nodes) {
-          const lit = node.getBoundingClientRect().top <= mark;
+        nodes.forEach((node, index) => {
+          const lit = (tops[index] ?? Infinity) <= mark;
           node.toggleAttribute("data-lit", lit);
-          for (const target of node.querySelectorAll("[data-track]")) target.toggleAttribute("data-lit", lit);
+          for (const target of tracks[index] ?? []) target.toggleAttribute("data-lit", lit);
           // El contenido entra una sola vez: al volver arriba no se desmonta.
-          if (lit) for (const target of node.querySelectorAll("[data-reveal]")) target.setAttribute("data-seen", "");
-        }
+          if (lit) for (const target of reveals[index] ?? []) target.setAttribute("data-seen", "");
+        });
       };
       const schedule = () => {
         if (visible && !frame) frame = requestAnimationFrame(update);

@@ -1,6 +1,6 @@
 # 005 — Experience timeline: read all layout first, then write (no per-node reflow on scroll)
 
-- **Status**: TODO
+- **Status**: DONE (2026-11-07)
 - **Commit**: 815deb1
 - **Severity**: MEDIUM
 - **Category**: Performance

@@ -2,7 +2,6 @@
 import "../styles/global.css";
 import geistMonoFont from "@fontsource-variable/geist-mono/files/geist-mono-latin-wght-normal.woff2?url";
 import interFont from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url";
-import soraFont from "@fontsource-variable/sora/files/sora-latin-wght-normal.woff2?url";
 import jetbrainsMonoFont from "@fontsource/jetbrains-mono/files/jetbrains-mono-latin-500-normal.woff2?url";
 import { getI18n } from "../i18n";
 import { DEFAULT_LANGUAGE, LANGUAGES } from "../lib/language";
@@ -33,15 +32,16 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
 ---
 
 <!doctype html>
-<html lang={language} data-theme="dark">
+<html lang={language}>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{meta.title}</title>
     <meta name="description" content={meta.description} />
     {noindex && <meta name="robots" content="noindex" />}
     <meta name="author" content="José Sánchez" />
     <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="dark" />
     {
       seoTags.map(({ tag: Tag, attributes }) => <Tag {...attributes} />)
     }
@@ -49,19 +49,11 @@ const languagePaths = Object.fromEntries(LANGUAGES.map((code) => [code, pathForL
     {/* Precarga de las fuentes del primer pantallazo (subconjunto latino; Geist Mono es la de la pantalla de carga): evita esperar al CSS para descubrirlas. */}
     <link rel="preload" as="font" type="font/woff2" crossorigin href={geistMonoFont} />
     <link rel="preload" as="font" type="font/woff2" crossorigin href={interFont} />
-    <link rel="preload" as="font" type="font/woff2" crossorigin href={soraFont} />
     <link rel="preload" as="font" type="font/woff2" crossorigin href={jetbrainsMonoFont} />
     <script is:inline define:vars={{ home, language, defaultLanguage: DEFAULT_LANGUAGE, languagePaths }}>
       // Se ejecuta antes del primer pintado para evitar parpadeos. Duplica a propósito parte de
-      // src/lib/theme.ts y src/lib/language.ts (un script inline no puede importar módulos): mantener en sincronía.
+      // src/lib/language.ts (un script inline no puede importar módulos): mantener en sincronía.
       var root = document.documentElement;
-
-      // Tema guardado. Sin localStorage se mantiene el oscuro por defecto.
-      try {
-        root.dataset.theme = localStorage.getItem("theme") === "light" ? "light" : "dark";
-      } catch (e) {
-        // Sin persistencia se queda el tema por defecto.
-      }
 
       // En la home, en la URL sin prefijo manda el idioma que eligió el usuario y, si nunca eligió, el del navegador.
       // En /en/ manda la URL.

@@ -28,9 +28,6 @@ export const BOOT_SEQUENCE: readonly BootStep[] = [
   { type: "cmd", text: "git clone github.com/josesaanchez7/portfolio" },
   { type: "out", text: "Cloning into 'portfolio'... done.", tone: "dim" },
 
-  { type: "cmd", text: "npm install" },
-  { type: "out", text: "added 214 packages in 1.2s", tone: "dim" },
-
   { type: "cmd", text: "npx playwright test jose.spec.ts" },
   ...TEST_RUN_LINES.map((line): BootStep => ({ type: "out", ...line })),
   {

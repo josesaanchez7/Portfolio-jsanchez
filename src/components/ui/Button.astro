@@ -18,7 +18,7 @@ interface Props extends Omit<HTMLAttributes<"a">, "class" | "target" | "rel"> {
 
 const BASE = [
   "inline-flex items-center justify-center gap-[0.55rem] py-[0.7rem]",
-  "rounded-sm border text-[0.95rem] leading-[1.2] font-semibold cursor-pointer",
+  "rounded-sm border text-[0.95rem] leading-[1.2] font-semibold cursor-pointer select-none [-webkit-touch-callout:none]",
   // Color: `ease` (cambio de estado). Pulsar: encoge un 3 % al instante para que el botón «escuche» al usuario.
   "transition-[background-color,border-color,color,scale,box-shadow] duration-150 ease-[ease]",
   "active:scale-[0.97]",

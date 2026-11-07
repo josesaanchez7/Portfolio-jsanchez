@@ -7,10 +7,10 @@ handled globally, reveal delays kept off hover). These are the remaining leverag
 | # | Title | Severity | Category | Status |
 | --- | --- | --- | --- | --- |
 | 001 | [Scope the aurora hue transition to `.ambient`](001-scope-aurora-hue-transition.md) | MEDIUM | Performance | OBSOLETE (aurora removed in the monochrome redesign) |
-| 002 | [Make the boot screen exit snappy](002-faster-boot-exit.md) | MEDIUM | Easing & duration | TODO |
-| 003 | [Give the lightbox a matching exit](003-lightbox-exit-animation.md) | MEDIUM | Physicality / interruptibility | TODO |
+| 002 | [Make the boot screen exit snappy](002-faster-boot-exit.md) | MEDIUM | Easing & duration | DONE (2026-11-07) |
+| 003 | [Give the lightbox a matching exit](003-lightbox-exit-animation.md) | MEDIUM | Physicality / interruptibility | DONE (2026-11-07) |
 | 004 | [Button sheen: no reverse sweep](004-button-sheen-no-reverse-sweep.md) | MEDIUM | Purpose / asymmetric timing | OBSOLETE (sheen removed in the monochrome redesign) |
-| 005 | [Timeline: batch reads before writes](005-timeline-batch-reads-writes.md) | MEDIUM | Performance | TODO |
+| 005 | [Timeline: batch reads before writes](005-timeline-batch-reads-writes.md) | MEDIUM | Performance | DONE (2026-11-07) |
 
 > 2026-11-07: the monochrome/minimal redesign removed the aurora, cursor glow, hero tilt/orbit, button sheen, spotlight and card lift. Plans 001 and 004 no longer apply; the "hover-lift cards" LOW item is also moot. 002, 003 and 005 are unaffected.
 

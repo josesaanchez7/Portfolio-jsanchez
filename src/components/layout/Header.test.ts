@@ -69,12 +69,10 @@ describe("Header", () => {
     expect(document.querySelector("[data-palette-open], [data-palette-kbd]")).toBeNull();
   });
 
-  it("el botón de tema lleva las dos etiquetas para que el script alterne", async () => {
-    const { getByRole } = await renderComponent(Header);
+  it("no hay botón de tema: la web solo tiene modo oscuro", async () => {
+    const { document } = await renderComponent(Header);
 
-    const toggle = getByRole("button", { name: "Cambiar a tema claro" });
-    expect(toggle).toHaveAttribute("data-label-to-light", "Cambiar a tema claro");
-    expect(toggle).toHaveAttribute("data-label-to-dark", "Cambiar a tema oscuro");
+    expect(document.querySelector("[data-theme-toggle]")).toBeNull();
   });
 
   it("el selector de idioma es un enlace a la otra versión de la web", async () => {

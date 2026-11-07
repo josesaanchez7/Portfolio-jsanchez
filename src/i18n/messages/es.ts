@@ -1,3 +1,4 @@
+import { en } from "./en.ts";
 import type { Messages } from "./types.ts";
 
 export const es: Messages = {
@@ -12,40 +13,11 @@ export const es: Messages = {
   sectionStatus: { running: "ejecutando", passed: "superado" },
   rail: { home: "Inicio" },
   boot: { label: "Cargando portfolio", skip: "Saltar", skipLabel: "Saltar la animación de carga" },
-  console: {
-    title: "Consola",
-    inputLabel: "Escribe un comando",
-    placeholder: "escribe help",
-    close: "Cerrar consola",
-    welcome: "Bienvenido. Escribe <ok>help</ok> para ver los comandos.",
-    help: {
-      help: "muestra esta ayuda",
-      whoami: "quién soy",
-      skills: "tecnologías con las que trabajo",
-      projects: "mis proyectos y su estado",
-      tests: "ejecuta la batería de pruebas",
-      contact: "cómo contactar conmigo",
-      cv: "abre mi currículum",
-      notFound: "visita una página que no existe",
-      clear: "limpia la consola",
-      exit: "cierra la consola",
-    },
-    whoami: ({ name, job, employer }) =>
-      `${name}. ${job} en ${employer} y desarrollador multiplataforma. Pruebo aplicaciones y las construyo con Astro y TypeScript.`,
-    skillsTesting: "Testing:",
-    skillsDevelopment: "Desarrollo:",
-    projectStatus: { done: "Hecho", "in-progress": "En curso", todo: "Por hacer" },
-    openingCv: "Abriendo CHANGELOG.md…",
-    navigatingToNotFound: (path) => `Navegando a ${path}…`,
-    sudoGranted: (email) => `Permiso concedido. Escríbeme a ${email} 😉`,
-    sudoDenied: "Buen intento. Prueba con sudo contratar",
-    unknownCommand: (input) => `comando no encontrado: ${input}. Escribe help.`,
-  },
+  // La consola es siempre en inglés (como una shell de verdad): mismos textos que en en.ts.
+  console: en.console,
   header: {
     homeLabel: (name) => `${name}, ir al inicio`,
     navLabel: "Principal",
-    themeToLight: "Cambiar a tema claro",
-    themeToDark: "Cambiar a tema oscuro",
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
     consoleLabel: "Abrir la consola (Ctrl K)",
@@ -55,12 +27,10 @@ export const es: Messages = {
     eyebrowRole: (job, employer) => `${job} en ${employer}`,
     title: "Desarrollo software con <h>mentalidad de QA</h>.",
     lead: ({ role, job, employer }) =>
-      `Soy ${role.toLowerCase()}. Actualmente trabajo como <b>${job}</b> en <b>${employer}</b>, asegurando la calidad y el buen funcionamiento de las aplicaciones.`,
+      `Soy ${role}. Actualmente trabajo como <b>${job}</b> en <b>${employer}</b>, asegurando la calidad y el buen funcionamiento de las aplicaciones.`,
     viewProjects: "Ver proyectos",
-    contact: "Contactar",
     profileLinksLabel: "Enlaces de perfil",
     downloadCv: "Descargar CV",
-    stackLabel: "stack",
     portraitAlt: (name) => `Foto de ${name}`,
   },
   projects: {

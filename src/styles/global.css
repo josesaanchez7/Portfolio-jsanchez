@@ -9,9 +9,9 @@
 @import "@fontsource/jetbrains-mono/latin-500.css";
 
 /*
- * Tokens de diseño. Los colores cambian con el tema (claro/oscuro) mediante variables CSS en :root;
+ * Tokens de diseño. Los colores son variables CSS en :root (la web solo tiene modo oscuro);
  * `@theme inline` las expone como utilidades de Tailwind (bg-surface, text-fg-muted, border-border…)
- * apuntando a la variable en vivo, de modo que el cambio de tema funciona también con las utilidades.
+ * apuntando a la variable en vivo.
  */
 @theme inline {
   --color-page: var(--bg);
@@ -64,7 +64,6 @@
   --animate-panel-in: panel-in 0.25s ease-out;
   --animate-digit-in: digit-in 0.35s ease-out;
   --animate-rise: rise 600ms var(--ease-out) both;
-  --animate-line: line-in 380ms var(--ease-out) both;
 
   /* La pista lleva cuatro copias iguales: desplazar la mitad vuelve al punto de partida sin saltos. */
   @keyframes marquee {
@@ -117,13 +116,6 @@
 
 
 
-  /* Una línea de la salida del test aparece desde la izquierda, como si se imprimiera. */
-  @keyframes line-in {
-    from {
-      opacity: 0;
-      translate: -8px 0;
-    }
-  }
 
 }
 
@@ -174,29 +166,6 @@
   --header-height: 88px; /* cápsula (56px) + hueco superior + aire: margen de scroll de las anclas */
 }
 
-:root[data-theme="light"] {
-  color-scheme: light;
-
-  --bg: #fafafa;
-  --surface: #ffffff;
-  --surface-hover: #f0f0f0;
-  --text: #0a0a0a;
-  --text-muted: #525252;
-  --accent: #1553e0;
-  --accent-hover: #0f3fb5;
-  --accent-contrast: #ffffff;
-  --accent-soft: rgba(21, 83, 224, 0.1);
-  --grad-a: #1553e0;
-  --grad-b: #4f8dff;
-  --border: #e5e5e5;
-  --border-strong: #8a8a8a;
-  --ok: #0f7a4a; /* ≥ 4,5:1 sobre blanco y sobre --bg */
-  --warn: #a16207;
-  --shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-
-  --panel: #ffffff;
-}
-
 /*
  * Panel: superficie sólida con filo de 1 px y nada más. Sin vidrio, sin marcas ni brillos: la separación la da el
  * contraste con el fondo y el filo. Al pasar el ratón cada tarjeta resalta su borde con el acento y sube 2 px.
@@ -207,10 +176,13 @@
 }
 
 /*
- * Textura de fondo: símbolos de programación (llaves, etiquetas, flecha, `();`, `//`, `&&`…) repetidos en un mosaico
- * escalonado, a ~8 % de opacidad. Es una máscara (`mask-image`) sobre el color del texto, así que sirve en los dos temas
- * sin duplicar nada. Más visible en los márgenes y más tenue detrás de la columna de contenido, para no restar lectura.
- * Estática y fija (no se mueve ni repinta al hacer scroll). Con «más contraste» se oculta.
+ * Fondo al estilo de los fondos de chat de Telegram: un mosaico de garabatos de línea (iconos dibujados con trazo fino
+ * y esquinas redondeadas, girados al azar y repartidos con holgura) sobre el negro liso del fondo. Aquí, de programación
+ * y QA: bug, terminal, rama de git, matraz de pruebas, lista de comprobación, llaves, escudo, nube, base de datos, chip,
+ * burbuja de chat y un avión de papel (guiño a Telegram). El mosaico (400×400 px, 25 iconos con giro propio) es una
+ * máscara SVG (`mask-image`) sobre un color, así que no pesa, no se pixela y toma el color de las variables del sitio.
+ * Más visible en los márgenes y más tenue detrás de la columna de contenido. Fijo y estático. Con «más contraste» se
+ * oculta el mosaico.
  */
 body::before {
   content: "";
@@ -218,26 +190,66 @@ body::before {
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: var(--text);
-  opacity: 0.08;
-  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='220'%20viewBox='0%200%20260%20220'%3E%3Cg%20font-family='ui-monospace,SFMono-Regular,Menlo,Consolas,monospace'%20font-size='15'%20font-weight='500'%20fill='black'%3E%3Ctext%20x='18'%20y='34'%3E%7B%20%7D%3C/text%3E%3Ctext%20x='150'%20y='22'%3E%26lt%3B/%26gt%3B%3C/text%3E%3Ctext%20x='96'%20y='84'%3E=%26gt%3B%3C/text%3E%3Ctext%20x='206'%20y='96'%3E()%3B%3C/text%3E%3Ctext%20x='30'%20y='128'%3E%5B%20%5D%3C/text%3E%3Ctext%20x='140'%20y='150'%3E//%3C/text%3E%3Ctext%20x='64'%20y='194'%3E%26amp%3B%26amp%3B%3C/text%3E%3Ctext%20x='198'%20y='190'%3E%21==%3C/text%3E%3C/g%3E%3C/svg%3E"), linear-gradient(90deg, #000, rgb(0 0 0 / 0.4) 28%, rgb(0 0 0 / 0.4) 72%, #000);
-  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='260'%20height='220'%20viewBox='0%200%20260%20220'%3E%3Cg%20font-family='ui-monospace,SFMono-Regular,Menlo,Consolas,monospace'%20font-size='15'%20font-weight='500'%20fill='black'%3E%3Ctext%20x='18'%20y='34'%3E%7B%20%7D%3C/text%3E%3Ctext%20x='150'%20y='22'%3E%26lt%3B/%26gt%3B%3C/text%3E%3Ctext%20x='96'%20y='84'%3E=%26gt%3B%3C/text%3E%3Ctext%20x='206'%20y='96'%3E()%3B%3C/text%3E%3Ctext%20x='30'%20y='128'%3E%5B%20%5D%3C/text%3E%3Ctext%20x='140'%20y='150'%3E//%3C/text%3E%3Ctext%20x='64'%20y='194'%3E%26amp%3B%26amp%3B%3C/text%3E%3Ctext%20x='198'%20y='190'%3E%21==%3C/text%3E%3C/g%3E%3C/svg%3E"), linear-gradient(90deg, #000, rgb(0 0 0 / 0.4) 28%, rgb(0 0 0 / 0.4) 72%, #000);
-  -webkit-mask-size: 260px 220px, 100% 100%;
-  mask-size: 260px 220px, 100% 100%;
+  background: color-mix(in srgb, var(--accent) 45%, var(--text));
+  opacity: 0.11;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='400'%20height='400'%20viewBox='0%200%20400%20400'%3E%3Cg%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20transform='translate(28.8%2021.7)%20rotate(-17%2012%2012)%20scale(1.22)'%3E%3Cellipse%20cx='12'%20cy='13.5'%20rx='4.5'%20ry='6'/%3E%3Cpath%20d='M12%207.5V20M7.5%2013.5H3M16.5%2013.5H21M8%209L5%206.5M16%209l3-2.5M8%2018l-3%202.5M16%2018l3%202.5M9.5%207.5c0-2.5%205-2.5%205%200'/%3E%3C/g%3E%3Cg%20transform='translate(120.3%2034.9)%20rotate(16%2012%2012)%20scale(1.38)'%3E%3Cpath%20d='M4%205.5h16v10H11l-4.5%204v-4H4z'/%3E%3C/g%3E%3Cg%20transform='translate(173.9%2015.9)%20rotate(-33%2012%2012)%20scale(1.17)'%3E%3Ccircle%20cx='12'%20cy='12'%20r='9'/%3E%3Cpath%20d='M7.8%2012.3l3%203%205.5-6'/%3E%3C/g%3E%3Cg%20transform='translate(259.8%2035.1)%20rotate(-9%2012%2012)%20scale(1.31)'%3E%3Cpath%20d='M8%203c-2%200-3%201-3%203v3c0%201.5-1%203-3%203%202%200%203%201.5%203%203v3c0%202%201%203%203%203M16%203c2%200%203%201%203%203v3c0%201.5%201%203%203%203-2%200-3%201.5-3%203v3c0%202-1%203-3%203'/%3E%3C/g%3E%3Cg%20transform='translate(355.1%206.0)%20rotate(-22%2012%2012)%20scale(1.36)'%3E%3Ccircle%20cx='8'%20cy='12'%20r='4'/%3E%3Cpath%20d='M12%2012h9.5M18%2012v3.5M21.5%2012v2.5'/%3E%3C/g%3E%3Cg%20transform='translate(22.2%20119.7)%20rotate(-8%2012%2012)%20scale(1.35)'%3E%3Cpath%20d='M2.5%209a14%2014%200%200%201%2019%200M5.5%2012.5a9.5%209.5%200%200%201%2013%200M8.6%2016a5%205%200%200%201%206.8%200'/%3E%3Ccircle%20cx='12'%20cy='19.3'%20r='.9'/%3E%3C/g%3E%3Cg%20transform='translate(107.7%20112.8)%20rotate(-17%2012%2012)%20scale(1.10)'%3E%3Ccircle%20cx='6'%20cy='5.5'%20r='2.3'/%3E%3Ccircle%20cx='6'%20cy='18.5'%20r='2.3'/%3E%3Ccircle%20cx='18'%20cy='9'%20r='2.3'/%3E%3Cpath%20d='M6%207.8v8.4M18%2011.3c0%204-4%204-10.6%206.4'/%3E%3C/g%3E%3Cg%20transform='translate(177.4%20119.2)%20rotate(20%2012%2012)%20scale(1.10)'%3E%3Cpath%20d='M8%207l-5%205%205%205M16%207l5%205-5%205M14%204l-4%2016'/%3E%3C/g%3E%3Cg%20transform='translate(254.5%2089.5)%20rotate(-33%2012%2012)%20scale(1.11)'%3E%3Crect%20x='5'%20y='4.5'%20width='14'%20height='17'%20rx='2'/%3E%3Cpath%20d='M9%204.5V3h6v1.5M8.5%2011l1.5%201.5L12.5%2010M8.5%2016.5l1.5%201.5%202.5-2.5M14.5%2011.5H16M14.5%2017H16'/%3E%3C/g%3E%3Cg%20transform='translate(332.1%20105.2)%20rotate(-4%2012%2012)%20scale(1.32)'%3E%3Cellipse%20cx='12'%20cy='5.5'%20rx='7.5'%20ry='2.8'/%3E%3Cpath%20d='M4.5%205.5v13c0%201.5%203.4%202.8%207.5%202.8s7.5-1.3%207.5-2.8v-13M4.5%2012c0%201.5%203.4%202.8%207.5%202.8s7.5-1.3%207.5-2.8'/%3E%3C/g%3E%3Cg%20transform='translate(31.2%20170.5)%20rotate(11%2012%2012)%20scale(1.13)'%3E%3Crect%20x='4.5'%20y='5'%20width='15'%20height='10.5'%20rx='1.5'/%3E%3Cpath%20d='M2.5%2019h19'/%3E%3C/g%3E%3Cg%20transform='translate(100.5%20173.3)%20rotate(-17%2012%2012)%20scale(1.11)'%3E%3Ccircle%20cx='12'%20cy='12'%20r='3'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='6.8'/%3E%3Cpath%20d='M12%202.8v3M12%2018.2v3M2.8%2012h3M18.2%2012h3M5.5%205.5l2.1%202.1M16.4%2016.4l2.1%202.1M18.5%205.5l-2.1%202.1M7.6%2016.4l-2.1%202.1'/%3E%3C/g%3E%3Cg%20transform='translate(193.6%20176.5)%20rotate(29%2012%2012)%20scale(1.37)'%3E%3Cpath%20d='M7%2018a4.5%204.5%200%200%201-.6-8.96A6%206%200%200%201%2018%209.5%204%204%200%200%201%2017.5%2018Z'/%3E%3C/g%3E%3Cg%20transform='translate(259.6%20195.4)%20rotate(11%2012%2012)%20scale(1.14)'%3E%3Cpath%20d='M12%202.8l7.5%203v5.7c0%204.5-3.2%208.3-7.5%209.7-4.3-1.4-7.5-5.2-7.5-9.7V5.8z'/%3E%3Cpath%20d='M8.8%2012l2.4%202.4%204-4.6'/%3E%3C/g%3E%3Cg%20transform='translate(360.0%20173.3)%20rotate(-18%2012%2012)%20scale(1.10)'%3E%3Crect%20x='2.5'%20y='4'%20width='19'%20height='16'%20rx='2.5'/%3E%3Cpath%20d='M6.5%209.5l3%202.5-3%202.5M12.5%2015h5'/%3E%3C/g%3E%3Cg%20transform='translate(17.3%20256.2)%20rotate(-32%2012%2012)%20scale(1.31)'%3E%3Ccircle%20cx='10.5'%20cy='10.5'%20r='6.5'/%3E%3Cpath%20d='M15.5%2015.5L21%2021'/%3E%3C/g%3E%3Cg%20transform='translate(106.0%20254.4)%20rotate(8%2012%2012)%20scale(1.10)'%3E%3Cpath%20d='M21%203L3%2010.5l6.5%202.5L12%2020zM21%203L9.5%2013'/%3E%3C/g%3E%3Cg%20transform='translate(181.6%20279.0)%20rotate(-1%2012%2012)%20scale(1.19)'%3E%3Crect%20x='6.5'%20y='6.5'%20width='11'%20height='11'%20rx='1.8'/%3E%3Crect%20x='9.5'%20y='9.5'%20width='5'%20height='5'/%3E%3Cpath%20d='M9%203v3.5M15%203v3.5M9%2017.5V21M15%2017.5V21M3%209h3.5M3%2015h3.5M17.5%209H21M17.5%2015H21'/%3E%3C/g%3E%3Cg%20transform='translate(275.8%20252.3)%20rotate(-26%2012%2012)%20scale(1.25)'%3E%3Cpath%20d='M9%204L7%2020M17%204l-2%2016M4.5%209h16M3.5%2015h16'/%3E%3C/g%3E%3Cg%20transform='translate(354.1%20254.6)%20rotate(-24%2012%2012)%20scale(1.35)'%3E%3Crect%20x='5'%20y='10.5'%20width='14'%20height='10'%20rx='2'/%3E%3Cpath%20d='M8%2010.5V8a4%204%200%200%201%208%200v2.5'/%3E%3C/g%3E%3Cg%20transform='translate(38.3%20332.8)%20rotate(34%2012%2012)%20scale(1.30)'%3E%3Cpath%20d='M9.5%203h5M10.5%203v6L5%2019.2c-.6%201.2.2%202.3%201.5%202.3h11c1.3%200%202.1-1.1%201.5-2.3L13.5%209V3M7.8%2015h8.4'/%3E%3C/g%3E%3Cg%20transform='translate(106.8%20340.5)%20rotate(-30%2012%2012)%20scale(1.34)'%3E%3Crect%20x='4.5'%20y='5'%20width='15'%20height='10.5'%20rx='1.5'/%3E%3Cpath%20d='M2.5%2019h19'/%3E%3C/g%3E%3Cg%20transform='translate(199.1%20334.2)%20rotate(16%2012%2012)%20scale(1.09)'%3E%3Ccircle%20cx='10.5'%20cy='10.5'%20r='6.5'/%3E%3Cpath%20d='M15.5%2015.5L21%2021'/%3E%3C/g%3E%3Cg%20transform='translate(274.3%20346.5)%20rotate(-16%2012%2012)%20scale(1.15)'%3E%3Cpath%20d='M4%205.5h16v10H11l-4.5%204v-4H4z'/%3E%3C/g%3E%3Cg%20transform='translate(350.8%20328.4)%20rotate(-21%2012%2012)%20scale(1.13)'%3E%3Cpath%20d='M7%2018a4.5%204.5%200%200%201-.6-8.96A6%206%200%200%201%2018%209.5%204%204%200%200%201%2017.5%2018Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"), linear-gradient(90deg, #000, rgb(0 0 0 / 0.55) 26%, rgb(0 0 0 / 0.55) 74%, #000);
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='400'%20height='400'%20viewBox='0%200%20400%20400'%3E%3Cg%20fill='none'%20stroke='black'%20stroke-width='1.5'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cg%20transform='translate(28.8%2021.7)%20rotate(-17%2012%2012)%20scale(1.22)'%3E%3Cellipse%20cx='12'%20cy='13.5'%20rx='4.5'%20ry='6'/%3E%3Cpath%20d='M12%207.5V20M7.5%2013.5H3M16.5%2013.5H21M8%209L5%206.5M16%209l3-2.5M8%2018l-3%202.5M16%2018l3%202.5M9.5%207.5c0-2.5%205-2.5%205%200'/%3E%3C/g%3E%3Cg%20transform='translate(120.3%2034.9)%20rotate(16%2012%2012)%20scale(1.38)'%3E%3Cpath%20d='M4%205.5h16v10H11l-4.5%204v-4H4z'/%3E%3C/g%3E%3Cg%20transform='translate(173.9%2015.9)%20rotate(-33%2012%2012)%20scale(1.17)'%3E%3Ccircle%20cx='12'%20cy='12'%20r='9'/%3E%3Cpath%20d='M7.8%2012.3l3%203%205.5-6'/%3E%3C/g%3E%3Cg%20transform='translate(259.8%2035.1)%20rotate(-9%2012%2012)%20scale(1.31)'%3E%3Cpath%20d='M8%203c-2%200-3%201-3%203v3c0%201.5-1%203-3%203%202%200%203%201.5%203%203v3c0%202%201%203%203%203M16%203c2%200%203%201%203%203v3c0%201.5%201%203%203%203-2%200-3%201.5-3%203v3c0%202-1%203-3%203'/%3E%3C/g%3E%3Cg%20transform='translate(355.1%206.0)%20rotate(-22%2012%2012)%20scale(1.36)'%3E%3Ccircle%20cx='8'%20cy='12'%20r='4'/%3E%3Cpath%20d='M12%2012h9.5M18%2012v3.5M21.5%2012v2.5'/%3E%3C/g%3E%3Cg%20transform='translate(22.2%20119.7)%20rotate(-8%2012%2012)%20scale(1.35)'%3E%3Cpath%20d='M2.5%209a14%2014%200%200%201%2019%200M5.5%2012.5a9.5%209.5%200%200%201%2013%200M8.6%2016a5%205%200%200%201%206.8%200'/%3E%3Ccircle%20cx='12'%20cy='19.3'%20r='.9'/%3E%3C/g%3E%3Cg%20transform='translate(107.7%20112.8)%20rotate(-17%2012%2012)%20scale(1.10)'%3E%3Ccircle%20cx='6'%20cy='5.5'%20r='2.3'/%3E%3Ccircle%20cx='6'%20cy='18.5'%20r='2.3'/%3E%3Ccircle%20cx='18'%20cy='9'%20r='2.3'/%3E%3Cpath%20d='M6%207.8v8.4M18%2011.3c0%204-4%204-10.6%206.4'/%3E%3C/g%3E%3Cg%20transform='translate(177.4%20119.2)%20rotate(20%2012%2012)%20scale(1.10)'%3E%3Cpath%20d='M8%207l-5%205%205%205M16%207l5%205-5%205M14%204l-4%2016'/%3E%3C/g%3E%3Cg%20transform='translate(254.5%2089.5)%20rotate(-33%2012%2012)%20scale(1.11)'%3E%3Crect%20x='5'%20y='4.5'%20width='14'%20height='17'%20rx='2'/%3E%3Cpath%20d='M9%204.5V3h6v1.5M8.5%2011l1.5%201.5L12.5%2010M8.5%2016.5l1.5%201.5%202.5-2.5M14.5%2011.5H16M14.5%2017H16'/%3E%3C/g%3E%3Cg%20transform='translate(332.1%20105.2)%20rotate(-4%2012%2012)%20scale(1.32)'%3E%3Cellipse%20cx='12'%20cy='5.5'%20rx='7.5'%20ry='2.8'/%3E%3Cpath%20d='M4.5%205.5v13c0%201.5%203.4%202.8%207.5%202.8s7.5-1.3%207.5-2.8v-13M4.5%2012c0%201.5%203.4%202.8%207.5%202.8s7.5-1.3%207.5-2.8'/%3E%3C/g%3E%3Cg%20transform='translate(31.2%20170.5)%20rotate(11%2012%2012)%20scale(1.13)'%3E%3Crect%20x='4.5'%20y='5'%20width='15'%20height='10.5'%20rx='1.5'/%3E%3Cpath%20d='M2.5%2019h19'/%3E%3C/g%3E%3Cg%20transform='translate(100.5%20173.3)%20rotate(-17%2012%2012)%20scale(1.11)'%3E%3Ccircle%20cx='12'%20cy='12'%20r='3'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='6.8'/%3E%3Cpath%20d='M12%202.8v3M12%2018.2v3M2.8%2012h3M18.2%2012h3M5.5%205.5l2.1%202.1M16.4%2016.4l2.1%202.1M18.5%205.5l-2.1%202.1M7.6%2016.4l-2.1%202.1'/%3E%3C/g%3E%3Cg%20transform='translate(193.6%20176.5)%20rotate(29%2012%2012)%20scale(1.37)'%3E%3Cpath%20d='M7%2018a4.5%204.5%200%200%201-.6-8.96A6%206%200%200%201%2018%209.5%204%204%200%200%201%2017.5%2018Z'/%3E%3C/g%3E%3Cg%20transform='translate(259.6%20195.4)%20rotate(11%2012%2012)%20scale(1.14)'%3E%3Cpath%20d='M12%202.8l7.5%203v5.7c0%204.5-3.2%208.3-7.5%209.7-4.3-1.4-7.5-5.2-7.5-9.7V5.8z'/%3E%3Cpath%20d='M8.8%2012l2.4%202.4%204-4.6'/%3E%3C/g%3E%3Cg%20transform='translate(360.0%20173.3)%20rotate(-18%2012%2012)%20scale(1.10)'%3E%3Crect%20x='2.5'%20y='4'%20width='19'%20height='16'%20rx='2.5'/%3E%3Cpath%20d='M6.5%209.5l3%202.5-3%202.5M12.5%2015h5'/%3E%3C/g%3E%3Cg%20transform='translate(17.3%20256.2)%20rotate(-32%2012%2012)%20scale(1.31)'%3E%3Ccircle%20cx='10.5'%20cy='10.5'%20r='6.5'/%3E%3Cpath%20d='M15.5%2015.5L21%2021'/%3E%3C/g%3E%3Cg%20transform='translate(106.0%20254.4)%20rotate(8%2012%2012)%20scale(1.10)'%3E%3Cpath%20d='M21%203L3%2010.5l6.5%202.5L12%2020zM21%203L9.5%2013'/%3E%3C/g%3E%3Cg%20transform='translate(181.6%20279.0)%20rotate(-1%2012%2012)%20scale(1.19)'%3E%3Crect%20x='6.5'%20y='6.5'%20width='11'%20height='11'%20rx='1.8'/%3E%3Crect%20x='9.5'%20y='9.5'%20width='5'%20height='5'/%3E%3Cpath%20d='M9%203v3.5M15%203v3.5M9%2017.5V21M15%2017.5V21M3%209h3.5M3%2015h3.5M17.5%209H21M17.5%2015H21'/%3E%3C/g%3E%3Cg%20transform='translate(275.8%20252.3)%20rotate(-26%2012%2012)%20scale(1.25)'%3E%3Cpath%20d='M9%204L7%2020M17%204l-2%2016M4.5%209h16M3.5%2015h16'/%3E%3C/g%3E%3Cg%20transform='translate(354.1%20254.6)%20rotate(-24%2012%2012)%20scale(1.35)'%3E%3Crect%20x='5'%20y='10.5'%20width='14'%20height='10'%20rx='2'/%3E%3Cpath%20d='M8%2010.5V8a4%204%200%200%201%208%200v2.5'/%3E%3C/g%3E%3Cg%20transform='translate(38.3%20332.8)%20rotate(34%2012%2012)%20scale(1.30)'%3E%3Cpath%20d='M9.5%203h5M10.5%203v6L5%2019.2c-.6%201.2.2%202.3%201.5%202.3h11c1.3%200%202.1-1.1%201.5-2.3L13.5%209V3M7.8%2015h8.4'/%3E%3C/g%3E%3Cg%20transform='translate(106.8%20340.5)%20rotate(-30%2012%2012)%20scale(1.34)'%3E%3Crect%20x='4.5'%20y='5'%20width='15'%20height='10.5'%20rx='1.5'/%3E%3Cpath%20d='M2.5%2019h19'/%3E%3C/g%3E%3Cg%20transform='translate(199.1%20334.2)%20rotate(16%2012%2012)%20scale(1.09)'%3E%3Ccircle%20cx='10.5'%20cy='10.5'%20r='6.5'/%3E%3Cpath%20d='M15.5%2015.5L21%2021'/%3E%3C/g%3E%3Cg%20transform='translate(274.3%20346.5)%20rotate(-16%2012%2012)%20scale(1.15)'%3E%3Cpath%20d='M4%205.5h16v10H11l-4.5%204v-4H4z'/%3E%3C/g%3E%3Cg%20transform='translate(350.8%20328.4)%20rotate(-21%2012%2012)%20scale(1.13)'%3E%3Cpath%20d='M7%2018a4.5%204.5%200%200%201-.6-8.96A6%206%200%200%201%2018%209.5%204%204%200%200%201%2017.5%2018Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"), linear-gradient(90deg, #000, rgb(0 0 0 / 0.55) 26%, rgb(0 0 0 / 0.55) 74%, #000);
+  -webkit-mask-size: 400px 400px, 100% 100%;
+  mask-size: 400px 400px, 100% 100%;
   -webkit-mask-repeat: repeat, no-repeat;
   mask-repeat: repeat, no-repeat;
   -webkit-mask-composite: source-in;
   mask-composite: intersect;
 }
 
-:root[data-theme="light"] body::before {
-  opacity: 0.09;
-}
-
 @media (prefers-contrast: more) {
   body::before {
     display: none;
   }
+}
+
+/*
+ * El hero ocupa como mínimo toda la pantalla: para ver la siguiente sección hay que hacer scroll. `svh` es la altura del
+ * viewport con la barra del navegador visible (la de la primera carga en móvil): llena justo lo que se ve, sin cortar
+ * los botones bajo la barra y sin saltos de diseño cuando esta se esconde al hacer scroll. `vh` queda de respaldo.
+ */
+.hero-screen {
+  min-height: 100vh;
+  min-height: 100svh;
+}
+
+/*
+ * Capa de plataforma en móvil:
+ *  - sin el destello gris/azul que pintan iOS y Android al tocar (cada control tiene su propio :active);
+ *  - sin inflado de texto al girar el móvil;
+ *  - `viewport-fit=cover` (Layout.astro) deja pintar bajo la muesca: el contenido se aparta de los lados con los
+ *    márgenes seguros (en vertical ya los respetan la cabecera, el pie y el aviso);
+ *  - los controles responden al instante (sin la espera del doble toque) y una pulsación larga no selecciona su texto.
+ *    Los textos de contenido siguen siendo seleccionables.
+ */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+a,
+button,
+summary,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+button,
+summary,
+[role="button"] {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Estilos base de elementos (los componentes los sustituyen con utilidades). */
@@ -392,21 +404,13 @@ html[data-reveal] [data-seen] .st-pass {
   *,
   *::before,
   *::after {
+    animation-delay: 0s !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     /* Sin esperas: p. ej. el escalonado del menú móvil. */
     transition-delay: 0s !important;
   }
-}
-
-/*
- * Cambio de tema: fundido cruzado del conjunto (View Transitions) en vez de un salto brusco de brillo entre oscuro y
- * claro. Lo dispara el botón de tema de la cabecera; sin soporte o con «reducir movimiento» el cambio es instantáneo.
- */
-::view-transition-group(root) {
-  animation-duration: 320ms;
-  animation-timing-function: var(--ease-out);
 }
 
 /*
@@ -442,14 +446,9 @@ html[data-reveal] [data-seen] .st-pass {
 
 @media (prefers-contrast: more) {
   :root {
-    --text-muted: #c4cee4;
-    --border: #3a4a78;
-    --border-strong: #8fa4d8;
-  }
-  :root[data-theme="light"] {
-    --text-muted: #2a3858;
-    --border: #7f93c2;
-    --border-strong: #3a4f86;
+    --text-muted: #d4d4d4;
+    --border: #4a4a4a;
+    --border-strong: #a3a3a3;
   }
   .material {
     border-color: var(--border-strong);
@@ -461,11 +460,6 @@ html[data-reveal] [data-seen] .st-pass {
  * elementos se quedan en su estado inicial y la animación arranca al quitarse el atributo.
  */
 html[data-boot] .animate-rise {
-  animation: none;
-  opacity: 0;
-}
-
-html[data-boot] .animate-line {
   animation: none;
   opacity: 0;
 }

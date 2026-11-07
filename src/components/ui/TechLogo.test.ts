@@ -37,16 +37,14 @@ describe("TechLogo", () => {
     expect(classes).toContain("group-focus-within/tile:text-(--hover)");
   });
 
-  it("define el color de hover por tema: la marca donde contrasta y el acento donde no", async () => {
+  it("define el color de hover: la marca donde contrasta y el acento donde no", async () => {
     const jira = await render({ name: "Jira" });
     const git = await render({ name: "Git" });
 
-    // Jira (#0052CC) no se ve sobre la baldosa oscura: acento; sobre la clara, su azul.
-    expect(jira.document.querySelector("svg")?.getAttribute("style")).toContain("--hover-dark:var(--accent)");
-    expect(jira.document.querySelector("svg")?.getAttribute("style")).toContain("--hover-light:#0052CC");
-    // Git (#F03C2E) contrasta en los dos temas.
-    expect(git.document.querySelector("svg")?.getAttribute("style")).toContain("--hover-dark:#F03C2E");
-    expect(git.document.querySelector("svg")?.getAttribute("style")).toContain("--hover-light:#F03C2E");
+    // Jira (#0052CC) no se ve sobre la baldosa oscura: acento.
+    expect(jira.document.querySelector("svg")?.getAttribute("style")).toContain("--hover:var(--accent)");
+    // Git (#F03C2E) contrasta: su color de marca.
+    expect(git.document.querySelector("svg")?.getAttribute("style")).toContain("--hover:#F03C2E");
   });
 
   it("decorativo: aria-hidden y sin role ni aria-label", async () => {

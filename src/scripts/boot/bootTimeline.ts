@@ -1,12 +1,13 @@
 import type { BootStep } from "./bootSequence";
 
-export const CHAR_DELAY_MS = 18;
-export const OUTPUT_DELAY_MS = 120;
-export const COMMAND_PAUSE_MS = 220;
-export const START_DELAY_MS = 200;
+// Rápida a propósito (≈ 1,6 s en total): es lo primero que ve quien llega con prisa, y se puede saltar.
+export const CHAR_DELAY_MS = 6;
+export const OUTPUT_DELAY_MS = 40;
+export const COMMAND_PAUSE_MS = 90;
+export const START_DELAY_MS = 100;
 /** Tiempo con el prompt vacío y el cursor parpadeando antes de cerrar. */
-export const IDLE_DELAY_MS = 700;
-export const EXIT_DURATION_MS = 500;
+export const IDLE_DELAY_MS = 200;
+export const EXIT_DURATION_MS = 300;
 
 /**
  * Qué se ve en cada momento:

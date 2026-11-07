@@ -108,18 +108,6 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
           >Ctrl K</kbd
         >
       </button>
-      {/* El tema real lo fija el script del <head> antes del primer pintado: el icono sigue a <html data-theme>. */}
-      <button
-        type="button"
-        data-theme-toggle
-        data-label-to-light={t.header.themeToLight}
-        data-label-to-dark={t.header.themeToDark}
-        class={`inline-grid w-11 text-[1.1rem] ${ICON_BUTTON}`}
-        aria-label={t.header.themeToLight}
-      >
-        <Icon name="moon" class="in-data-[theme=light]:hidden" />
-        <Icon name="sun" class="hidden in-data-[theme=light]:block" />
-      </button>
       {/* Cambiar de idioma es ir a la otra URL ("/" ↔ "/en/"); el script conserva el ancla y recuerda la elección. */}
       <a
         href={pathForLanguage(otherLanguage)}
@@ -150,7 +138,6 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
 
 <script>
   import { parseLanguage, storeLanguage } from "../../lib/language";
-  import { parseTheme, readStoredTheme, storeTheme, type Theme } from "../../lib/theme";
 
   const html = document.documentElement;
   const header = document.querySelector<HTMLElement>("[data-header]");
@@ -158,7 +145,6 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
   const track = header?.querySelector<HTMLElement>("[data-nav-track]");
   const indicator = header?.querySelector<HTMLElement>("[data-indicator]");
   const menuToggle = header?.querySelector<HTMLButtonElement>("[data-menu-toggle]");
-  const themeToggle = header?.querySelector<HTMLButtonElement>("[data-theme-toggle]");
   const languageSwitch = header?.querySelector<HTMLAnchorElement>("[data-language-switch]");
   const links = [...(nav?.querySelectorAll<HTMLAnchorElement>("[data-nav-link]") ?? [])];
 
@@ -343,32 +329,6 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
     // Si se llega con el teclado a la cabecera mientras está oculta, reaparece.
     header.addEventListener("focusin", () => {
       if (header.querySelector(":focus-visible")) header.removeAttribute("data-hidden");
-    });
-  }
-
-  // --- Tema claro / oscuro ----------------------------------------------------------------------
-  // El script del <head> ya aplicó el tema guardado; aquí solo se sincroniza la etiqueta y se alterna.
-  if (themeToggle) {
-    const currentTheme = (): Theme => parseTheme(html.dataset.theme) ?? readStoredTheme();
-    const syncLabel = () => {
-      const { labelToLight, labelToDark } = themeToggle.dataset;
-      themeToggle.setAttribute("aria-label", (currentTheme() === "dark" ? labelToLight : labelToDark) ?? "");
-    };
-
-    syncLabel();
-    themeToggle.addEventListener("click", () => {
-      const next: Theme = currentTheme() === "dark" ? "light" : "dark";
-      const apply = () => {
-        html.dataset.theme = next;
-        storeTheme(next);
-        syncLabel();
-      };
-      // Fundido cruzado en vez de un salto de brillo; sin soporte o con «reducir movimiento», cambio directo.
-      if (!prefersReducedMotion && typeof document.startViewTransition === "function") {
-        document.startViewTransition(apply);
-      } else {
-        apply();
-      }
     });
   }
 

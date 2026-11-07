@@ -70,7 +70,7 @@ describe("guion de la consola", () => {
     }
   });
 
-  it("dura unos 5 segundos con la salida incluida (≈ 4.3 s + 0.5 s de fundido)", () => {
+  it("es corta: entre 1 y 2 segundos antes del fundido de salida (≈ 1,6 s + 0,3 s)", () => {
     const commands = BOOT_SEQUENCE.filter((step) => step.type === "cmd");
     const outputs = BOOT_SEQUENCE.length - commands.length;
     const typedChars = commands.reduce((total, step) => total + step.text.length, 0);
@@ -85,7 +85,7 @@ describe("guion de la consola", () => {
 
     const duration = getTimelineDuration(buildTimeline(BOOT_SEQUENCE));
     expect(duration).toBe(expected);
-    expect(duration).toBeGreaterThan(4000);
-    expect(duration).toBeLessThan(5000);
+    expect(duration).toBeGreaterThan(1000);
+    expect(duration).toBeLessThan(2000);
   });
 });

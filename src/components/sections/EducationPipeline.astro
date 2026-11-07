@@ -45,7 +45,7 @@ const panelId = (stage: EducationStage) => `edu-panel-${stage.id}`;
     </p>
     <span
       data-badge
-      class={`inline-flex items-center gap-2 rounded-full border px-3 py-[0.2rem] text-[0.8rem] transition-[opacity,scale] duration-500 ease-out group-data-ready:scale-75 group-data-ready:opacity-0 group-data-ready:data-passed:scale-100 group-data-ready:data-passed:opacity-100 ${finished ? "border-ok/50 bg-ok/15" : "border-warn/60 bg-warn/15"}`}
+      class={`inline-flex items-center gap-2 rounded-md border px-3 py-[0.2rem] text-[0.8rem] transition-[opacity,scale] duration-500 ease-out group-data-ready:scale-75 group-data-ready:opacity-0 group-data-ready:data-passed:scale-100 group-data-ready:data-passed:opacity-100 ${finished ? "border-ok/50 bg-ok/15" : "border-warn/60 bg-warn/15"}`}
     >
       <span aria-hidden="true" class={`size-2 rounded-full ${finished ? "bg-ok" : "bg-warn"}`}></span>
       <span class="sr-only">{t.education.workflowStatus}: </span>

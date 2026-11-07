@@ -6,9 +6,10 @@ import type {
 import { educationItems, upcomingFromStages } from "./education";
 
 // Fuente: CV (descripciones y centros) y perfil de LinkedIn (fechas de estudios).
+// Mismo nombre que en el hero (profile.employer): la empresa se presenta siempre como «Torcal Formación».
 const TORCAL = {
-  es: "Torcal Innovación y Seguridad SL",
-  en: "Torcal Innovación y Seguridad SL",
+  es: "Torcal Formación",
+  en: "Torcal Formación",
 };
 
 const items: ExperienceItem[] = [

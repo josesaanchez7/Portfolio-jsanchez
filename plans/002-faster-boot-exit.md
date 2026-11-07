@@ -1,6 +1,6 @@
 # 002 — Make the boot screen exit snappy (300 ms, strong ease-out)
 
-- **Status**: TODO
+- **Status**: DONE (2026-11-07)
 - **Commit**: 815deb1
 - **Severity**: MEDIUM
 - **Category**: Easing & duration (+ interruptibility of a skip)

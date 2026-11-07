@@ -1,7 +1,8 @@
 ---
-import { getI18n } from "../../i18n";
+import { messages } from "../../i18n/messages";
 
-const { t } = getI18n(Astro.currentLocale);
+// La consola es siempre en inglés, en las dos versiones de la web: una shell no se traduce.
+const t = messages.en;
 
 const WINDOW_TITLE = "jose@portfolio — zsh";
 
@@ -15,7 +16,7 @@ const DIALOG =
   la transcripción y el historial de comandos mientras esté abierta. El comportamiento está en el
   <script> de abajo; los comandos, en src/scripts/console/commands.ts.
 */}
-<dialog aria-label={t.console.title} class={DIALOG} data-console>
+<dialog lang="en" aria-label={t.console.title} class={DIALOG} data-console>
   <div class="flex h-full flex-col">
     <header
       class="flex shrink-0 items-center justify-between border-b border-boot-dot py-[0.35rem] pr-2 pl-4 text-[0.9em] text-boot-dim"
@@ -24,6 +25,7 @@ const DIALOG =
       <button
         type="button"
         aria-label={t.console.close}
+        aria-keyshortcuts="Escape"
         data-console-close
         class="grid h-7 w-7 cursor-pointer place-items-center rounded-sm text-[1.5em] leading-none text-boot-dim transition-colors duration-200 hover:text-boot-text focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-boot-prompt"
       >
@@ -44,7 +46,7 @@ const DIALOG =
       data-console-form
       class="flex shrink-0 items-center gap-2 border-t border-boot-dot px-4 py-2"
     >
-      <span class="text-boot-prompt" aria-hidden="true">~ $</span>
+      <span class="whitespace-nowrap text-boot-prompt" aria-hidden="true" data-console-cwd>~ $</span>
       <input
         data-console-input
         aria-label={t.console.inputLabel}
@@ -54,7 +56,7 @@ const DIALOG =
         autocapitalize="off"
         spellcheck="false"
         enterkeyhint="send"
-        class="min-w-0 flex-1 border-0 bg-transparent p-0 text-inherit outline-none placeholder:text-boot-dim max-phone:text-[16px]"
+        class="min-w-0 flex-1 border-0 bg-transparent p-0 text-inherit outline-none placeholder:text-boot-dim [@media(pointer:coarse)]:text-[16px]"
       />
     </form>
   </div>
@@ -62,12 +64,11 @@ const DIALOG =
 
 <script>
   import { cvUrl } from "../../data/cv";
+  import { copyText } from "../../scripts/clipboard";
   import { profile } from "../../data/profile";
   import { projects } from "../../data/projects";
   import { messages } from "../../i18n/messages";
-  import { DEFAULT_LANGUAGE, parseLanguage } from "../../lib/language";
-  import { notFoundPath } from "../../lib/seo";
-  import { welcomeLine } from "../../scripts/console/commands";
+  import { completeInput, welcomeLine } from "../../scripts/console/commands";
   import type {
     CommandContext,
     ConsoleEffect,
@@ -88,9 +89,11 @@ const DIALOG =
   const form = dialog?.querySelector<HTMLFormElement>("[data-console-form]");
   const input = dialog?.querySelector<HTMLInputElement>("[data-console-input]");
   const closeButton = dialog?.querySelector<HTMLButtonElement>("[data-console-close]");
+  const cwdLabel = dialog?.querySelector<HTMLElement>("[data-console-cwd]");
 
   if (dialog && log && form && input && closeButton) {
-    const language = parseLanguage(document.documentElement.lang) ?? DEFAULT_LANGUAGE;
+    // Siempre en inglés (comandos, ayuda, carpetas y mensajes), sea cual sea el idioma de la página.
+    const language = "en" as const;
 
     const getContext = (): CommandContext => ({
       t: messages[language],
@@ -132,17 +135,54 @@ const DIALOG =
       if (dialog.open) log.scrollTop = log.scrollHeight;
     };
 
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Lleva a una sección: el foco pasa a ella (no vuelve al botón que abrió la consola, que podría estar lejos y
+    // devolver el scroll) y el scroll se hace con la página ya desbloqueada.
+    const goToSection = (sectionId: string) => {
+      const section = document.getElementById(sectionId);
+      if (!section) return;
+      returnFocus = null;
+      document.documentElement.removeAttribute("data-console-active");
+      if (!section.hasAttribute("tabindex")) section.setAttribute("tabindex", "-1");
+      section.focus({ preventScroll: true });
+      section.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+    };
+
+    const downloadCv = () => {
+      const link = Object.assign(document.createElement("a"), { href: cvUrl, download: "Jose_Sanchez_CV.pdf" });
+      document.body.append(link);
+      link.click();
+      link.remove();
+    };
+
+    // Se confirma con una línea nueva; el <textarea> de respaldo va dentro del diálogo (el resto de la página está inerte).
+    const copy = (value: string) => {
+      const { t } = getContext();
+      void copyText(value, dialog).then((ok) =>
+        append([[{ text: ok ? t.console.copied(value) : t.console.copyFailed(value), tone: ok ? "ok" : "warn" }]]),
+      );
+    };
+
     const handleEffect = (effect: ConsoleEffect) => {
-      switch (effect) {
+      switch (effect.type) {
         case "close":
           dialog.close();
+          break;
+        case "scrollTo":
+          goToSection(effect.sectionId);
           break;
         case "openCv":
           window.open(cvUrl, "_blank", "noopener,noreferrer");
           break;
-        case "show404":
-          // Una ruta que no existe a propósito: la responde la página 404 real.
-          window.location.assign(notFoundPath(language));
+        case "downloadCv":
+          downloadCv();
+          break;
+        case "openUrl":
+          window.open(effect.url, "_blank", "noopener,noreferrer");
+          break;
+        case "copy":
+          copy(effect.text);
           break;
       }
     };
@@ -152,9 +192,9 @@ const DIALOG =
       onEffect: handleEffect,
       onAppend: append,
       onClear: () => log.replaceChildren(),
-      onBusyChange: (busy) => {
-        input.readOnly = busy;
-        input.setAttribute("aria-busy", String(busy));
+      // El prompt de la línea de comandos muestra la carpeta actual, como en una shell.
+      onCwdChange: (cwd) => {
+        if (cwdLabel) cwdLabel.textContent = `${cwd} $`;
       },
     });
     append([welcomeLine(getContext())]);
@@ -165,6 +205,46 @@ const DIALOG =
     // La consola no se puede abrir mientras se muestra la pantalla de carga (<html data-boot>).
     const isBooting = () => "boot" in document.documentElement.dataset;
 
+    // La primera vez que se abre, `help` se escribe solo (letra a letra) y se ejecuta, para que se vean los comandos
+    // sin tener que saber cuál teclear. Con «reducir movimiento» se ejecuta directamente. Si se cierra a medias, se
+    // vuelve a intentar en la siguiente apertura.
+    const AUTO_COMMAND = "help";
+    const AUTO_CHAR_MS = 70;
+    let autoHelpDone = false;
+    let autoTimer: number | undefined;
+
+    const autoHelp = () => {
+      if (autoHelpDone) return;
+      autoHelpDone = true;
+      if (reducedMotion) {
+        session.submit(AUTO_COMMAND);
+        return;
+      }
+      input.readOnly = true;
+      let typed = 0;
+      const step = () => {
+        if (!dialog.open) {
+          input.value = "";
+          input.readOnly = false;
+          autoHelpDone = false;
+          return;
+        }
+        typed += 1;
+        input.value = AUTO_COMMAND.slice(0, typed);
+        if (typed < AUTO_COMMAND.length) {
+          autoTimer = window.setTimeout(step, AUTO_CHAR_MS);
+          return;
+        }
+        autoTimer = window.setTimeout(() => {
+          input.value = "";
+          input.readOnly = false;
+          session.submit(AUTO_COMMAND);
+        }, AUTO_CHAR_MS * 2);
+      };
+      window.clearTimeout(autoTimer);
+      autoTimer = window.setTimeout(step, 200);
+    };
+
     const open = () => {
       if (dialog.open || isBooting()) return;
       returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -173,6 +253,7 @@ const DIALOG =
       dialog.showModal();
       log.scrollTop = log.scrollHeight;
       input.focus();
+      autoHelp();
     };
 
     // Cualquier cierre (Esc, ×, clic fuera, exit…) acaba aquí: devuelve el foco a quien abrió.
@@ -242,6 +323,21 @@ const DIALOG =
     });
 
     input.addEventListener("keydown", (event) => {
+      // Tab autocompleta comandos, carpetas y archivos; con varias opciones las lista debajo, como bash. Con la línea
+      // vacía, Tab sigue moviendo el foco (no se atrapa al usuario de teclado).
+      if (event.key === "Tab" && !event.shiftKey && input.value.trim() !== "") {
+        event.preventDefault();
+        const { value, options } = completeInput(input.value, language);
+        input.value = value;
+        if (options.length > 1) append([[{ text: options.join("  "), tone: "dim" }]]);
+        return;
+      }
+      // Ctrl+L limpia la consola, como en una terminal.
+      if (event.key.toLowerCase() === "l" && event.ctrlKey && !event.altKey && !event.shiftKey && !event.metaKey) {
+        event.preventDefault();
+        log.replaceChildren();
+        return;
+      }
       if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
       event.preventDefault();
       const recalled = event.key === "ArrowUp" ? session.previous(input.value) : session.next();
