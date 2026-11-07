@@ -285,9 +285,9 @@ describe("autocompletado (Tab)", () => {
 });
 
 describe("bienvenida", () => {
-  it("resalta help y ls en verde y menciona el Tab", () => {
+  it("resalta help y ls en verde", () => {
     const line = welcomeLine(buildContext());
-    expect(plain(line)).toContain("Tab completes");
+    expect(plain(line)).toBe("Welcome to jose@portfolio. Type help to see the commands or ls to look around.");
     expect(line.find((segment) => segment.text === "help")?.tone).toBe("ok");
     expect(line.find((segment) => segment.text === "ls")?.tone).toBe("ok");
   });

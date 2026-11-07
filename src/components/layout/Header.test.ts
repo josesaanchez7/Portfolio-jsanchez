@@ -59,13 +59,11 @@ describe("Header", () => {
     expect(steps).toEqual(SECTIONS.map((_, index) => `--i:${index}`));
   });
 
-  it("tiene un botón para abrir la consola con su atajo (Ctrl K) anunciado, y ya no hay paleta de comandos", async () => {
-    const { getByRole, document } = await renderComponent(Header);
+  it("la cabecera es solo navegación: la consola y el idioma están en el pie", async () => {
+    const { document } = await renderComponent(Header);
 
-    const consoleButton = getByRole("button", { name: "Abrir la consola (Ctrl K)" });
-    expect(consoleButton).toHaveAttribute("data-console-open");
-    expect(consoleButton).toHaveAttribute("aria-keyshortcuts", "Control+K Meta+K");
-    expect(consoleButton.querySelector("[data-console-kbd]")).toHaveTextContent("Ctrl K");
+    expect(document.querySelector("[data-console-open]")).toBeNull();
+    expect(document.querySelector("[data-language-switch]")).toBeNull();
     expect(document.querySelector("[data-palette-open], [data-palette-kbd]")).toBeNull();
   });
 
@@ -75,18 +73,6 @@ describe("Header", () => {
     expect(document.querySelector("[data-theme-toggle]")).toBeNull();
   });
 
-  it("el selector de idioma es un enlace a la otra versión de la web", async () => {
-    const es = await renderComponent(Header);
-    const toEnglish = es.getByRole("link", { name: "Cambiar idioma a inglés" });
-    expect(toEnglish).toHaveAttribute("href", "/en/");
-    expect(toEnglish).toHaveAttribute("hreflang", "en");
-    expect(toEnglish).toHaveTextContent("EN");
-
-    const en = await renderComponent(Header, { language: "en" });
-    const toSpanish = en.getByRole("link", { name: "Switch language to Spanish" });
-    expect(toSpanish).toHaveAttribute("href", "/");
-    expect(toSpanish).toHaveTextContent("ES");
-  });
 
   it("los enlaces externos usan rel seguro y los iconos no se leen en voz alta", async () => {
     const { document } = await renderComponent(Header);

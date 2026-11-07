@@ -17,7 +17,7 @@ export const en: Messages = {
     inputLabel: "Type a command",
     placeholder: "type help",
     close: "Close console",
-    welcome: "Welcome to jose@portfolio. Type <ok>help</ok> to see the commands or <ok>ls</ok> to look around. Tab completes.",
+    welcome: "Welcome to jose@portfolio. Type <ok>help</ok> to see the commands or <ok>ls</ok> to look around.",
     help: {
       ls: "list folders (sections) and files",
       cd: "go to a section: cd projects · cd ~ back to the top",
@@ -46,7 +46,6 @@ export const en: Messages = {
     navLabel: "Main",
     openMenu: "Open menu",
     closeMenu: "Close menu",
-    consoleLabel: "Open the console (Ctrl K)",
     switchLanguage: { es: "Switch language to Spanish", en: "Switch language to English" },
   },
   hero: {
@@ -136,13 +135,16 @@ export const en: Messages = {
     sendEmail: "Send email",
     available: "Available for new opportunities",
   },
+  entryHint: {
+    label: "Shortcuts",
+    openConsole: "Open the console",
+    close: "Minimise shortcuts",
+    open: "Show shortcuts",
+    dragHint: "Drag to move it · double-click to send it back to the corner",
+    otherLanguage: "Ver en español",
+  },
   footer: {
     label: "Page footer",
-    errors: (count) => `${count} ${count === 1 ? "error" : "errors"}`,
-    testsPassing: (count) => `${count} tests passing`,
-    available: "Available",
-    notFound: "404",
-    notFoundLabel: "Show the 404 error page",
     console: "Console",
     consoleLabel: "Open the interactive console (Ctrl K or the ` key)",
     backToTop: "Back to top",

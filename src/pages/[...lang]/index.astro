@@ -11,6 +11,7 @@ import ExperienceSection from "../../components/sections/ExperienceSection.astro
 import HeroSection from "../../components/sections/HeroSection.astro";
 import ProjectsSection from "../../components/sections/ProjectsSection.astro";
 import ImageLightbox from "../../components/ui/ImageLightbox.astro";
+import EntryHint from "../../components/ui/EntryHint.astro";
 import Toast from "../../components/ui/Toast.astro";
 import { getI18n } from "../../i18n";
 import Layout from "../../layouts/Layout.astro";
@@ -50,5 +51,6 @@ const { t } = getI18n(Astro.currentLocale);
   </div>
   <ConsoleDialog />
   <ImageLightbox />
+  <EntryHint />
   <Toast />
 </Layout>

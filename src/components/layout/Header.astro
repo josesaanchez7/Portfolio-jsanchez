@@ -2,18 +2,14 @@
 import { profile } from "../../data/profile";
 import { HERO_ID, SECTIONS } from "../../data/sections";
 import { getI18n } from "../../i18n";
-import { LANGUAGE_CODE } from "../../lib/language";
-import { pathForLanguage } from "../../lib/seo";
 import Icon from "../ui/Icon.astro";
 
-const { language, t, localize } = getI18n(Astro.currentLocale);
+const { t, localize } = getI18n(Astro.currentLocale);
 
 // Botones circulares de la cabecera. Sin ancho ni display: cada botón añade los suyos.
 const ICON_BUTTON =
   "h-11 place-items-center rounded-md bg-transparent text-fg-muted cursor-pointer transition-[color,background-color,scale] duration-200 ease-[ease] hover:bg-accent/15 hover:text-accent active:scale-[0.92] active:duration-100";
 
-// El selector muestra y activa el idioma al que se cambiaría.
-const otherLanguage = language === "es" ? "en" : "es";
 
 // Entrada escalonada de los enlaces del menú móvil: cada elemento espera un poco más que el anterior.
 const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[opacity,translate] max-menu:duration-500 max-menu:group-data-menu-open:translate-y-0 max-menu:group-data-menu-open:opacity-100 max-menu:group-data-menu-open:delay-[calc(var(--i)*60ms+120ms)]";
@@ -89,36 +85,11 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
       </div>
     </nav>
 
-    <div
-      class="relative z-10 flex items-center gap-1 border-l border-border pl-3 max-menu:ml-auto max-menu:border-l-0 max-menu:pl-0"
-    >
-      {/* Consola (Ctrl/⌘ + K): el atajo está en components/console/ConsoleDialog.astro */}
-      <button
-        type="button"
-        data-console-open
-        aria-label={t.header.consoleLabel}
-        aria-keyshortcuts="Control+K Meta+K"
-        class={`inline-flex items-center gap-2 px-[0.65rem] text-[1.05rem] ${ICON_BUTTON}`}
-      >
-        <span class="font-code text-[0.95rem] font-medium" aria-hidden="true">&gt;_</span>
-        <kbd
-          data-console-kbd
-          aria-hidden="true"
-          class="hidden rounded-[6px] border border-border-strong px-1.5 py-0.5 font-code text-[0.8125rem] leading-none text-fg-muted lg:inline"
-          >Ctrl K</kbd
-        >
-      </button>
-      {/* Cambiar de idioma es ir a la otra URL ("/" ↔ "/en/"); el script conserva el ancla y recuerda la elección. */}
-      <a
-        href={pathForLanguage(otherLanguage)}
-        data-language-switch={otherLanguage}
-        hreflang={otherLanguage}
-        lang={otherLanguage}
-        class={`inline-grid w-auto min-w-11 px-2 font-code text-[0.8rem] font-semibold tracking-[0.04em] ${ICON_BUTTON}`}
-        aria-label={t.header.switchLanguage[otherLanguage]}
-      >
-        {LANGUAGE_CODE[otherLanguage]}
-      </a>
+    {/*
+      Solo el botón del menú móvil. La consola (Ctrl/⌘ K) y el cambio de idioma viven en el pie: son herramientas
+      secundarias y la cabecera queda solo para navegar.
+    */}
+    <div class="relative z-10 flex items-center max-menu:ml-auto">
       <button
         type="button"
         data-menu-toggle
@@ -137,15 +108,12 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
 </header>
 
 <script>
-  import { parseLanguage, storeLanguage } from "../../lib/language";
-
   const html = document.documentElement;
   const header = document.querySelector<HTMLElement>("[data-header]");
   const nav = header?.querySelector<HTMLElement>("[data-nav]");
   const track = header?.querySelector<HTMLElement>("[data-nav-track]");
   const indicator = header?.querySelector<HTMLElement>("[data-indicator]");
   const menuToggle = header?.querySelector<HTMLButtonElement>("[data-menu-toggle]");
-  const languageSwitch = header?.querySelector<HTMLAnchorElement>("[data-language-switch]");
   const links = [...(nav?.querySelectorAll<HTMLAnchorElement>("[data-nav-link]") ?? [])];
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -330,35 +298,5 @@ const STAGGER = "max-menu:translate-y-4 max-menu:opacity-0 max-menu:transition-[
     header.addEventListener("focusin", () => {
       if (header.querySelector(":focus-visible")) header.removeAttribute("data-hidden");
     });
-  }
-
-  // --- Cambio de idioma -------------------------------------------------------------------------
-  // Es un enlace normal (funciona sin JavaScript); antes de navegar se recuerda la elección, se
-  // conservan la búsqueda y el ancla, y se mantiene el scroll (la pantalla de carga no se repite: solo sale una vez por sesión).
-  const SCROLL_KEY = "scroll-restore";
-
-  if (languageSwitch) {
-    languageSwitch.addEventListener("click", () => {
-      const next = parseLanguage(languageSwitch.dataset.languageSwitch);
-      if (!next) return;
-
-      storeLanguage(next);
-      languageSwitch.href = languageSwitch.pathname + window.location.search + window.location.hash;
-      try {
-        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
-      } catch {
-        // Sin sessionStorage se empieza arriba.
-      }
-    });
-  }
-
-  try {
-    const saved = Number(sessionStorage.getItem(SCROLL_KEY));
-    sessionStorage.removeItem(SCROLL_KEY);
-    if (saved > 0) {
-      window.addEventListener("load", () => window.scrollTo({ top: saved, behavior: "instant" }), { once: true });
-    }
-  } catch {
-    // Sin sessionStorage se empieza arriba.
   }
 </script>

@@ -1,0 +1,226 @@
+---
+import { getI18n } from "../../i18n";
+import { pathForLanguage } from "../../lib/seo";
+
+const { language, t } = getI18n(Astro.currentLocale);
+const otherLanguage = language === "es" ? "en" : "es";
+
+// Acciones de la ventana: filas a todo el ancho, con el hover azul de la navbar y respuesta al pulsar.
+const ACTION =
+  "flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-[0.9rem] text-fg transition-[color,background-color,scale] duration-150 ease-[ease] hover:bg-accent/15 hover:text-accent active:scale-[0.98]";
+const KBD = "rounded-[4px] border border-border-strong px-1.5 py-px font-code text-[0.75rem] leading-none text-fg-muted [@media(pointer:coarse)]:hidden";
+// Ventana y botón minimizado comparten esquina: abajo a la derecha, por encima del contenido y por debajo de los
+// diálogos y del aviso de «copiado». Se ocultan con el menú móvil abierto.
+const CORNER = "fixed right-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-[1500] in-data-menu-active:hidden";
+---
+
+{
+  /*
+    Ventanita de atajos que sale al entrar (la consola y el idioma viven en el pie, fuera de la vista): siempre está,
+    abierta al cargar. Se minimiza con su botón o con Esc y queda un botón «>_» en la esquina que la vuelve a abrir.
+    Las acciones reutilizan lo que ya existe: [data-console-open] lo enlaza ConsoleDialog.astro y
+    [data-language-switch], el script del pie. Sin JavaScript no se muestra (está `hidden`); el pie sigue teniendo
+    los dos accesos.
+  */
+}
+<aside
+  id="entry-hint"
+  data-entry-window
+  hidden
+  aria-label={t.entryHint.label}
+  class={`${CORNER} w-[min(19rem,calc(100%-2rem))] origin-bottom-right max-sm:left-4 max-sm:w-auto scale-95 rounded-lg border panel opacity-0 shadow-card transition-[opacity,scale] duration-150 ease-out data-open:scale-100 data-open:opacity-100 data-open:duration-200`}
+>
+  {/* Barra de título: en escritorio se arrastra para mover la ventana (doble clic la devuelve a su esquina). En móvil, no. */}
+  <div
+    data-entry-drag
+    title={t.entryHint.dragHint}
+    class="flex items-center justify-between border-b border-border py-1 pr-1 pl-3 font-code text-[0.75rem] text-fg-muted select-none [@media(pointer:fine)]:cursor-grab [@media(pointer:fine)]:touch-none in-data-dragging:cursor-grabbing"
+  >
+    <span>{t.entryHint.label.toLowerCase()}</span>
+    <button
+      type="button"
+      data-entry-minimize
+      aria-label={t.entryHint.close}
+      aria-keyshortcuts="Escape"
+      class="grid size-7 cursor-pointer place-items-center rounded-md text-[1rem] leading-none transition-[color,background-color,scale] duration-150 hover:bg-accent/15 hover:text-accent active:scale-[0.92]"
+    >
+      <span aria-hidden="true">–</span>
+    </button>
+  </div>
+  <div class="p-1.5">
+    <button type="button" data-console-open class={ACTION}>
+      <span class="font-code text-accent" aria-hidden="true">&gt;_</span>
+      {t.entryHint.openConsole}
+      <kbd data-console-kbd class={`ml-auto ${KBD}`}>Ctrl K</kbd>
+    </button>
+    <a
+      href={pathForLanguage(otherLanguage)}
+      data-language-switch={otherLanguage}
+      hreflang={otherLanguage}
+      lang={otherLanguage}
+      class={ACTION}
+    >
+      <span class="font-code text-accent" aria-hidden="true">⇄</span>
+      {t.entryHint.otherLanguage}
+    </a>
+  </div>
+</aside>
+
+<button
+  type="button"
+  data-entry-launcher
+  hidden
+  aria-label={t.entryHint.open}
+  aria-controls="entry-hint"
+  aria-expanded="false"
+  class={`${CORNER} grid h-10 min-w-10 cursor-pointer place-items-center rounded-lg border panel px-3 font-code text-[0.85rem] text-accent opacity-0 shadow-card transition-[opacity,scale,background-color] duration-200 ease-out hover:bg-accent/15 active:scale-[0.94] data-open:opacity-100`}
+>
+  <span aria-hidden="true">&gt;_</span>
+</button>
+
+<script>
+  const SHOW_DELAY_MS = 500;
+  const EXIT_MS = 150;
+
+  const html = document.documentElement;
+  // Móvil: pantalla estrecha o pantalla táctil sin ratón. Ahí la ventana sale minimizada y no se puede mover.
+  const MOBILE = window.matchMedia("(max-width: 640px), (hover: none) and (pointer: coarse)");
+  const windowEl = document.querySelector<HTMLElement>("[data-entry-window]");
+  const launcher = document.querySelector<HTMLButtonElement>("[data-entry-launcher]");
+  const minimize = windowEl?.querySelector<HTMLButtonElement>("[data-entry-minimize]");
+
+  /** Quita `hidden` y, un fotograma después, pone `data-open` para que la entrada se anime. */
+  const show = (element: HTMLElement) => {
+    element.hidden = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => element.toggleAttribute("data-open", true)));
+  };
+  /** Quita `data-open` (salida animada) y vuelve a ocultar al terminar. */
+  const hide = (element: HTMLElement) => {
+    element.removeAttribute("data-open");
+    window.setTimeout(() => {
+      if (!element.hasAttribute("data-open")) element.hidden = true;
+    }, EXIT_MS);
+  };
+
+  /** Ejecuta `callback` cuando termine la pantalla de carga (<html data-boot>), o ya si no la hay. */
+  const afterBoot = (callback: () => void) => {
+    if (!html.hasAttribute("data-boot")) {
+      callback();
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      if (html.hasAttribute("data-boot")) return;
+      observer.disconnect();
+      callback();
+    });
+    observer.observe(html, { attributes: true, attributeFilter: ["data-boot"] });
+  };
+
+  if (windowEl && launcher && minimize) {
+    const openWindow = (focus: boolean) => {
+      hide(launcher);
+      launcher.setAttribute("aria-expanded", "true");
+      show(windowEl);
+      if (focus) minimize.focus({ preventScroll: true });
+    };
+
+    const closeWindow = (focus: boolean) => {
+      hide(windowEl);
+      launcher.setAttribute("aria-expanded", "false");
+      show(launcher);
+      if (focus) launcher.focus({ preventScroll: true });
+    };
+
+    minimize.addEventListener("click", () => closeWindow(true));
+    // Esc con el foco dentro de la ventana la minimiza (y el foco pasa al botón que la reabre).
+    windowEl.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      closeWindow(true);
+    });
+
+    // --- Mover la ventana -----------------------------------------------------------------------------
+    // Solo en escritorio (en móvil no se mueve). Se arrastra desde la barra de título, 1:1 con el puntero (con captura
+    // del puntero) y respetando el punto por donde se agarra. Se mueve con `translate` (compositor) y nunca sale de la
+    // pantalla. La posición no se recuerda: cada vez que se abre, sale en su esquina; doble clic en la barra también la
+    // devuelve a ella.
+    const dragHandle = windowEl.querySelector<HTMLElement>("[data-entry-drag]");
+    const MARGIN = 8;
+    let offset = { x: 0, y: 0 };
+    let dragStart: { x: number; y: number; offsetX: number; offsetY: number } | null = null;
+
+    const applyOffset = () => {
+      windowEl.style.translate = offset.x || offset.y ? `${offset.x}px ${offset.y}px` : "";
+    };
+    /** Vuelve a la posición por defecto (su esquina). */
+    const resetPosition = () => {
+      offset = { x: 0, y: 0 };
+      applyOffset();
+    };
+    /** Desplazamiento más cercano a (x, y) que deja la ventana entera dentro de la pantalla. */
+    const clampOffset = (x: number, y: number) => {
+      const rect = windowEl.getBoundingClientRect();
+      // Posición en su esquina = la medida menos el desplazamiento que ya tiene aplicado.
+      const baseLeft = rect.left - offset.x;
+      const baseTop = rect.top - offset.y;
+      const minX = MARGIN - baseLeft;
+      const maxX = window.innerWidth - MARGIN - (baseLeft + rect.width);
+      const minY = MARGIN - baseTop;
+      const maxY = window.innerHeight - MARGIN - (baseTop + rect.height);
+      return { x: Math.min(maxX, Math.max(minX, x)), y: Math.min(maxY, Math.max(minY, y)) };
+    };
+
+    if (dragHandle) {
+      dragHandle.addEventListener("pointerdown", (event) => {
+        if (MOBILE.matches || event.button !== 0) return;
+        if (event.target instanceof Element && event.target.closest("button")) return;
+        event.preventDefault();
+        dragHandle.setPointerCapture(event.pointerId);
+        dragStart = { x: event.clientX, y: event.clientY, offsetX: offset.x, offsetY: offset.y };
+        windowEl.toggleAttribute("data-dragging", true);
+      });
+      dragHandle.addEventListener("pointermove", (event) => {
+        if (!dragStart) return;
+        offset = clampOffset(
+          dragStart.offsetX + event.clientX - dragStart.x,
+          dragStart.offsetY + event.clientY - dragStart.y,
+        );
+        applyOffset();
+      });
+      const endDrag = () => {
+        if (!dragStart) return;
+        dragStart = null;
+        windowEl.removeAttribute("data-dragging");
+      };
+      dragHandle.addEventListener("pointerup", endDrag);
+      dragHandle.addEventListener("pointercancel", endDrag);
+      dragHandle.addEventListener("dblclick", (event) => {
+        if (MOBILE.matches || (event.target instanceof Element && event.target.closest("button"))) return;
+        resetPosition();
+      });
+    }
+
+    // Reabrirla desde el botón «>_» la saca siempre en su esquina, no donde se minimizó.
+    launcher.addEventListener("click", () => {
+      resetPosition();
+      openWindow(true);
+    });
+
+    // Si la pantalla cambia de tamaño (o se gira el móvil), la ventana vuelve a caber.
+    // En móvil vuelve siempre a su esquina.
+    window.addEventListener("resize", () => {
+      if (windowEl.hidden) return;
+      if (MOBILE.matches) resetPosition();
+      else {
+        offset = clampOffset(offset.x, offset.y);
+        applyOffset();
+      }
+    });
+
+    // Tras la pantalla de carga, sin robar el foco: en escritorio sale abierta en cada visita; en móvil, minimizada
+    // (solo el botón «>_» de la esquina, que la abre al tocarlo).
+    afterBoot(() =>
+      window.setTimeout(() => (MOBILE.matches ? closeWindow(false) : openWindow(false)), SHOW_DELAY_MS),
+    );
+  }
+</script>

@@ -54,8 +54,6 @@ export interface Messages {
     navLabel: string;
     openMenu: string;
     closeMenu: string;
-    /** Botón de la cabecera que abre la consola (Ctrl/⌘ + K). */
-    consoleLabel: string;
     /** Etiqueta accesible del selector, indexada por el idioma al que se cambia. */
     switchLanguage: Record<Language, string>;
   };
@@ -165,13 +163,22 @@ export interface Messages {
     /** Indicador junto al correo cuando `statusBar.available` es true. */
     available: string;
   };
+  /** Ventanita de atajos que sale al entrar: consola y cambio de idioma (ver components/ui/EntryHint.astro). */
+  entryHint: {
+    /** Nombre accesible del aviso. */
+    label: string;
+    openConsole: string;
+    /** Botón de la barra de título que minimiza la ventana. */
+    close: string;
+    /** Botón de la esquina que la vuelve a abrir. */
+    open: string;
+    /** Pista (title) de la barra de título: se arrastra para mover la ventana. */
+    dragHint: string;
+    /** El otro idioma, escrito en ese idioma («View in English» en la versión española). */
+    otherLanguage: string;
+  };
   footer: {
     label: string;
-    errors: (count: number) => string;
-    testsPassing: (count: string) => string;
-    available: string;
-    notFound: string;
-    notFoundLabel: string;
     console: string;
     consoleLabel: string;
     /** Nombre accesible del enlace para volver al inicio. */
